@@ -20,8 +20,9 @@ else
 fi
 
 # Add forwarding address to DNS
-ifconfig ${ROBOT_IFACE} | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'
-THIS_IP=$?
-ssh root@tiago-${TIAGO_NUM}c "addLocalDns -u \"${HOSTNAME}\" -i \"${THIS_IP}\""
+#echo $ROBOT_IFACE
+THIS_IP=`ifconfig ${ROBOT_IFACE} | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'`
+#echo ${THIS_IP}
 export ROS_IP=${THIS_IP}
+ssh root@tiago-${TIAGO_NUM}c "addLocalDns -u \"${HOSTNAME}\" -i \"${THIS_IP}\""
 
