@@ -1,0 +1,4 @@
+<VLP-16 parent="torso_lift_link" name="velodyne" topic="/velodyne_points">
+      <!-- The 0.2 will most likely have to be adjusted to fit -->
+      <origin xyz="0 0 0.3" rpy="0 0 0" />
+  </VLP-16>

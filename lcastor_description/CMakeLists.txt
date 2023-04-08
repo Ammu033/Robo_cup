@@ -9,7 +9,6 @@ project(lcastor_description)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   tiago_description
-  velodyne_simulator_description
   velodyne_description
   velodyne_gazebo_plugins
 )

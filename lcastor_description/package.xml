@@ -51,12 +51,10 @@
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>tiago_description</build_depend>
   <build_depend>velodyne_description</build_depend>
-  <build_depend>velodyne_simulator</build_depend>
   <build_depend>velodyne_gazebo_plugins</build_depend>
   <build_export_depend>tiago_description</build_export_depend>
   <exec_depend>tiago_description</exec_depend>
   <exec_depend>velodyne_description</exec_depend>
-  <exec_depend>velodyne_simulator</exec_depend>
   <exec_depend>velodyne_gazebo_plugins</exec_depend>
 
 

@@ -28,6 +28,8 @@
     <xacro:arg name="namespace" default=""/>
     <xacro:arg name="no_safety_eps" default="false"/>
     <xacro:arg name="base_type" default="pmb2"/> <!-- pmb2, omni_base -->
+    <xacro:arg name="organize_cloud" default="true"/>
+    <xacro:arg name="gpu" default="true"/>
     <xacro:property name="wrist_model" value="$(arg wrist_model)" />
     <xacro:property name="end_effector" value="$(arg end_effector)" />
     <xacro:property name="ft_sensor" value="$(arg ft_sensor)" />
@@ -97,6 +99,9 @@
   <!-- Generic simulator_gazebo plugins -->
   <xacro:include filename="$(find tiago_description)/gazebo/gazebo.urdf.xacro" />
 
+  <!-- Velodyne VLP-16 -->
+  <xacro:include filename="$(find velodyne_description)/urdf/VLP-16.urdf.xacro"/>
+
   <!-- Now we can start using the macros included above to define the actual robot -->
   <xacro:if value="${base_type == 'pmb2'}">
     <xacro:base_sensors name="base" laser_model="$(arg laser_model)" sonars="true" microphone="true"/>
@@ -153,7 +158,8 @@
   </link>
 
   <!-- VLP-16 velodyne -->
-  <xacro:include filename="$(find velodyne_description)/urdf/VLP-16.urdf.xacro" />
-  <xacro:velodyne name="velodyne" parent="torso_lift_link" origin="0 0 0.30 0 0 0"/>
+  <xacro:VLP-16 parent="torso_lift_link" name="velodyne" topic="/velodyne_points" hz="10" gpu="true" >
+    <origin xyz="0 0 0.3" rpy="0 0 0" />
+  </xacro:VLP-16>
 
 </robot>

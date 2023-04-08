@@ -38,7 +38,7 @@
   -->
 
   <!-- Robot model -->
-  <include file="$(find lcastor_description)/robots/upload.launch">
+  <include file="$(find lcastor_description)/launch/upload.launch">
     <arg name="arm" value="$(arg arm)"/>
     <arg name="end_effector" value="$(arg end_effector)"/>
     <arg name="ft_sensor" value="$(arg ft_sensor)"/>
