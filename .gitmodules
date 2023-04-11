@@ -1,0 +1,3 @@
+[submodule "lcastor_perception"]
+	path = lcastor_perception
+	url = https://github.com/Melanoneiro/lcastor_perception.git
