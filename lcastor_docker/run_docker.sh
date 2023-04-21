@@ -10,4 +10,5 @@ docker run --network host \
            -e ROS_IP=${ROS_IP} \
            --name "${image_name/:/-}" \
            --rm \
-           -it ${image_name}
+           -it ${image_name} \
+           bash -c "echo ciao & /bin/bash"

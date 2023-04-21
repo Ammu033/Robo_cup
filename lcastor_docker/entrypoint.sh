@@ -17,7 +17,9 @@ echo " "
   echo "Container is now running."
   echo " "
 
-  /bin/bash
+   catkin build
+   source /ros_ws/devel/setup.bash
+   /bin/bash
 
 } || {
 

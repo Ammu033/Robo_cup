@@ -24,7 +24,7 @@ RUN DEBIAN_FRONTEND=noninteractive pip install tmule
 RUN pip3 install tensorflow tensorflow-hub
 
 # Create entrypoint for image
-WORKDIR /
+WORKDIR /ros_ws
 COPY entrypoint.sh .
 ENTRYPOINT ["/bin/bash", "entrypoint.sh"]
 
