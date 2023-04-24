@@ -20,8 +20,8 @@ init_cmd: |
   source "/opt/ros/$(rosversion -d)/setup.bash"
 
   # source the lcastor catkin workspace
-  export_default CATKIN_WORKSPACE "/tiago_public_ws"
-  source "$CATKIN_WORKSPACE/devel/setup.bash"
+  # export_default CATKIN_WORKSPACE "/tiago_public_ws"
+  source "$HOME/.bashrc"
 
   # robot specific arguments
   export_default TIAGO_EE "pal-gripper"

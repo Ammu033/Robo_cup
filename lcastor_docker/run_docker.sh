@@ -4,11 +4,15 @@ image_name=lcastor_base
 
 echo "Starting docker container..."
 docker run --network host \
-           -v $(dirname "$0")/../:/ros_ws/src/LCASTOR \
            --gpus all \
-           -e ROS_MASTER_URI=${ROS_MASTER_URI} \
-           -e ROS_IP=${ROS_IP} \
+           --env="NVIDIA_DRIVER_CAPABILITIES=all" \
+           --env="DISPLAY" \
+           --env="QT_X11_NO_MITSHM=1" \
+           -v $(dirname "$0")/../:/ros_ws/src/LCASTOR \
+           -v /dev/dri:/dev/dri \
            --name "${image_name/:/-}" \
            --rm \
-           -it ${image_name} \
-           bash -c "echo ciao & /bin/bash"
+           -it ${image_name}
+        #    -e ROS_MASTER_URI=${ROS_MASTER_URI} \
+        #    -e ROS_IP=${ROS_IP} \ 
+        #    bash -c "echo ciao & /bin/bash"
