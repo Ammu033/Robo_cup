@@ -1,6 +1,6 @@
 #!/bin/bash
 
-image_name=lcastor_base
+image_name=lcas.lincoln.ac.uk/lcastor/lcastor_base
 
 xhost +
 
@@ -13,9 +13,9 @@ docker run --privileged --network host \
            --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
            -v $(pwd)/../:/ros_ws/src/LCASTOR \
            -v /dev/dri:/dev/dri \
-           --name "${image_name/:/-}" \
            --rm \
            -it ${image_name}
+           #--name "${image_name/:/-}" \
         #    -e ROS_MASTER_URI=${ROS_MASTER_URI} \
         #    -e ROS_IP=${ROS_IP} \ 
         #    bash -c "echo ciao & /bin/bash"

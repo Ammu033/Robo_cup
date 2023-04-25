@@ -42,3 +42,5 @@ RUN DEBIAN_FRONTEND=noninteractive rosdep install -y --from-paths /ros_ws/src --
 RUN cd /ros_ws; . /opt/ros/${ROS_DISTRO}/setup.sh; catkin build
 RUN echo "source /ros_ws/devel/setup.bash" >> ~/.bashrc
 
+# Install net-tools
+RUN DEBIAN_FRONTEND=noninteractive apt install -y net-tools
