@@ -13,12 +13,12 @@ RUN dpkg-reconfigure locales
 # Install ROS
 RUN rm /etc/apt/sources.list.d/* && \
     DEBIAN_FRONTEND=noninteractive apt update --no-install-recommends && \
-    DEBIAN_FRONTEND=noninteractive apt install -y software-properties-common lsb-release curl wget apt-transport-https git tmux nano htop --no-install-recommends
+    DEBIAN_FRONTEND=noninteractive apt install -y software-properties-common lsb-release curl wget apt-transport-https git tmux nano htop net-tools --no-install-recommends
 RUN rm -rf /var/lib/apt/lists/* && \
     echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list && \
     apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
 RUN DEBIAN_FRONTEND=noninteractive apt update && \
-    DEBIAN_FRONTEND=noninteractive apt install -y ros-${ROS_DISTRO}-catkin ros-${ROS_DISTRO}-ros-base ros-${ROS_DISTRO}-vision-msgs ros-${ROS_DISTRO}-cv-bridge python3-catkin-tools python3-venv python3-pip python3-rosdep python3-rosinstall --no-install-recommends && \
+    DEBIAN_FRONTEND=noninteractive apt install -y ros-${ROS_DISTRO}-catkin ros-${ROS_DISTRO}-ros-base ros-${ROS_DISTRO}-vision-msgs ros-${ROS_DISTRO}-cv-bridge python3-catkin-tools python3-venv python3-pip python3-rosdep python3-rosinstall python-is-python3 --no-install-recommends && \
     rosdep init && rosdep update
 RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
 
@@ -27,11 +27,6 @@ RUN DEBIAN_FRONTEND=noninteractive pip install tmule
 
 # Install Tensorflow
 RUN pip3 install tensorflow tensorflow-hub
-
-# Create entrypoint for image
-WORKDIR /ros_ws
-COPY entrypoint.sh .
-ENTRYPOINT ["/bin/bash", "entrypoint.sh"]
 
 
 # Clone TIAGo dependencies
@@ -42,5 +37,8 @@ RUN DEBIAN_FRONTEND=noninteractive rosdep install -y --from-paths /ros_ws/src --
 RUN cd /ros_ws; . /opt/ros/${ROS_DISTRO}/setup.sh; catkin build
 RUN echo "source /ros_ws/devel/setup.bash" >> ~/.bashrc
 
-# Install net-tools
-RUN DEBIAN_FRONTEND=noninteractive apt install -y net-tools
+# Create entrypoint for image
+WORKDIR /ros_ws
+COPY entrypoint.sh .
+ENTRYPOINT ["/bin/bash", "entrypoint.sh"]
+
