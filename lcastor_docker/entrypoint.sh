@@ -18,7 +18,7 @@ echo " "
   echo " "
 
    catkin build
-   source /ros_ws/devel/setup.bash
+   source /home/lcastor/ros_ws/devel/setup.bash
    /bin/bash
 
 } || {

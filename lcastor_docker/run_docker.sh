@@ -11,10 +11,10 @@ docker run --privileged --network host \
            --env="DISPLAY=$DISPLAY" \
            --env="QT_X11_NO_MITSHM=1" \
            --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
-           -v $(pwd)/../:/ros_ws/src/LCASTOR \
+           -v $(pwd)/../:/home/lcastor/ros_ws/src/LCASTOR \
            -v /dev/dri:/dev/dri \
            --rm \
-           -it ${image_name} 
+           -it ${image_name}  
            #--name "${image_name/:/-}" \
         #    -e ROS_MASTER_URI=${ROS_MASTER_URI} \
         #    -e ROS_IP=${ROS_IP} \ 
