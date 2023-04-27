@@ -1,7 +1,9 @@
 #!/bin/bash
 
 set -e
-source "/opt/ros/noetic/setup.bash"
+
+# setup environment
+source "$HOME/.bashrc"
 
 echo " "
 echo "###"
@@ -15,8 +17,10 @@ echo " "
   echo "Container is now running."
   echo " "
 
-  /bin/bash
-  
+   catkin build
+   source /home/lcastor/ros_ws/devel/setup.bash
+   /bin/bash
+
 } || {
 
   echo "Container failed."
