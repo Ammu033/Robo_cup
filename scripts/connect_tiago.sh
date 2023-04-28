@@ -10,7 +10,7 @@ ROBOT_IFACE=$2
 #echo $ROBOT_IFACE
 
 # Change ROS Master
-export ROS_MASTER_URI=http://tiago-${TIAGO_NUM}c:11311
+export ROS_MASTER_URI=http://192.168.1.${TIAGO_NUM}:11311
 rostopic list &>/dev/null
 RETVAL=$?
 if [ $RETVAL -ne 0 ]; then
@@ -24,5 +24,5 @@ fi
 THIS_IP=`ifconfig ${ROBOT_IFACE} | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'`
 #echo ${THIS_IP}
 export ROS_IP=${THIS_IP}
-ssh root@tiago-${TIAGO_NUM}c "addLocalDns -u \"${HOSTNAME}\" -i \"${THIS_IP}\""
+sshpass -p "palroot" ssh root@192.168.1.${TIAGO_NUM} "addLocalDns -u \"${HOSTNAME}\" -i \"${THIS_IP}\""
 
