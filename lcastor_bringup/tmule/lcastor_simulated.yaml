@@ -54,7 +54,6 @@ windows:
     tags: ['nav']
     panes:
       - 'roslaunch tiago_2dnav_gazebo navigation.launch public_sim:=true global_planner:=$GLOBAL_PLANNER local_planner:=$LOCAL_PLANNER localization:=$LOCALIZATION config_base_path:=$CONFIG_BASE_PATH map:=$MAP rgbd_sensors:=$RGBD_SENSORS laser_model:=$LASER_MODEL base_type:=$BASE_TYPE'
-      - 'roslaunch tiago_laser_sensors rgbd_cloud_laser.launch cloud:=/xtion/depth_registered/points'
   - name: rviz
     tags: ['viz']
     panes:
