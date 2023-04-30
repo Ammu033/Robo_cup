@@ -33,7 +33,7 @@ jobs:
         context: .
         file: ./lcastor_docker/Dockerfile
         platforms: linux/amd64
-        push: ${{ github.event_name != 'pull_request' }}
+        push: true # ${{ github.event_name != 'pull_request' }}
         tags: lcas.lincoln.ac.uk/lcastor/lcastor_base:latest
 #         run: docker build --file ./lcastor_docker/Dockerfile --tag lcas.lincoln.ac.uk/lcastor/lcastor_base:latest
         build-args: |
