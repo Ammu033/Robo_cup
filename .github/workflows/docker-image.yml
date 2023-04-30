@@ -31,10 +31,11 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         context: .
-#        file: ./lcastor_docker/build_docker.sh
+        file: ./lcastor_docker/Dockerfile
         platforms: linux/amd64
         push: ${{ github.event_name != 'pull_request' }}
         tags: lcas.lincoln.ac.uk/lcastor/lcastor_base:latest
-        run: docker build --file ./lcastor_docker/Dockerfile --build-arg UID=1001 --build-arg GID=1001 --tag lcas.lincoln.ac.uk/lcastor/lcastor_base:latest
-#         build-args: |
-#             BRANCH=${{ env.BRANCH }}
+#         run: docker build --file ./lcastor_docker/Dockerfile --tag lcas.lincoln.ac.uk/lcastor/lcastor_base:latest
+        build-args: |
+            UID=1001
+            GID=1001
