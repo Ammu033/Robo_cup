@@ -35,6 +35,6 @@ jobs:
         platforms: linux/amd64
         push: ${{ github.event_name != 'pull_request' }}
         tags: lcas.lincoln.ac.uk/lcastor/lcastor_base:latest
-        run: docker build . --file Dockerfile --build-arg UID=1001 --build-arg GID=1001 --tag lcas.lincoln.ac.uk/lcastor/lcastor_base:latest
+        run: docker build --file ./lcastor_docker/Dockerfile --build-arg UID=1001 --build-arg GID=1001 --tag lcas.lincoln.ac.uk/lcastor/lcastor_base:latest
 #         build-args: |
 #             BRANCH=${{ env.BRANCH }}
