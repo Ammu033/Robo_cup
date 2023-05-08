@@ -53,4 +53,4 @@ RUN cd /home/lcastor/ros_ws; . /opt/ros/${ROS_DISTRO}/setup.sh; catkin build
 # Create entrypoint for image
 # COPY entrypoint.sh .
 ENTRYPOINT ["/bin/bash", "/home/lcastor/ros_ws/src/LCASTOR/lcastor_docker/entrypoint.sh"]
-
+RUN DEBIAN_FRONTEND=noninteractive apt install -y ros-${ROS_DISTRO}-velodyne-*

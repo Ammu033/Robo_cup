@@ -28,8 +28,6 @@
     <xacro:arg name="namespace" default=""/>
     <xacro:arg name="no_safety_eps" default="false"/>
     <xacro:arg name="base_type" default="pmb2"/> <!-- pmb2, omni_base -->
-    <xacro:arg name="organize_cloud" default="true"/>
-    <xacro:arg name="gpu" default="true"/>
     <xacro:property name="wrist_model" value="$(arg wrist_model)" />
     <xacro:property name="end_effector" value="$(arg end_effector)" />
     <xacro:property name="ft_sensor" value="$(arg ft_sensor)" />
