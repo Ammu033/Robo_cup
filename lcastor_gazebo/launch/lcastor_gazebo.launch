@@ -5,10 +5,8 @@
   <!--deprecated argument, you should specify the parameters below-->
   <!-- They are described in tiago.urdf.xacro -->
   <arg name="robot"  default="titanium"/>
-  <!-- <arg name="arm"  default="$(eval {'iron': False}.get(arg('robot'), True))"/>
-  <arg name="end_effector"  default="$(eval {'iron': 'false', 'steel': 'pal-gripper', 'titanium': 'pal-hey5'}.get(arg('robot'), 'pal-gripper'))"/> -->
-  <arg name="arm" default="false"/>
-  <arg name="end_effector" default="false"/>
+  <arg name="arm"  default="$(eval {'iron': False}.get(arg('robot'), True))"/>
+  <arg name="end_effector"  default="$(eval {'iron': 'false', 'steel': 'pal-gripper', 'titanium': 'pal-hey5'}.get(arg('robot'), 'pal-gripper'))"/>
   <arg name="ft_sensor"  default="$(eval {'titanium': 'schunk-ft'}.get(arg('robot'), 'false'))"/>
   <arg name="laser_model"  default="sick-571"/>
   <arg name="camera_model"  default="orbbec-astra"/>
@@ -16,7 +14,7 @@
   <arg name="gzpose" default="-x 0.0 -y 0.0 -z 0.0 -R 0.0 -P 0.0 -Y 0.0"/>
   <arg name="gui" default="true"/>
   <arg name="debug" default="false"/>
-  <arg name="public_sim" default="true"/>
+  <arg name="public_sim" default="false"/>
   <arg name="tuck_arm" default="true"/>
   <arg name="recording" default="false"/>
   <arg name="extra_gazebo_args" default=""/>
@@ -24,7 +22,6 @@
   <arg name="use_dynamic_footprint" default="false"/>
   <arg name="base_type" default="pmb2"/>
   <arg name="advanced_grasping" default="false"/> <!-- Requires extra software from PAL Robotics -->
-  <arg name="3d_mapping" default="true"/>
 
   <env name="LC_NUMERIC" value="C" />
 

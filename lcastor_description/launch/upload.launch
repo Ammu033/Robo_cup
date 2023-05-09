@@ -14,7 +14,7 @@
   <!-- Robot description -->
   <param name="$(arg robot_description)"
     command="rosrun xacro xacro --inorder
-    '$(find lcastor_description)/robots/tiago-029.urdf.xacro'
+    '$(find lcastor_description)/robots/tiago.urdf.xacro'
     arm:=$(arg arm)
     wrist_model:=$(arg wrist_model)
     end_effector:=$(arg end_effector)

@@ -98,7 +98,7 @@
   <xacro:include filename="$(find tiago_description)/gazebo/gazebo.urdf.xacro" />
 
   <!-- Velodyne VLP-16 -->
-  <xacro:include filename="$(find velodyne_description)/urdf/VLP-16.urdf.xacro"/>
+  <xacro:include filename="$(find lcastor_description)/urdf/VLP-16.urdf.xacro"/>
 
   <!-- Now we can start using the macros included above to define the actual robot -->
   <xacro:if value="${base_type == 'pmb2'}">
@@ -156,7 +156,7 @@
   </link>
 
   <!-- VLP-16 velodyne -->
-  <xacro:VLP-16 parent="torso_lift_link" name="velodyne" topic="/velodyne_points" hz="10" gpu="true" >
+  <xacro:VLP-16 parent="torso_lift_link" name="velodyne" gpu="true" >
     <origin xyz="0 0 0.3" rpy="0 0 0" />
   </xacro:VLP-16>
 
