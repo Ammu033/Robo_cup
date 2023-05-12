@@ -7,7 +7,6 @@ Panels:
         - /Robot1
         - /Planning1/Base1/Global1
         - /Planning1/Base1/Global1/Plan1
-        - /Localization1
         - /Mapping1/Map1
       Splitter Ratio: 0.4197138249874115
     Tree Height: 1175
@@ -945,6 +944,14 @@ Visualization Manager:
             map: true
           Queue Size: 100
           Value: true
+        - Class: rviz/MarkerArray
+          Enabled: true
+          Marker Topic: /head/occupied_cells_vis_array
+          Name: HeadOctomap
+          Namespaces:
+            map: true
+          Queue Size: 100
+          Value: true
       Enabled: true
       Name: Mapping
     - Class: rviz/Camera
@@ -969,6 +976,7 @@ Visualization Manager:
           Pose Graph: true
           Value: true
         Mapping:
+          HeadOctomap: true
           Map: true
           Map (with Virtual Obstacles): true
           OctoMap: true
@@ -1048,7 +1056,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 20.926403045654297
+      Distance: 12.368755340576172
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -1056,17 +1064,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: -0.08696489781141281
-        Y: -4.414169788360596
-        Z: -1.2779300212860107
+        X: -1.0156618356704712
+        Y: -5.506145000457764
+        Z: -0.28012770414352417
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.6998008489608765
+      Pitch: 0.6398006677627563
       Target Frame: <Fixed Frame>
-      Yaw: 1.0691137313842773
+      Yaw: 0.7491187453269958
     Saved: ~
 Window Geometry:
   Displays:

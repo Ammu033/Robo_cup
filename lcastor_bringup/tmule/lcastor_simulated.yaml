@@ -54,10 +54,15 @@ windows:
     tags: ['nav']
     panes:
       - 'roslaunch tiago_2dnav_gazebo navigation.launch public_sim:=true global_planner:=$GLOBAL_PLANNER local_planner:=$LOCAL_PLANNER localization:=$LOCALIZATION config_base_path:=$CONFIG_BASE_PATH map:=$MAP rgbd_sensors:=$RGBD_SENSORS laser_model:=$LASER_MODEL base_type:=$BASE_TYPE'
-  - name: mapping
-    tags: ['map']
+  - name: nav_octomap
+    tags: ['nav_oct']
     panes: 
       - 'roslaunch lcastor_navigation lcastor_octomap.launch'
+  - name: man_octomap
+    tags: ['man_oct']
+    panes: 
+      - 'rosparam load `rospack find tiago_moveit_tutorial`/config/tiago_octomap_motions.yaml; rosrun topic_tools throttle messages /xtion/depth_registered/points 2  /head_filtered_points'
+      - 'roslaunch lcastor_navigation lcastor_head_octomap.launch'
   - name: rviz
     tags: ['viz']
     panes:
