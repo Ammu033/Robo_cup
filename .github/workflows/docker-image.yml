@@ -31,7 +31,7 @@ jobs:
       id: pr-labels
       uses: joerick/pr-labels-action@v1.0.8
     - name: Debug echo
-      run: echo "steps.pr-labels.outputs.labels is ${{ steps.pr-labels.outputs.labels }} ${{ contains(steps.pr-labels.outputs.labels, ' docker-build ') }}, github.event.label.name is ${{ github.event.label.name }} and github.event_name is ${{ github.event_name }} and env.BRANCH is ${{ env.BRANCH }}"
+      run: echo "github.head_ref is ${{ github.head_ref }}, steps.pr-labels.outputs.labels is ${{ steps.pr-labels.outputs.labels }} ${{ contains(steps.pr-labels.outputs.labels, ' docker-build ') }}, github.event.label.name is ${{ github.event.label.name }} and github.event_name is ${{ github.event_name }} and env.BRANCH is ${{ env.BRANCH }}"
     - name: Build and push noetic on focal docker-build PR
       if: ${{ contains(steps.pr-labels.outputs.labels, ' docker-build ') && github.event_name == 'pull_request' }}
       uses: docker/build-push-action@v2
@@ -40,7 +40,7 @@ jobs:
         file: ./lcastor_docker/Dockerfile
         platforms: linux/amd64
         push: true
-        tags: lcas.lincoln.ac.uk/lcastor/lcastor_base:${{ env.BRANCH }}
+        tags: lcas.lincoln.ac.uk/lcastor/lcastor_base:${{ github.head_ref }}
 #         run: docker build --file ./lcastor_docker/Dockerfile --tag lcas.lincoln.ac.uk/lcastor/lcastor_base:latest
         build-args: |
             UID=1001
