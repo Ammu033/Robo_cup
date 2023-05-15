@@ -9,9 +9,7 @@ on:
     paths: ['lcastor_docker/Dockerfile']
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -29,7 +27,21 @@ jobs:
         username: ${{ secrets.LCAS_REGISTRY_PUSHER }}
         # Password or personal access token used to log against the Docker registry
         password: ${{ secrets.LCAS_REGISTRY_TOKEN }}
-    - name: Build and push noetic on focal
+    - name: Build and push noetic on focal docker-build PR
+      if: ${{ github.event.label.name == 'docker-build' && github.event_name == 'pull_request' }}
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        file: ./lcastor_docker/Dockerfile
+        platforms: linux/amd64
+        push: true
+        tags: lcas.lincoln.ac.uk/lcastor/lcastor_base:${{ env.BRANCH }}
+#         run: docker build --file ./lcastor_docker/Dockerfile --tag lcas.lincoln.ac.uk/lcastor/lcastor_base:latest
+        build-args: |
+            UID=1001
+            GID=1001
+    - name: Build and push noetic on focal 
+      if: ${{ github.event.label.name != 'docker-build' }}
       uses: docker/build-push-action@v2
       with:
         context: .
