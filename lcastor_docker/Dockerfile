@@ -70,3 +70,5 @@ RUN cd /home/lcastor/ros_ws; . /opt/ros/${ROS_DISTRO}/setup.sh; catkin build
 # COPY entrypoint.sh .
 ENTRYPOINT ["/bin/bash", "/home/lcastor/ros_ws/src/LCASTOR/lcastor_docker/entrypoint.sh"]
 
+
+
