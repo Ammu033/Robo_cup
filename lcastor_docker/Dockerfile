@@ -49,6 +49,7 @@ RUN chmod 755 /home/lcastor/ros_ws
 RUN echo "source /home/lcastor/ros_ws/devel/setup.bash" >> /home/lcastor/.bashrc
 USER $UNAME
 RUN cd /home/lcastor/ros_ws; . /opt/ros/${ROS_DISTRO}/setup.sh; catkin build
+USER root
 
 # Create entrypoint for image
 # COPY entrypoint.sh .

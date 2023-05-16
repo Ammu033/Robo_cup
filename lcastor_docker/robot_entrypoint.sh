@@ -17,6 +17,11 @@ echo " "
 
 {
 
+  echo "10.8.0.102 tiago-29c" >> /etc/hosts
+  echo "10.8.0.106 tiago-89c" >> /etc/hosts
+  echo "10.8.0.105 tiago-125c" >> /etc/hosts
+  su-exec lcastor "$@"
+
   echo "Container is now running."
   echo " "
   if [ -z "$ROBOT_NUM" ]; then

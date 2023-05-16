@@ -5,12 +5,11 @@
 
 
 TIAGO_NUM=$1
-# ROBOT_IFACE=$2
 #echo $TIAGO_NUM
 #echo $ROBOT_IFACE
 
 # Change ROS Master
-ROS_MASTER=192.168.1.${TIAGO_NUM}
+export ROS_MASTER=192.168.1.${TIAGO_NUM}
 export ROS_MASTER_URI=http://${ROS_MASTER}:11311
 rostopic list &>/dev/null
 RETVAL=$?
@@ -27,5 +26,5 @@ THIS_IP=`ip route get ${ROS_MASTER} | grep "src" | sed 's/.*src \([0-9\.]*\).*/\
 export ROS_HOSTNAME=${THIS_IP}
 export ROS_IP=${THIS_IP}
 
-sshpass -p "palroot" ssh root@192.168.1.${TIAGO_NUM} "addLocalDns -u \"${HOSTNAME}\" -i \"${THIS_IP}\""
+sshpass -p "palroot" ssh root@${ROS_MASTER} "addLocalDns -u \"${HOSTNAME}\" -i \"${THIS_IP}\""
 
