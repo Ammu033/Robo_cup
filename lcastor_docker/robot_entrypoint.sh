@@ -20,7 +20,6 @@ echo " "
   echo "10.8.0.102 tiago-29c" >> /etc/hosts
   echo "10.8.0.106 tiago-89c" >> /etc/hosts
   echo "10.8.0.105 tiago-125c" >> /etc/hosts
-  su-exec lcastor "$@"
 
   echo "Container is now running."
   echo " "
@@ -34,11 +33,11 @@ echo " "
   else
     echo "It will connect to tiago ${ROBOT_NUM} via ${IFACE} "
   fi 
-
-   echo "source /home/lcastor/ros_ws/src/LCASTOR/scripts/connect_tiago.sh ${ROBOT_NUM} ${IFACE}" >> /home/lcastor/.bashrc
-   catkin build
-   source /home/lcastor/ros_ws/devel/setup.bash
-   /bin/bash
+  
+  echo "source /home/lcastor/ros_ws/src/LCASTOR/scripts/connect_tiago.sh ${ROBOT_NUM} ${IFACE}" >> /home/lcastor/.bashrc
+  catkin build
+  source /home/lcastor/ros_ws/devel/setup.bash
+  exec su lcastor 
    
 
 } || {
