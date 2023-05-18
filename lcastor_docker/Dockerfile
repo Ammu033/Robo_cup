@@ -13,7 +13,7 @@ RUN dpkg-reconfigure locales
 # Install ROS
 RUN rm /etc/apt/sources.list.d/* && \
     DEBIAN_FRONTEND=noninteractive apt update --no-install-recommends && \
-    DEBIAN_FRONTEND=noninteractive apt install -y software-properties-common lsb-release curl wget apt-transport-https git tmux nano htop net-tools iputils-ping sshpass --no-install-recommends
+    DEBIAN_FRONTEND=noninteractive apt install -y software-properties-common lsb-release curl wget apt-transport-https git tmux nano htop net-tools iputils-ping sshpass iproute2 --no-install-recommends
 RUN rm -rf /var/lib/apt/lists/* && \
     echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list && \
     apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
@@ -65,6 +65,7 @@ RUN echo "export PNP_HOME=/home/lcastor/ros_ws/src/pnp_ros/" >> /home/lcastor/.b
 
 # build ros ws
 RUN cd /home/lcastor/ros_ws; . /opt/ros/${ROS_DISTRO}/setup.sh; catkin build
+USER root
 
 # Create entrypoint for image
 # COPY entrypoint.sh .
