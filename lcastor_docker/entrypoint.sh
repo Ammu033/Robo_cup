@@ -20,6 +20,7 @@ echo " "
    catkin build
    source /home/lcastor/ros_ws/devel/setup.bash
    /bin/bash
+   exec su lcastor
 
 } || {
 

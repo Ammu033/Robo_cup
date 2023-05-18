@@ -14,6 +14,7 @@ docker run --privileged --network host \
            -v $(pwd)/../:/home/lcastor/ros_ws/src/LCASTOR \
            -v /dev/dri:/dev/dri \
            --rm \
+           --entrypoint /home/lcastor/ros_ws/src/LCASTOR/lcastor_docker/entrypoint.sh \
            -it ${image_name}  
            #--name "${image_name/:/-}" \
         #    -e ROS_MASTER_URI=${ROS_MASTER_URI} \
