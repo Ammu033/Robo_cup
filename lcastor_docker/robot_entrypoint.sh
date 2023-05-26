@@ -1,7 +1,6 @@
 #!/bin/bash
 
 ROBOT_NUM=$1
-#IFACE=$2
 
 set -e
 
@@ -36,7 +35,7 @@ echo " "
    echo "source /home/lcastor/ros_ws/src/LCASTOR/scripts/connect_tiago.sh ${ROBOT_NUM}" >> /home/lcastor/.bashrc
    catkin build
    source /home/lcastor/ros_ws/devel/setup.bash
-  exec su lcastor 
+   exec su lcastor 
   
    
 
