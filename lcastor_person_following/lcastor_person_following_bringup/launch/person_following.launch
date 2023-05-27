@@ -7,7 +7,7 @@
   <arg name="des_dist"  default="0.75" />
  
   <!-- Bayes Tracker -->
-  <include file="$(find tiago_tracker_bringup)/launch/tiago_tracker.launch" />
+  <include file="$(find lcastor_tracker_bringup)/launch/people_tracker.launch" />
 
   <!-- Person detection rosnode -->
   <node name="lcastor_person_detection" pkg="lcastor_person_detection" type="person_detection.py" >
@@ -19,5 +19,8 @@
   <node name="lcastor_person_following" pkg="lcastor_person_following" type="person_following.py" >
     <param name="des_dist" value="$(arg des_dist)" /> 
   </node>
+
+  <!-- rviz -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find lcastor_tracker_bringup)/launch/people_tracker.rviz -f map"/>
 
 </launch>

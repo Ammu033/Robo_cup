@@ -4,16 +4,36 @@ import rospy
 from people_msgs.msg import People
 from geometry_msgs.msg import PoseWithCovarianceStamped, Pose2D
 from std_msgs.msg import String
-
 import tf
 import math
+import actionlib
+from pal_interaction_msgs.msg import TtsActionGoal, TtsAction, TtsGoal
 
-NODE_NAME = 'person_detection'
+
+
+NODE_NAME = 'lcastor_person_detection'
 NODE_RATE = 100 # [Hz]
-FIELD_OF_VIEW = 60 # [°]
-DIST_THRESH = 3 # [m]
-# FIELD_OF_VIEW = str(rospy.get_param("/person_detection/field_of_view"))
-# DIST_THRESH = str(rospy.get_param("/person_detection/dist_threshold"))
+# FIELD_OF_VIEW = 60 # [°]
+# DIST_THRESH = 3 # [m]
+FIELD_OF_VIEW = str(rospy.get_param("/lcastor_person_detection/field_of_view"))
+DIST_THRESH = str(rospy.get_param("/lcastor_person_detection/dist_threshold"))
+
+
+
+def speak(msg):
+    ac = actionlib.SimpleActionClient("/tts", TtsAction)
+    rospy.loginfo("Connecting to /tts AS...")
+    ac.wait_for_server()
+    rospy.loginfo("Connected.")
+
+    # create goal
+    goal = TtsActionGoal()
+    # goal.goal.rawtext.text = " ".join(msg)
+    goal.goal.rawtext.text = msg
+    goal.goal.rawtext.lang_id = "en_GB"
+
+    # send goal
+    ac.send_goal(goal.goal)
 
 
 def wrapToPi(angle):
@@ -46,13 +66,16 @@ class PersonDetector():
         self.robot_pose = Pose2D()
         self.personID_to_follow = None
         
+        speak("Can any of you stand in front of me please?")
+
         # Robot pose subscriber
         self.sub_robot_pos = rospy.Subscriber('/robot_pose', PoseWithCovarianceStamped, callback = self.cb_robot_pose)
         
         # People subscriber
         self.sub_person_pos = rospy.Subscriber('/people_tracker/people', People, callback = self.cb_people)
         
-        self.pub_personID_to_follow = rospy.Publisher('/person_to_follow', String, queue_size=10)
+        # Person to follow publisher
+        self.pub_personID_to_follow = rospy.Publisher('/person_to_follow', String, queue_size = 10)
 
         
         
@@ -125,5 +148,9 @@ if __name__ == '__main__':
     rate = rospy.Rate(NODE_RATE)
     
     person_detector = PersonDetector()
-        
-    rospy.spin()
+    
+    while not rospy.is_shutdown():
+        if person_detector.personID_to_follow is None and (rospy.Time.now() - last_speak > 10): 
+            last_speak = rospy.Time.now()
+            speak("No person to follow detected")
+        rate.sleep()
