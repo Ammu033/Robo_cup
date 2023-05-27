@@ -10,7 +10,7 @@
   <include file="$(find lcastor_tracker_bringup)/launch/people_tracker.launch" />
 
   <!-- Person detection rosnode -->
-  <node name="lcastor_person_detection" pkg="lcastor_person_detection" type="person_detection.py" >
+  <node name="lcastor_person_detection" pkg="lcastor_person_detection" type="person_detection2.py" >
     <param name="field_of_view" value="$(arg field_of_view)" /> 
     <param name="dist_threshold" value="$(arg dist_threshold)" /> 
   </node>

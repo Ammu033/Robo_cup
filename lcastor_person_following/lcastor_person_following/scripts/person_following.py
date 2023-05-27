@@ -79,7 +79,7 @@ class PersonFollowing():
             # If the old person ID is not detected anymore, self.personID_to_follow is updated -> the robot will follow the new person
             self.personID_to_follow = id.data
 
-        rospy.logdebug("Person to follow ID" + self.personID_to_follow)
+        # rospy.logdebug("Person to follow ID" + self.personID_to_follow)
 
         
     def cb_people(self, data: People):
