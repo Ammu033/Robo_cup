@@ -6,6 +6,7 @@
 
   <!-- parameter fo person following rosnode -->
   <arg name="des_dist"  default="0.75" />
+  <arg name="cancel_dist"  default="0.75" />
  
   <!-- Bayes Tracker -->
   <include file="$(find bayes_people_tracker_bringup)/launch/people_tracker.launch" />
@@ -21,6 +22,7 @@
   <!-- Person following rosnode -->
   <node name="lcastor_person_following" pkg="lcastor_person_following" type="person_following.py" >
     <param name="des_dist" value="$(arg des_dist)" /> 
+    <param name="cancel_dist" value="$(arg cancel_dist)" /> 
   </node>
 
   <!-- rviz -->
