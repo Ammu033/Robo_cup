@@ -15,7 +15,7 @@ import actionlib
 NODE_NAME = 'lcastor_person_following'
 NODE_RATE = 100 # [Hz]
 # DES_DIST = 0.75 
-DES_DIST = str(rospy.get_param("/lcastor_person_following/des_dist"))
+DES_DIST = float(rospy.get_param("/lcastor_person_following/des_dist"))
 
 
 
