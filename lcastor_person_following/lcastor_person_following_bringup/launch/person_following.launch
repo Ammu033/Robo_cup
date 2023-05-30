@@ -7,7 +7,7 @@
   <arg name="des_dist"  default="0.75" />
  
   <!-- Bayes Tracker -->
-  <include file="$(find tiago_tracker_bringup)/launch/tiago_tracker.launch" />
+  <include file="$(find lcastor_tracker_bringup)/launch/tiago_tracker.launch" />
 
   <!-- Person detection rosnode -->
   <node name="lcastor_person_detection" pkg="lcastor_person_detection" type="person_detection.py" >
