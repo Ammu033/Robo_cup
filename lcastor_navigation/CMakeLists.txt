@@ -100,11 +100,27 @@ find_package(catkin REQUIRED COMPONENTS
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
-catkin_package(
+#catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES lcastor_description
 #  CATKIN_DEPENDS tiago_description
 #  DEPENDS system_lib
+#)
+
+SET(optional_dependencies "")
+IF(apriltag_ros_FOUND)
+   SET(optional_dependencies ${optional_dependencies} apriltag_ros)
+ENDIF(apriltag_ros_FOUND)
+
+catkin_package(
+  INCLUDE_DIRS include
+  LIBRARIES rtabmap_sync rtabmap_sync_plugins rtabmap_slam_plugins
+  CATKIN_DEPENDS cv_bridge roscpp sensor_msgs nav_msgs image_transport
+                 nodelet message_filters rtabmap_msgs rtabmap_conversions
+                 actionlib actionlib_msgs cv_bridge geometry_msgs move_base_msgs
+                 pluginlib std_msgs std_srvs tf tf2_ros visualization_msgs
+                 rtabmap_util rtabmap_sync ${optional_dependencies}
+  CFG_EXTRAS extra_configs.cmake
 )
 
 ###########
