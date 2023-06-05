@@ -164,6 +164,7 @@ include_directories(
 catkin_install_python(PROGRAMS
   scripts/person_detection.py
   scripts/person_detection2.py
+  scripts/person_detection_showcase.py # FIXME: [showcase]
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
