@@ -1,7 +1,6 @@
 #!/bin/bash
 
 ROBOT_NUM=$1
-#IFACE=$2
 
 set -e
 
@@ -20,6 +19,9 @@ echo " "
   echo "10.8.0.102 tiago-29c" >> /etc/hosts
   echo "10.8.0.106 tiago-89c" >> /etc/hosts
   echo "10.8.0.105 tiago-125c" >> /etc/hosts
+  echo "192.168.1.29 tiago-29c" >> /etc/hosts
+  echo "192.168.1.89 tiago-89c" >> /etc/hosts
+  echo "192.168.1.125 tiago-125c" >> /etc/hosts
 
   echo "Container is now running."
   echo " "
@@ -36,7 +38,7 @@ echo " "
    echo "source /home/lcastor/ros_ws/src/LCASTOR/scripts/connect_tiago.sh ${ROBOT_NUM}" >> /home/lcastor/.bashrc
    catkin build
    source /home/lcastor/ros_ws/devel/setup.bash
-  exec su lcastor 
+   exec su lcastor 
   
    
 
