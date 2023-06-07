@@ -1,5 +1,7 @@
 FROM nvidia/cudagl:11.4.2-base-ubuntu20.04
 
+# SHELL ["/bin/bash", "-c"] 
+
 # Config
 ENV TZ=Europe/London
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
@@ -28,14 +30,31 @@ RUN DEBIAN_FRONTEND=noninteractive pip install tmule
 # Install Tensorflow
 RUN pip3 install tensorflow tensorflow-hub
 
+# create workspace
+# RUN mkdir -p /ros_ws/src
+# RUN cd /ros_ws; . /opt/ros/${ROS_DISTRO}/setup.sh
+
+
+# RUN cd /ros_ws; rosdep install --from-paths src --ignore-src -r -y
+# RUN catkin build
+
 # Clone TIAGo dependencies
 # RUN mkdir /home/lcastor
 RUN cd /
 RUN wget https://raw.githubusercontent.com/pal-robotics/tiago_tutorials/${ROS_DISTRO}-devel/tiago_public-${ROS_DISTRO}.rosinstall
 RUN rosinstall /ros_ws/src /opt/ros/${ROS_DISTRO} tiago_public-${ROS_DISTRO}.rosinstall
+RUN apt update; apt upgrade -y
+
+# clone the needed moveit packages tags
+RUN cd /ros_ws/src; git clone https://github.com/ros-planning/moveit_msgs.git
+RUN cd /ros_ws/src/moveit_msgs; git checkout tags/0.11.2
+RUN cd /ros_ws/src; git clone https://github.com/ros-planning/moveit.git
+RUN cd /ros_ws/src/moveit; git checkout tags/1.1.9
+
+# install deps
 RUN DEBIAN_FRONTEND=noninteractive rosdep install -y --from-paths /ros_ws/src --ignore-src --rosdistro ${ROS_DISTRO} --skip-keys "urdf_test omni_drive_controller orocos_kdl pal_filters libgazebo9-dev pal_usb_utils speed_limit_node camera_calibration_files pal_moveit_plugins pal_startup_msgs pal_local_joint_control pal_pcl_points_throttle_and_filter current_limit_controller hokuyo_node dynamixel_cpp pal_moveit_capabilities pal_pcl dynamic_footprint gravity_compensation_controller pal-orbbec-openni2 pal_loc_measure pal_map_manager ydlidar_ros_driver"
 
-ARG UNAME=lcastor
+ARG UNAME=lcastor   
 ARG UID=1000
 ARG GID=1000
 RUN groupadd -g $GID -o $UNAME
