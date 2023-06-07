@@ -21,8 +21,6 @@ DIST_DETECTION_THRESH = float(rospy.get_param("/lcastor_person_detection/dist_de
 DIST_FOLLOW_THRESH = float(rospy.get_param("/lcastor_person_detection/dist_follow_threshold"))
 
 
-
-
 def speak(msg):
     ac = actionlib.SimpleActionClient("/tts", TtsAction)
     ac.wait_for_server()
@@ -82,6 +80,12 @@ class PersonDetector():
         
         self.sub_trigger = rospy.Subscriber('/nlp/trigger', Bool, callback = self.cb_trigger) # FIXME: [showcase]
         self.sub_username = rospy.Subscriber('/nlp/username', String, callback = self.cb_username) # FIXME: [showcase]
+        self.sub_speech = rospy.Subscriber('robot_speech', String, self.subscribe_to_speech)
+        
+        
+    def subscribe_to_speech(self, msg):
+        speak(msg.data)
+
         
     # FIXME: [showcase]
     def cb_username(self, msg : String):
