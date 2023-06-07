@@ -12,11 +12,10 @@ import actionlib
 
 
 
-NODE_NAME = 'person_following'
+NODE_NAME = 'lcastor_person_following'
 NODE_RATE = 100 # [Hz]
-# DES_DIST = 0.75 
-DES_DIST = str(rospy.get_param("/person_following/des_dist"))
-
+DES_DIST = float(rospy.get_param("/lcastor_person_following/des_dist"))
+CANCEL_DISTANCE = float(rospy.get_param("/lcastor_person_following/cancel_dist"))
 
 
 class PersonFollowing():
@@ -33,6 +32,8 @@ class PersonFollowing():
         self.people = None
         self.robot_pose = Pose2D()
         self.goal = None
+        self.send_goal_pos = None
+        self.client = None
         
         # Robot pose subscriber
         self.sub_robot_pos = rospy.Subscriber('/robot_pose', PoseWithCovarianceStamped, callback = self.cb_robot_pose)
@@ -64,6 +65,10 @@ class PersonFollowing():
         self.robot_pose.x = p.pose.pose.position.x
         self.robot_pose.y = p.pose.pose.position.y
         self.robot_pose.theta = tf.transformations.euler_from_matrix(m)[2]
+
+        if self.send_goal_pos is not None and self.client is not None and self.client.get_state() == actionlib.GoalStatus.ACTIVE:
+            distance_travelled = math.dist(self.send_goal_pos, [self.robot_pose.x, self.robot_pose.y])
+            if distance_travelled > CANCEL_DISTANCE: self.client.cancel_goal()
         
         
     def cb_person_to_follow(self, id: String):
@@ -79,7 +84,7 @@ class PersonFollowing():
             # If the old person ID is not detected anymore, self.personID_to_follow is updated -> the robot will follow the new person
             self.personID_to_follow = id.data
 
-        rospy.logdebug("Person to follow ID" + self.personID_to_follow)
+        # rospy.logdebug("Person to follow ID" + self.personID_to_follow)
 
         
     def cb_people(self, data: People):
@@ -133,8 +138,8 @@ class PersonFollowing():
         """
         
         # Publish the goal position and orientation to the navigation system
-        client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
-        client.wait_for_server()
+        self.client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
+        self.client.wait_for_server()
         
         goal_msg = MoveBaseGoal()
         goal_msg.target_pose.header.frame_id = "map"
@@ -144,13 +149,8 @@ class PersonFollowing():
         goal_msg.target_pose.pose.orientation.z = math.sin(goal_orientation / 2)
         goal_msg.target_pose.pose.orientation.w = math.cos(goal_orientation / 2)
 
-        client.send_goal(goal_msg)
-        wait = client.wait_for_result()
-        if not wait:
-            rospy.logerr("Action server not available!")
-            rospy.signal_shutdown("Action server not available!")
-        else:
-            return client.get_result()
+        self.client.send_goal(goal_msg)
+        self.client.wait_for_result()
         
         
     def get_person_pos(self):
@@ -180,6 +180,7 @@ class PersonFollowing():
             goal_position, goal_orientation = self.calculate_goal(person_position)
 
             # Send the goal position and orientation to the navigation system
+            self.send_goal_pos = [self.robot_pose.x, self.robot_pose.y]
             self.send_goal(goal_position, goal_orientation)
             
         

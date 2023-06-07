@@ -1,23 +1,31 @@
 <launch>
   <!-- parameters fo person detection rosnode -->
   <arg name="field_of_view"  default="60" />
-  <arg name="dist_threshold"  default="3" />
+  <arg name="dist_detection_threshold"  default="3" />
+  <arg name="dist_follow_threshold"  default="3" />
 
   <!-- parameter fo person following rosnode -->
   <arg name="des_dist"  default="0.75" />
+  <arg name="cancel_dist"  default="0.75" />
  
   <!-- Bayes Tracker -->
-  <include file="$(find lcastor_tracker_bringup)/launch/tiago_tracker.launch" />
+  <include file="$(find bayes_people_tracker_bringup)/launch/people_tracker.launch" />
 
   <!-- Person detection rosnode -->
-  <node name="lcastor_person_detection" pkg="lcastor_person_detection" type="person_detection.py" >
+  <node name="lcastor_person_detection" pkg="lcastor_person_detection" type="person_detection2.py" >
     <param name="field_of_view" value="$(arg field_of_view)" /> 
-    <param name="dist_threshold" value="$(arg dist_threshold)" /> 
+    <param name="dist_detection_threshold" value="$(arg dist_detection_threshold)" /> 
+    <param name="dist_follow_threshold" value="$(arg dist_follow_threshold)" /> 
+
   </node>
 
   <!-- Person following rosnode -->
   <node name="lcastor_person_following" pkg="lcastor_person_following" type="person_following.py" >
     <param name="des_dist" value="$(arg des_dist)" /> 
+    <param name="cancel_dist" value="$(arg cancel_dist)" /> 
   </node>
+
+  <!-- rviz -->
+  <!--<node name="rviz" pkg="rviz" type="rviz" args="-d $(find bayes_people_tracker_bringup)/launch/people_tracker.rviz -f map"/>-->
 
 </launch>
