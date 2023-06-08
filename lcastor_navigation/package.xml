@@ -72,7 +72,7 @@
   <depend>rtabmap_util</depend>
   <depend>rtabmap_sync</depend>
   <depend>image_transport</depend>
-  <depend>message_filters</depen
+  <depend>message_filters</depend>
   <depend>roscpp</depend>
   <depend>rtabmap_conversions</depend>  
   <!-- rtabmap dependencies -->
