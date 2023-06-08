@@ -1,14 +1,15 @@
 # Run as `source connect_tiago.sh TIAGO_NUM ROBOT_IFACE`
 # where:
 #   - TIAGO_NUM: is the ID number of the robot you are connected
-#   - ethernet: just pass any second argument to connect via ethernet, otherwise it will connect via TIAGo_WIFI
+#   - ETH: just pass 1 to connect via ethernet or 0 via TIAGo_WIFI
 
 
 TIAGO_NUM=$1
+ETH=$2
 #echo $TIAGO_NUM
 
 # Change ROS Master
-if [ -z "$2" ]; then
+if [ "$ETH" -eq 0 ]; then
     echo "Connecting through TIAGo_WIFI"
     export ROS_MASTER=192.168.1.${TIAGO_NUM}
 else
