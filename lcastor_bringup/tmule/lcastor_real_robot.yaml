@@ -1,4 +1,4 @@
-session: lcastor_sim
+session: lcastor_robot
 init_cmd: |
   echo " "
   echo " "
@@ -41,28 +41,28 @@ init_cmd: |
   export_default BASE_TYPE "pmb2"
 
 windows:
-  - name: roscore
-    tags: ['core', 'robot', 'nav']
-    panes:
-      - roscore
-      - htop
+  # - name: roscore
+  #   tags: ['core', 'robot', 'nav']
+  #   panes:
+  #     - roscore
+  #     - htop
   # - name: navigation
   #   tags: ['nav']
   #   panes:
   #     - 'roslaunch tiago_2dnav_gazebo navigation.launch public_sim:=false global_planner:=$GLOBAL_PLANNER local_planner:=$LOCAL_PLANNER localization:=$LOCALIZATION config_base_path:=$CONFIG_BASE_PATH map:=$MAP rgbd_sensors:=$RGBD_SENSORS laser_model:=$LASER_MODEL base_type:=$BASE_TYPE'
-  # - name: nav_octomap
-  #   tags: ['nav_oct']
-  #   panes: 
-  #     - 'roslaunch lcastor_navigation lcastor_octomap.launch'
+  - name: nav_octomap
+    tags: ['nav_oct']
+    panes: 
+      - 'roslaunch lcastor_navigation lcastor_octomap.launch'
   # - name: man_octomap
   #   tags: ['man_oct']
   #   panes: 
-  #     - 'rosparam load `rospack find tiago_moveit_tutorial`/config/tiago_octomap_motions.yaml;
+      # - 'rosparam load `rospack find tiago_moveit_tutorial`/config/tiago_octomap_motions.yaml;'
       # - 'roslaunch lcastor_navigation lcastor_head_octomap.launch' cloud_in:='/head_filtered_points'
   - name: people_tracking_following
     tags: ['people_tracking'  ]
     panes:
-      - 'roslaunch lcastor_tracker_bringup lcastor_people_tracker.launch'
+      - 'roslaunch bayes_people_tracker_bringup people_tracker.launch'
       # - 'roslaunch lcastor_person_following_bringup person_following.launch'
   - name: rviz
     tags: ['viz']

@@ -113,14 +113,14 @@ IF(apriltag_ros_FOUND)
 ENDIF(apriltag_ros_FOUND)
 
 catkin_package(
-  INCLUDE_DIRS include
+  # INCLUDE_DIRS include
   LIBRARIES rtabmap_sync rtabmap_sync_plugins rtabmap_slam_plugins
   CATKIN_DEPENDS cv_bridge roscpp sensor_msgs nav_msgs image_transport
                  nodelet message_filters rtabmap_msgs rtabmap_conversions
                  actionlib actionlib_msgs cv_bridge geometry_msgs move_base_msgs
                  pluginlib std_msgs std_srvs tf tf2_ros visualization_msgs
                  rtabmap_util rtabmap_sync ${optional_dependencies}
-  CFG_EXTRAS extra_configs.cmake
+  # CFG_EXTRAS extra_configs.cmake
 )
 
 ###########

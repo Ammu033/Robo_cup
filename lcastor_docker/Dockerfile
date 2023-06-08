@@ -34,7 +34,7 @@ RUN cd /
 RUN wget https://raw.githubusercontent.com/pal-robotics/tiago_tutorials/${ROS_DISTRO}-devel/tiago_public-${ROS_DISTRO}.rosinstall
 RUN rosinstall /ros_ws/src /opt/ros/${ROS_DISTRO} tiago_public-${ROS_DISTRO}.rosinstall
 RUN DEBIAN_FRONTEND=noninteractive rosdep install -y --from-paths /ros_ws/src --ignore-src --rosdistro ${ROS_DISTRO} --skip-keys "urdf_test omni_drive_controller orocos_kdl pal_filters libgazebo9-dev pal_usb_utils speed_limit_node camera_calibration_files pal_moveit_plugins pal_startup_msgs pal_local_joint_control pal_pcl_points_throttle_and_filter current_limit_controller hokuyo_node dynamixel_cpp pal_moveit_capabilities pal_pcl dynamic_footprint gravity_compensation_controller pal-orbbec-openni2 pal_loc_measure pal_map_manager ydlidar_ros_driver"
-RUN DEBIAN_FRONTEND=noninteractive apt install -y ros-${ROS_DISTRO}-velodyne-*
+RUN DEBIAN_FRONTEND=noninteractive apt install -y ros-${ROS_DISTRO}-velodyne-* ros-${ROS_DISTRO}-apriltag-ros ros-${ROS_DISTRO}-rtabmap-* 
 
 ARG UNAME=lcastor
 ARG UID=1000
