@@ -1,6 +1,7 @@
 #!/bin/bash
 
 ROBOT_NUM=$1
+ETH=$2
 
 set -e
 
@@ -28,14 +29,14 @@ echo " "
   if [ -z "$ROBOT_NUM" ]; then
     echo "ERROR: No argument supplied!"
     echo " "
-    echo "You should run as:   ./run_robot_docker.sh ROBOT_NUM"
-    echo "         (example:   ./run_robot_docker.sh 125)"
+    echo "You should run as:   ./run_robot_docker.sh ROBOT_NUM ETH"
+    echo "         (example:   ./run_robot_docker.sh 125 true)"
     echo " "
     exit 1
   else
-    echo "It will connect to tiago ${ROBOT_NUM} "
+    echo "It will connect to tiago ${ROBOT_NUM}"
   fi 
-   echo "source /home/lcastor/ros_ws/src/LCASTOR/scripts/connect_tiago.sh ${ROBOT_NUM}" >> /home/lcastor/.bashrc
+   echo "source /home/lcastor/ros_ws/src/LCASTOR/scripts/connect_tiago.sh ${ROBOT_NUM} ${ETH}" >> /home/lcastor/.bashrc
    catkin build
    source /home/lcastor/ros_ws/devel/setup.bash
    exec su lcastor 
