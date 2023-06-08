@@ -8,8 +8,21 @@ TIAGO_NUM=$1
 #echo $TIAGO_NUM
 #echo $ROBOT_IFACE
 
+if [ ${TIAGO_NUM} -eq 29 ]
+then
+  TIAGO_NUM=102
+elif [ ${TIAGO_NUM} -eq 89 ]
+then
+  TIAGO_NUM=106
+elif [ ${TIAGO_NUM} -eq 125 ]
+then
+  TIAGO_NUM=105
+else
+  echo "You entered a wrong TIAGo ID (accepted value: 29,89,125)."
+fi
+
 # Change ROS Master
-export ROS_MASTER=192.168.1.${TIAGO_NUM}
+export ROS_MASTER=10.8.0.${TIAGO_NUM}
 export ROS_MASTER_URI=http://${ROS_MASTER}:11311
 rostopic list &>/dev/null
 RETVAL=$?

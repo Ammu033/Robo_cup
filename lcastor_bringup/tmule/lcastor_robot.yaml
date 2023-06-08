@@ -28,8 +28,8 @@ init_cmd: |
   export_default TIAGO_TYPE "titanium"
 
   # world arguments
-  export_default WORLD "small_office"
-  export_default GZ_GUI "true"
+  #export_default WORLD "small_office"
+  #export_default GZ_GUI "true"
 
   # navigation specific arguments
   export_default GLOBAL_PLANNER "global_planner"
@@ -48,20 +48,12 @@ init_cmd: |
 
 windows:
   - name: roscore
-    tags: ['core', 'robot', 'nav']
+    tags: ['core']
     panes:
-      - roscore
       - htop
-  - name: simulation
-    tags: ['core', 'robot', 'nav']
-    panes:
-      - 'roslaunch tiago_gazebo tiago_gazebo.launch robot:=$TIAGO_TYPE end_effector:=$TIAGO_EE public_sim:=true world:=$WORLD gui:=$GZ_GUI'
-  - name: navigation
-    tags: ['nav']
-    panes:
-      - 'roslaunch tiago_2dnav_gazebo navigation.launch public_sim:=true global_planner:=$GLOBAL_PLANNER local_planner:=$LOCAL_PLANNER localization:=$LOCALIZATION config_base_path:=$CONFIG_BASE_PATH map:=$MAP rgbd_sensors:=$RGBD_SENSORS laser_model:=$LASER_MODEL base_type:=$BASE_TYPE'
+      - ping $ROS_MASTER
   - name: planning
-    tags: []
+    tags: ['core']
     panes:
       - 'roslaunch pnp_ros pnp_ros.launch plans_folder:=$PNP_PLANS actions_folder:=$PNP_ACTIONS conditions_folder:=$PNP_CONDITIONS'
   - name: rviz

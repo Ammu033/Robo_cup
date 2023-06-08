@@ -1,5 +1,7 @@
 #!/bin/bash
 
+
+
 image_name=lcas.lincoln.ac.uk/lcastor/lcastor_base
 
 xhost + local:docker
@@ -14,4 +16,10 @@ docker run --privileged --network host \
            -v $(pwd)/../:/home/lcastor/ros_ws/src/LCASTOR \
            -v /dev/dri:/dev/dri \
            --rm \
-           -it ${image_name}
+           --entrypoint /home/lcastor/ros_ws/src/LCASTOR/lcastor_docker/robot_entrypoint.sh \
+           -it ${image_name}  \
+           $1
+           #--name "${image_name/:/-}" \
+        #    -e ROS_MASTER_URI=${ROS_MASTER_URI} \
+        #    -e ROS_IP=${ROS_IP} \ 
+        #    bash -c "echo ciao & /bin/bash"

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-image_name=lcastor_base
+image_name=lcas.lincoln.ac.uk/lcastor/lcastor_base
 
-docker build -t ${image_name} $(dirname "$0")/
+docker build --build-arg UID=$(id -u) --build-arg GID=$(id -g) -t ${image_name} $(dirname "$0")/
