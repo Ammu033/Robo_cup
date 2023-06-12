@@ -29,7 +29,7 @@ init_cmd: |
 
   # world arguments
   export_default WORLD "small_office"
-  export_default GZ_GUI "true"
+  export_default GZ_GUI "false"
 
   # navigation specific arguments
   export_default GLOBAL_PLANNER "global_planner"
@@ -64,6 +64,12 @@ windows:
     tags: []
     panes:
       - 'roslaunch pnp_ros pnp_ros.launch plans_folder:=$PNP_PLANS actions_folder:=$PNP_ACTIONS conditions_folder:=$PNP_CONDITIONS'
+  - name: ui
+    tags: ['ui']
+    panes:
+      - 'roslaunch rosbridge_server rosbridge_websocket.launch'
+      - 'roslaunch lcastor_ui start_server.launch'
+      - 'sleep 5; roslaunch lcastor_ui start_chrome.launch'
   - name: rviz
     tags: ['viz']
     panes:

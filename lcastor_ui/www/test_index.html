@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en" style="height: 100%">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous"> -->
+
+    <link rel="stylesheet" href="/css/ladda.min.css">
+    <link rel="stylesheet" href="/css/index.css">
+
+    <title>The Collection Guide Robot App</title>
+
+  </head>
+
+  <body style="height: 100%;overflow:hidden;">
+       <div id="overlay"></div>
+
+      <button id="home_page" class="ladda-button" style="box-shadow: 0px 0px 2px #ffff00; z-index: 10000;" data-style="contract-overlay" type="button" onclick="on()">
+          Home
+      </button>
+
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="/js/spin.min.js"></script>
+    <script src="/js/ladda.min.js"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script> -->
+
+    <!-- For some util function -->
+    <!-- <script src="/js/utilities.js"></script> -->
+    <!-- For communicating with ros -->
+    <!-- <script src="/js/ros-init-index.js"></script> -->
+    <!-- For allowuing switching between pages -->
+    <!-- <script src="/js/pageEvents.js"></script> -->
+    <!-- For showing notifications -->
+    <!-- <script src="/js/notifications.js"></script> -->
+
+    <script>
+      var l = Ladda.create( document.querySelector( '#home_page' ) );
+
+      function on() {
+        l.start();
+        document.getElementById("overlay").style.display = "block";
+      }
+    </script>
+
+  </body>
+</html>

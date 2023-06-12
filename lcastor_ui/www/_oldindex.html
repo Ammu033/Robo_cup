@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Linda interface</title>
+	<meta charset="utf-8">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+	<link rel="stylesheet" href="css/jquery.mobile-1.4.5.min.css" />
+
+	<!--flipclock -->
+	<link rel="stylesheet" href="./widgets/flipclock/flipclock.css">
+
+	<!--speechbubble -->
+	<link rel="stylesheet" href="./widgets/speech_tools/speech_tools.css">
+
+	<!-- jBox -->
+	<link rel="stylesheet" href="./css/jBox/jBox.css">
+	 <link rel="stylesheet" href="./css/jBox/plugins/jBox.Notice.css">
+	<link rel="stylesheet" href="./css/jBox/plugins/jBox.Confirm.css">
+	<link rel="stylesheet" href="./css/jBox/plugins/jBox.Image.css">
+	<link rel="stylesheet" href="./css/jBox/themes/NoticeFancy.css">
+	<link rel="stylesheet" href="./css/jBox/themes/TooltipBorder.css">
+	<link rel="stylesheet" href="./css/jBox/themes/TooltipBorderThick.css">
+	<link rel="stylesheet" href="./css/jBox/themes/TooltipDark.css">
+	<link rel="stylesheet" href="./css/jBox/themes/TooltipSmall.css">
+	<link rel="stylesheet" href="./css/jBox/themes/TooltipSmallGray.css">
+	<link rel="stylesheet" href="./css/jBox/themes/TooltipError.css">
+	<!-- <link rel="stylesheet" href="./css/jBox/Demo.css"> -->
+
+
+</head>
+
+<body onload="start_ros();">
+
+	<div id="robotspeech" data-display="overlay" class="speaking-top-left" style="display:none;" data-transition="slidedown" data-overlay-theme="a" ></div>
+	<div id="userspeech" data-display="overlay" class="thinking-bottom-right" style="display:none;" data-overlay-theme="a" ></div>
+
+
+<div data-role="page" id="page_home" >
+
+	<div data-role="header" >
+
+		<div id="header" class="ui-grid-b">
+				<div class="ui-block-a" style="width: 30%" ><div  style="height:100px"><img src="./images/logo-collection.png" class="logo-h"></div></div>
+				<div class="ui-block-b" style="width: 60%" >
+					<div  class="ui-grid-a" id="countdown_tour"  style="height:100px;">
+						<div class="ui-block-a" style="width: 30%" >
+							<h2>Next tour in :</h2>
+						</div>
+						<div class="ui-block-b" style="width: 60%" >
+						<div id="countdown" style="margin-left:10px;margin-top:30px;"></div>
+
+						</div>
+					</div>
+				</div>
+				<div class="ui-block-c" style="width: 10%"><div style="height:100px"><img src="./images/lcas.png" class="logo" style="float: right"></div></div>
+		</div><!-- /grid-b -->
+	</div>
+
+	<div id="main" role="main" class="ui-content">
+	<div id="Notice-3" class="target-notice">Click me</div>
+
+	<div  class="responsive-list" >
+		<ul id ="list_services" data-role="listview"  data-inset="true">
+
+		</ul>
+
+	</div>
+	</div><!-- /content -->
+
+
+	<div data-role="footer" data-position="fixed" style="background:#000000;border:0px;">
+
+	</div>
+
+</div><!-- /page -->
+<div data-role="page" id="page_service" >
+
+	<div data-role="popup" id="popupNavigation" data-overlay-theme="a" data-theme="a" data-dismissible="false">
+		<div data-role="content" data-theme="d" data-mini="true" class="ui-corner-bottom ui-content">
+			<h1>Next stop:</h1>
+			<h2 id="nav_target_html" size="5px"></h2>
+			<!-- <div id="threed-map"></div> -->
+		</div>
+	</div>
+
+	<div data-role="header" >
+
+		<div id="header" class="ui-grid-b">
+				<div class="ui-block-a" style="width: 20%" ><div  style="height:100px"><img src="./images/logo-collection.png" class="logo-h"></div></div>
+				<div class="ui-block-b" style="width: 60%" >
+						<div id="title_page">
+							<h1></h1>
+						</div>
+				</div>
+
+				<div class="ui-block-c" style="width: 20%">
+						<div  class="ui-grid-a"  style="height:100px;">
+						<div class="ui-block-a" >
+							<a id="home_button" href="#page_home"  class="ui-btn ui-corner-all ui-shadow ui-icon-home ui-btn-icon-top ui-btn-b"  >Home</a>
+						</div>
+						<div class="ui-block-b" style="height:100px;">
+							<img src="./images/lcas.png" class="logo" style="float: right">
+						</div>
+					</div>
+				</div>
+		</div><!-- /grid-b -->
+	</div>
+
+	<div data-role="content" >
+		<iframe id="id_iframe"  scrolling="no" >
+		</iframe>
+	</div><!-- /content -->
+
+</div><!-- /page -->
+
+<!-- <script src="http://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="http://code.jquery.com/jquery-migrate-1.4.1.js"></script> -->
+<script src="./js/jquery-1.7.2.min.js"></script>
+<script src="./js/jquery.mobile-1.4.5.min.js"></script>
+<script type="text/javascript" src="./js/ros-init-index.js"></script>
+<!-- <script src="./widgets/flipclock/libs/prefixfree.min.js"></script> -->
+<script src="./widgets/flipclock/flipclock.min.js"></script>
+<!-- rosbridge -->
+<!-- <script type="text/javascript" src="js/WebSocketTest.js"></script> -->
+<script src="./js/eventemitter2.js"></script>
+<!-- <script type="text/javascript" src="./js/mjpegcanvas.js"></script> -->
+<script src="./js/roslib.js"></script>
+<script src="./widgets/speech_tools/speech_tools.js"></script>
+<script src="./js/jBox/jBox.min.js"></script>
+<script src="./js/jBox/jBox.Notice.js"></script>
+<script src="./js/jBox/jBox.Confirm.js"></script>
+<script src="./js/jBox/jBox.Image.js"></script>
+<script src="./js/jBox/Demo.js"></script>
+
+<script src="./js/interactions.js"></script>
+
+ <script>
+
+	new jBox('Modal').setTitle('My Title').setContent('My Content').open();
+	var $speech_dialogs = {};
+
+	$(function () {
+		restart_Countdown(0);
+	});
+
+	$('#Notice-3').click(function() {
+	  new jBox('Notice', {
+	    theme: 'NoticeFancy',
+	    attributes: {
+	      x: 'left',
+	      y: 'bottom'
+	    },
+	    color: 'red',
+	    content: 'Hello, I\'m down here',
+	    // audio: '../Source/audio/bling2',
+	    // volume: 80,
+	    animation: {open: 'slide:bottom', close: 'slide:left'}
+	  });
+
+	});
+
+
+	function Read_file(name){
+		var name_file='./'+name+'.json';
+
+		console.log('Read_file '+name_file);
+		var ret_data=null;
+		 $.ajax({
+				url: name_file,
+				async: false,
+				cache:false,
+				dataType: 'json',
+				success: function(data) {
+					ret_data = data;
+
+				}
+
+		});
+		return ret_data;
+	}
+
+	$(function () {
+		json_data=Read_file("services");
+		data_services=json_data.services;
+		//console.log('data_services='+data_services);
+
+		for (var i=0;i<data_services.length;i++){
+			var item=data_services[i];
+				$('#list_services').append(
+						$('<li>').append(
+								$('<a>').attr("href","#page_service").bind('vclick',function(){
+								var index=$(this).parent().index()
+
+								 Init_service(index);
+
+								}).append(
+									$('<img>').attr("class","ui-li-thumb").attr("src",item.image),
+									$('<h2>').text(item.title),
+									$('<p>').text(item.description)
+								)
+						)
+				);
+		}
+		$('#list_services').enhanceWithin().listview('refresh');
+
+	});
+
+	function sleep(milliseconds) {
+		var start = new Date().getTime();
+		for (var i = 0; i < 1e7; i++) {
+			if ((new Date().getTime() - start) > milliseconds){
+				break;
+			}
+		}
+	}
+
+	function Init_service(service_index){
+		var current_service=data_services[service_index]
+
+		$("#title_page h1").html(current_service.title);
+		$(document).find("#id_iframe").attr("src", current_service.url);
+	}
+
+	function restart_Countdown(goal_time){
+		clock = $('#countdown').FlipClock({
+				// ... your options here
+				//clockFace:'TwentyFourHourClock'
+				clockFace:'HourlyCounter'
+		});
+
+		var d = new Date();
+		var mseg_now = d.getTime();
+		var d = new Date();
+		d.setHours(15);
+		var mseg_nexttour=mseg_now+d; //goal_time; ///
+		var mseg_count=mseg_nexttour-mseg_now;
+		var min_count=mseg_count/1000;
+		clock.setTime(70000);  //1 hour 3600
+		clock.setCountdown(true);
+	}
+
+
+	// show the robot's speech dialog bubble
+	function Show_speech(str, id, mode) {
+		$speech_dialogs[id] = $("#robotspeech")
+		$speech_dialogs[id].empty();
+		$speech_dialogs[id].text(str).css({
+			top: 40 ,
+			left: 10
+		});
+
+		$speech_dialogs[id].slideDown();
+		$speech_dialogs[id].css("display","block");
+	}
+
+	// close the robot's dialog bubble when the robot finished to speak
+	function Receive_speech_result(str, id, mode) {
+		if(mode=='nonblock' && id in $speech_dialogs) {
+			$speech_dialogs[id].slideUp();
+			delete $speech_dialogs[id];
+		}
+	}
+
+	function Show_question(data,target){
+
+		var temp=data.request[Math.floor(Math.random()*data.request.length)];
+		console.log('Show_speech temp='+temp);
+		var str=String(temp.speech);
+		console.log('Show_speech str='+str);
+
+		//Ask question to user with speech
+		Command_speech(str);
+
+		// $userspeech = $("#userspeech");
+		// $userspeech.empty();
+
+		// $speechrecognition = new Bubble({
+		// 	object: '#robotspeech'
+		// });
+
+		// var elem_recognition=$speechrecognition.init_recognition();
+
+		new jBox('Confirm', {
+			  content: str,
+		    confirmButton: 'Do it!',
+		    cancelButton: 'Nope',
+				confirm: function() {
+							var str_go=String(data.response[0].speech[Math.floor(Math.random()*data.response[0].speech.length)]);
+							Command_speech(str_go);
+							Command_navigation(target);
+							Show_navigation_feedback(target);
+					},
+				overlay: true
+		}).open().show();
+
+		// $userspeech.append(
+		// 	$('<ul>').attr('data-role','listview').attr('data-split-theme','a').attr('data-inset','true').append(
+		// 		$('<li>').attr('style','border:0px;').append(
+		// 			elem_recognition
+		// 		),
+		// 		$('<li>').attr('style','border:0px;').append(
+		// 			$('<div>').attr('class','ui-grid-a').attr('style','width:60%;text-align: center;margin-left: auto;margin-right:auto;border:0px;').append(
+		// 				$('<div>').attr('class','ui-block-a').append(
+		// 					$('<button>').attr('style', 'background:green;padding-left:20px;padding-right:20px;height:60px;').attr('id','OK').text('YES').bind('vclick',function(){
+		// 						$userspeech.slideUp();
+		// 						var temp_go=data.response[0].speech[Math.floor(Math.random()*data.response[0].speech.length)];
+		// 						var str_go=String(temp_go);
+		// 						Command_speech(str_go);
+		// 						console.log('After speech target=' +target);
+		// 						Command_navigation(target);
+		// 						Show_navigation_feedback(target);
+		// 					})
+		// 				),
+		// 				$('<div>').attr('class','ui-block-b').append(
+		// 					$('<button>').attr('style', 'background:red;padding-left:20px;padding-right:20px;height:60px;').attr('id','CANCEL').text('NO').bind('vclick',function(){
+		// 						$userspeech.slideUp();
+		// 						$("#overlay").remove();
+		// 					})
+		// 				)
+		// 			)
+		// 		)
+		// 	)
+		// ).enhanceWithin();
+    //
+		// $userspeech.slideDown();
+		// $userspeech.css("display","block");
+	}
+
+
+
+	function PTU_pose_command(cmd) {
+		var pose_pan=0.0;
+		if(cmd=='navigation')
+			pose_pan=0.0;
+		else if(cmd=='interaction')
+			pose_pan=-180.0;
+
+		ptu_goal_action = new ROSLIB.Goal( {
+			actionClient : ptu_client_action,
+			goalMessage : {
+					pan : pose_pan,
+					tilt:0.0,
+					pan_vel:80.0,  //min_pan_speed=4.0, max_pan_speed=140.0
+					tilt_vel:0.0
+			}
+		});
+	 // Then we create the payload to be published. The object we pass in to ros.Message matches the
+		console.log('goal_ptu_action.send() ' );
+		// And finally, publish.
+		ptu_goal_action.send();
+
+		ptu_goal_action.on('result', function(result) {
+				console.log('Final Result: ' + result.state.position); //result.state sensor_msgs/JointState
+		});
+	}
+	</script>
+</body>
+</html>
