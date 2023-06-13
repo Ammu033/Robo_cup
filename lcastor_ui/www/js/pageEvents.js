@@ -117,7 +117,7 @@ function Show_home() {
               );
           // Now when we press each service button we send a topic message
           // console.log("registered" + item.id);
-          $("#"+item.id).onclick( (function() {
+          $("#"+item.id).click( (function() {
             var btn_id = item.id; //copy the value in a new var
             return function() {
 
@@ -211,7 +211,7 @@ function Show_available_tours() {
               // t_btn_c = t_btn.cloneNode(true);
               // t_btn_c.onmousedown
               t_content_c.querySelector("[role=tour-btn]").innerHTML = "Start this tour!"
-              t_content_c.querySelector("[role=tour-btn]").onclick = (function() {
+              t_content_c.querySelector("[role=tour-btn]").click = (function() {
                 var tour_id = tours[i]["key"]; //copy the value in a new var
                 return function(){
                     SafePhysicalButtonEvent(function() {

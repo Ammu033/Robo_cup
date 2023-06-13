@@ -16,6 +16,7 @@ var $speech_bubbles = {}
 
 // show the robot's speech dialog bubble
 function Show_robot_speech(str, id, mode) {
+  console.log("removed all the speech bubbles")
   $speech_bubbles[id] = robot_speech_bubble(str);
   $speech_bubbles[id].slideDown();
   $speech_bubbles[id].attr("style", "display: block");

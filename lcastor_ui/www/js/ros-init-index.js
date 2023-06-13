@@ -89,7 +89,8 @@ function start_ros(){
 
   // wait some time to be sure the file env.json is read
   setTimeout(function(){
-    ip = env["ROS_MASTER"];
+    ip = env["ROBOT_IP"];
+    console.log("connecting to" + 'ws://' + ip + ':9090' )
     ros.connect('ws://' + ip + ':9090');
   }, 1000); // 1 sec
 
@@ -122,7 +123,11 @@ function Subscribe(){
 
   ROS_TOPIC_HANDLES['/tts/goal'].subscribe(function(msg) {
       console.log('listener_speech_goal msg.goal='+msg.goal.text);
-      Show_robot_speech(msg.goal.text, msg.goal_id.id, 'nonblock');
+      if (msg.goal.rawtext.text != "") {
+        Show_robot_speech(msg.goal.rawtext.text, msg.goal_id.id, 'nonblock');
+      } else{
+        Show_robot_speech("TODO check exact format for this case", msg.goal_id.id, 'nonblock');
+      }
   });
 
   ROS_TOPIC_HANDLES['/tts/result'].subscribe(function(msg) {
@@ -217,10 +222,10 @@ function Subscribe(){
     Close_listening_alert();
   });
 
-  ROS_TOPIC_HANDLES['/task_executor/events'].subscribe(function(msg) {
-    console.log('listener /task_executor/events msg='+ msg);
-    Notify_task_event(msg);
-  });
+  // ROS_TOPIC_HANDLES['/task_executor/events'].subscribe(function(msg) {
+  //   console.log('listener /task_executor/events msg='+ msg);
+  //   Notify_task_event(msg);
+  // });
 
   ROS_TOPIC_HANDLES['/PNPActionCmd'].subscribe(function(msg) {
     console.log('listener /PNPActionCmd msg.data='+ msg.data);

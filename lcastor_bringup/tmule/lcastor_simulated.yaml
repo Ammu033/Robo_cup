@@ -69,7 +69,7 @@ windows:
     panes:
       - 'roslaunch rosbridge_server rosbridge_websocket.launch'
       - 'roslaunch lcastor_ui start_server.launch'
-      - 'sleep 5; roslaunch lcastor_ui start_chrome.launch'
+      - '#sleep 5; roslaunch lcastor_ui start_chrome.launch'
   - name: rviz
     tags: ['viz']
     panes:
