@@ -50,6 +50,7 @@
   <!--   <doc_depend>doxygen</doc_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>octomap_server</build_depend>
+  <build_depend>message_generation</build_depend>
   <build_export_depend>octomap_server</build_export_depend>
   
   <!-- rtabmap dependencies -->
@@ -76,6 +77,7 @@
   <depend>roscpp</depend>
   <depend>rtabmap_conversions</depend>  
   <!-- rtabmap dependencies -->
+  <exec_depend>message_runtime</exec_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
