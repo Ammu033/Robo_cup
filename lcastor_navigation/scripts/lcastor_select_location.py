@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import rospy
-import lcastor_navigation
 from lcastor_navigation.srv import FindLocation, FindLocationResponse
 
 NODE_NAME = "destination_selector"
