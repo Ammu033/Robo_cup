@@ -141,12 +141,36 @@ function Show_modalContinue(text) {
   console.log("showing dialog continue");
 }
 
+function Show_modalInput(text) {
+  $("[role=modal]").load("modalInput.html", function() {
+    $('[role=dialog]').modal({
+      backdrop: 'static',
+      keyboard: false,
+      focus: true
+    });
+    overlay_off();
+    $('.modal-title').html(text.split("_").join(" "));
+    $('[role=dialog]').modal('show');
+
+    $('#continue_btn').mousedown(function(){
+      Signal_buttonPressed("modalInput");
+    });
+    // $("body").prepend(modal_dialog);
+  });
+  console.log("showing dialog continue");
+}
+
 function Close_modal(text) {
   $('[role=dialog]').modal('hide');
   console.log("hiding dialog");
 }
 
 function Close_modalContinue(text) {
+  $('[role=dialog]').modal('hide');
+  console.log("hiding dialog");
+}
+
+function Close_modalInput(text) {
   $('[role=dialog]').modal('hide');
   console.log("hiding dialog");
 }

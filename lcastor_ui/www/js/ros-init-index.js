@@ -15,6 +15,8 @@ var TOPICS = {
     '/interface/showmodalclose': 'std_msgs/String',
     '/interface/showmodalcontinue': 'std_msgs/String',
     '/interface/showmodalcontinueclose': 'std_msgs/String',
+    '/interface/showmodalinput': 'std_msgs/String',
+    '/interface/showmodalinputclose': 'std_msgs/String',
     '/STT/goal': 'lindimp_stt/STTActionGoal',
     '/STT/cancel': 'actionlib_msgs/GoalID',
     '/STT/result': 'lindimp_stt/STTActionResult',
@@ -204,6 +206,16 @@ function Subscribe(){
   ROS_TOPIC_HANDLES['/interface/showmodalcontinueclose'].subscribe(function(msg) {
     console.log('listener interface show modalConinue msg.data='+msg.data);
     Close_modalContinue(msg.data);
+  });
+
+  ROS_TOPIC_HANDLES['/interface/showmodalInput'].subscribe(function(msg) {
+    console.log('listener interface show modalInput msg.data='+msg.data);
+    Show_modalInput(msg.data);
+  });
+
+  ROS_TOPIC_HANDLES['/interface/showmodalInputclose'].subscribe(function(msg) {
+    console.log('listener interface show modalInput msg.data='+msg.data);
+    Close_modalInput(msg.data);
   });
 
 
