@@ -152,8 +152,12 @@ function Show_modalInput(text) {
     $('.modal-title').html(text.split("_").join(" "));
     $('[role=dialog]').modal('show');
 
-    $('#continue_btn').mousedown(function(){
+    $('#submit_btn').click(function(event){
+      var sentence = $('#InputText').val();
+      console.log("submitted" + sentence);
+      Alternative_input(sentence);
       Signal_buttonPressed("modalInput");
+      Close_modalInput();
     });
     // $("body").prepend(modal_dialog);
   });

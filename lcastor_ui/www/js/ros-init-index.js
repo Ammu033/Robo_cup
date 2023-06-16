@@ -1,4 +1,5 @@
 var TOPICS = {
+    '/alternative_stt': 'std_msgs/String',
     '/interface/status': 'std_msgs/String',
     '/interface/enable': 'std_msgs/String',
     '/interface/disable': 'std_msgs/String',
@@ -15,11 +16,11 @@ var TOPICS = {
     '/interface/showmodalclose': 'std_msgs/String',
     '/interface/showmodalcontinue': 'std_msgs/String',
     '/interface/showmodalcontinueclose': 'std_msgs/String',
-    '/interface/showmodalinput': 'std_msgs/String',
-    '/interface/showmodalinputclose': 'std_msgs/String',
-    '/STT/goal': 'lindimp_stt/STTActionGoal',
-    '/STT/cancel': 'actionlib_msgs/GoalID',
-    '/STT/result': 'lindimp_stt/STTActionResult',
+    '/interface/showmodalInput': 'std_msgs/String',
+    '/interface/showmodalInputclose': 'std_msgs/String',
+    // '/STT/goal': 'lindimp_stt/STTActionGoal',
+    // '/STT/cancel': 'actionlib_msgs/GoalID',
+    // '/STT/result': 'lindimp_stt/STTActionResult',
     '/interface/buttonPressed': 'std_msgs/String',
     '/interface/buttonPressedWhileDisabled': 'std_msgs/String',
     '/interface/pageRefreshed': 'std_msgs/String',
@@ -32,12 +33,12 @@ var TOPICS = {
     '/PNPActionCmd': 'std_msgs/String',
     '/joy_priority': 'std_msgs/Bool',
     // '/localization_status': 'lindimp_navigation/LocalizationStatus',
-    '/virtual_bumper_event': 'scitos_virtual_bumper/virtualbumperevent',
+    // '/virtual_bumper_event': 'scitos_virtual_bumper/virtualbumperevent',
     // '/blacklisted_areas_monitor/event': 'lindimp_navigation/BlacklistedMonitorEvent'
   };
 
 var ACTIONCLIENTS = {
-    '/speak': 'mary_tts/maryttsAction',
+    '/tts': 'pal_interaction_msgs/TtsAction',
   };
 
 
@@ -219,20 +220,20 @@ function Subscribe(){
   });
 
 
-  ROS_TOPIC_HANDLES['/STT/goal'].subscribe(function(msg) {
-    console.log('listener /STT/goal msg.goal.msg='+ msg.goal.msg);
-    Show_listening_alert(msg.goal.msg);
-  });
+  // ROS_TOPIC_HANDLES['/STT/goal'].subscribe(function(msg) {
+  //   console.log('listener /STT/goal msg.goal.msg='+ msg.goal.msg);
+  //   Show_listening_alert(msg.goal.msg);
+  // });
 
-  ROS_TOPIC_HANDLES['/STT/result'].subscribe(function(msg) {
-    console.log('listener /STT/resutl  msg.result.transcription='+ msg.result.transcription);
-    Close_listening_alert();
-  });
+  // ROS_TOPIC_HANDLES['/STT/result'].subscribe(function(msg) {
+  //   console.log('listener /STT/resutl  msg.result.transcription='+ msg.result.transcription);
+  //   Close_listening_alert();
+  // });
 
-  ROS_TOPIC_HANDLES['/STT/cancel'].subscribe(function(msg) {
-    console.log('listener /STT/cancel  msg.result.transcription='+ msg);
-    Close_listening_alert();
-  });
+  // ROS_TOPIC_HANDLES['/STT/cancel'].subscribe(function(msg) {
+  //   console.log('listener /STT/cancel  msg.result.transcription='+ msg);
+  //   Close_listening_alert();
+  // });
 
   // ROS_TOPIC_HANDLES['/task_executor/events'].subscribe(function(msg) {
   //   console.log('listener /task_executor/events msg='+ msg);
@@ -416,6 +417,17 @@ function Interface_status(str){
 
     // And finally, publish.
     ROS_TOPIC_HANDLES['/interface/status'].publish(msg);
+}
+
+function Alternative_input(sentence) {
+  console.log("publishing" + sentence);
+  var str_sentence = ""+sentence+""; 
+  msg = new ROSLIB.Message({
+    data: str_sentence
+  });
+
+  // And finally, publish.
+  ROS_TOPIC_HANDLES['/alternative_stt'].publish(msg);
 }
 
 function Start_tour_task(tour_key, duration=60*60) {
