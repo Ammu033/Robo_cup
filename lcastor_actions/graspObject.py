@@ -13,24 +13,23 @@ from AbstractAction import AbstractAction
 """
 Starts and stops the object detection node
 """
-class waitOpenDoor(AbstractAction):
+class graspObject(AbstractAction):
 
     def _start_action(self):
-        rospy.loginfo('Waiting until the door opens...')
+        #NOTE: Assume self.params is a list of strings where the first element contains the name of the object to grasp
+        rospy.loginfo('Starting to grasp ' + " ".join(self.params) + ' ...')
 
-        #TODO: here put the code necessary to detect the opening of a door just in front of the robot
+        #TODO: here put the code necessary to grasp the object
 
     def _stop_action(self):
-        #TODO: here put the code necessary to cleanly stop the opening door detection
-        
+        #TODO: here put the code necessary to cleanly stop the object grasping
 
         self.params.append("done")
-        rospy.loginfo('STOPPED waitopendoor action')
+        rospy.loginfo('STOPPED grasp object action')
 
     @classmethod
     def is_goal_reached(cls, params):
-        #TODO make the necessary changes to make sure that the below is also True after the door has been opened
-        
+        #TODO make sure the below returns True when the object has been grasped
         reached = False
         if len(params) > 0 and params[-1] == "done":
             reached = True

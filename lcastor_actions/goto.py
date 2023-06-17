@@ -26,7 +26,7 @@ class goto(AbstractAction):
         
 
         self.params.append("done")
-        rospy.loginfo('STOPPED detect action')
+        rospy.loginfo('STOPPED goto action')
 
     @classmethod
     def is_goal_reached(cls, params):

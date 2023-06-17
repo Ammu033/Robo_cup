@@ -16,7 +16,7 @@ Starts and stops the object detection node
 class followPerson(AbstractAction):
 
     def _start_action(self):
-        #NOTE: Assume self.params is a list of strings where the first element contains the ID of the person to follow
+        #NOTE: Assume self.params is a list of strings where the first element contains the tracker ID of the person to follow
         rospy.loginfo('Starting to follow ' + " ".join(self.params) + ' ...')
 
         #TODO: here put the code necessary to start the person following
@@ -25,7 +25,7 @@ class followPerson(AbstractAction):
         #TODO: here put the code necessary to cleanly stop the person following
 
         self.params.append("done")
-        rospy.loginfo('STOPPED listen action')
+        rospy.loginfo('STOPPED follow person action')
 
     @classmethod
     def is_goal_reached(cls, params):        

@@ -26,7 +26,7 @@ class gestureDetection(AbstractAction):
         
 
         self.params.append("done")
-        rospy.loginfo('STOPPED gesture action')
+        rospy.loginfo('STOPPED gesture detection action')
 
     @classmethod
     def is_goal_reached(cls, params):
