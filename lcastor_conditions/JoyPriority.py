@@ -21,10 +21,9 @@ class JoyPriority(AbstractTopicCondition):
     _topic_type = Bool
 
     def _get_value_from_data(self, data):
-        return str(data.data)
+        return bool(data.data)
 
     def evaluate(self, params):
         if self.last_value is not None:
-            if (self.last_value.lower() == str(params[0]).lower()):
-                return True
+            return self.last_value
         return False
