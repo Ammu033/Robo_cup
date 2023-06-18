@@ -15,7 +15,7 @@ from std_msgs.msg import Bool
 from AbstractTopicCondition import AbstractTopicCondition
 
 class IsGestureDetected(AbstractTopicCondition):
-    _topic_name = "" #TODO change this with the correct topic
+    _topic_name = "/test" #TODO change this with the correct topic
 
     _topic_type = Bool #TODO change this with the correct topic message
 
