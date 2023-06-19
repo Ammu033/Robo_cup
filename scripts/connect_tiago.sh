@@ -7,7 +7,6 @@
 TIAGO_NUM=$1
 ETH=$2
 #echo $TIAGO_NUM
-#echo $ROBOT_IFACE
 
 # Change ROS Master
 if [ "$ETH" -eq 0 ]; then

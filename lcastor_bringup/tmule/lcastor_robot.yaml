@@ -28,14 +28,14 @@ init_cmd: |
   export_default TIAGO_TYPE "titanium"
 
   # world arguments
-  export_default WORLD "small_office"
-  export_default GZ_GUI "true"
+  #export_default WORLD "small_office"
+  #export_default GZ_GUI "true"
 
   # navigation specific arguments
   export_default GLOBAL_PLANNER "global_planner"
   export_default LOCAL_PLANNER "teb"
   export_default LOCALIZATION "amcl"
-  export_default CONFIG_BASE_PATH "$(rospack find lcastor_navigation)"
+  export_default CONFIG_BASE_PATH "$(rospack find pal_navigation_cfg_tiago)"
   export_default MAP "$HOME/.pal/tiago_maps/configurations/$WORLD"
   export_default LASER_MODEL "sick-571"
   export_default RGBD_SENSORS "false"
@@ -48,32 +48,15 @@ init_cmd: |
 
 windows:
   - name: roscore
-    tags: ['core', 'robot', 'nav']
+    tags: ['core']
     panes:
-      - roscore
       - htop
-  - name: simulation
-    tags: ['core', 'robot', 'nav']
-    panes:
-      - 'roslaunch lcastor_gazebo lcastor_gazebo.launch robot:=$TIAGO_TYPE end_effector:=$TIAGO_EE public_sim:=true world:=$WORLD'
-  - name: navigation
-    tags: ['nav']
-    panes:
-      - 'roslaunch tiago_2dnav_gazebo navigation.launch public_sim:=true global_planner:=$GLOBAL_PLANNER local_planner:=$LOCAL_PLANNER localization:=$LOCALIZATION config_base_path:=$CONFIG_BASE_PATH map:=$MAP rgbd_sensors:=$RGBD_SENSORS laser_model:=$LASER_MODEL base_type:=$BASE_TYPE'
-  - name: nav_octomap
-    tags: ['nav_oct']
-    panes: 
-      - 'roslaunch lcastor_navigation lcastor_octomap.launch'
-  - name: man_octomap
-    tags: ['man_oct']
-    panes: 
-      - 'rosparam load `rospack find tiago_moveit_tutorial`/config/tiago_octomap_motions.yaml; rosrun topic_tools throttle messages /xtion/depth_registered/points 2  /head_filtered_points'
-      - 'roslaunch lcastor_navigation lcastor_head_octomap.launch'
+      - ping $ROS_MASTER
   - name: planning
-    tags: []
+    tags: ['core']
     panes:
       - 'roslaunch pnp_ros pnp_ros.launch plans_folder:=$PNP_PLANS actions_folder:=$PNP_ACTIONS conditions_folder:=$PNP_CONDITIONS'
   - name: rviz
     tags: ['viz']
     panes:
-      - 'rviz -d "$(rospack find lcastor_navigation)/config/rviz/lcastor_rviz_sim.rviz"'
+      - 'rviz -d "$(rospack find tiago_2dnav)/config/rviz/navigation_public_sim.rviz"'
