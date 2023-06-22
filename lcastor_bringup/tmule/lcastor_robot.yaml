@@ -56,6 +56,10 @@ windows:
     tags: ['core']
     panes:
       - 'roslaunch pnp_ros pnp_ros.launch plans_folder:=$PNP_PLANS actions_folder:=$PNP_ACTIONS conditions_folder:=$PNP_CONDITIONS'
+  - name: navigation
+    tags: ['nav']
+    panes:
+      - 'rosrun lcastor_navigation covariance_monitor.py'
   - name: ui
     tags: ['ui']
     panes:

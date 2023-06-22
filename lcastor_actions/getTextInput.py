@@ -28,7 +28,7 @@ class getTextInput(AbstractAction):
         self.input_close = rospy.Publisher("/interface/showmodalInputclose", String, queue_size=10)
         rospy.Subscriber("/alternative_stt", String, self.__alt_sentence_cb)
 
-        self.input.publish(str(self.params[0]))
+        self.input.publish(str(" ".join(self.params)))
 
     def __alt_sentence_cb(self, msg):
         rospy.set_param("textInput", {"text": msg.data, "time_secs": rospy.get_time()})

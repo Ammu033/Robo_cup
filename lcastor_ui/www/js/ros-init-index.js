@@ -32,8 +32,8 @@ var TOPICS = {
     // '/task_executor/events': 'strands_executive_msgs/TaskEvent',
     '/PNPActionCmd': 'std_msgs/String',
     '/joy_priority': 'std_msgs/Bool',
-    // '/localization_status': 'lindimp_navigation/LocalizationStatus',
-    // '/virtual_bumper_event': 'scitos_virtual_bumper/virtualbumperevent',
+    '/power/is_emergency': 'std_msgs/Bool',
+    '/localization_status': 'lcastor_navigation/LocalizationStatus',
     // '/blacklisted_areas_monitor/event': 'lindimp_navigation/BlacklistedMonitorEvent'
   };
 
@@ -248,6 +248,16 @@ function Subscribe(){
   ROS_TOPIC_HANDLES['/joy_priority'].subscribe(function (msg) {
     console.log('listener /joy_priority msg.data=' + msg.data);
     if (msg.data) {
+      Notify_bumper_pressed();
+    } else {
+      Notify_bumper_released();
+    }
+  });
+
+
+  ROS_TOPIC_HANDLES['/power/is_emergency'].subscribe(function (msg) {
+    console.log('listener /power/is_emergency msg.data=' + msg.data);
+    if (msg.data) {
       Notify_EB_pressed();
     } else {
       Notify_EB_released();
@@ -279,14 +289,14 @@ function Subscribe(){
   //        Notify_bumper_released();
   //     }
   // });
-  // ROS_TOPIC_HANDLES['/localization_status'].subscribe(function(msg) {
-  //     if (msg.status == 0) {
-  //         console.log('localization not accurate notification');
-  //         Notify_localization_bad();
-  //     } else {
-  //         Notify_localization_good();
-  //     }
-  // });
+  ROS_TOPIC_HANDLES['/localization_status'].subscribe(function(msg) {
+      if (msg.status == 0) {
+          console.log('localization not accurate notification');
+          Notify_localization_bad();
+      } else {
+          Notify_localization_good();
+      }
+  });
   // ROS_TOPIC_HANDLES['/blacklisted_areas_monitor/event'].subscribe(function(msg) {
   //   if (msg.status == 1) {
   //       console.log('navigating into blacklisted area!');
