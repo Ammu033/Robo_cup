@@ -23,7 +23,7 @@ class IsTextInputReceived(AbstractTopicCondition):
         return (data.data, rospy.get_time())
 
     def evaluate(self, params):
-        if len(self.last_value) > 0:
+        if self.last_value is not None and len(self.last_value) > 0:
             # this returns true when a sentence was received and is not onlder than a minute ago
             if (rospy.get_time() - self.last_value[1]) < 60.:
                 return True
