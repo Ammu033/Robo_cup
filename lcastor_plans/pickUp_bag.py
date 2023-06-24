@@ -12,20 +12,30 @@ import pnp_cmd_ros
 from pnp_cmd_ros import *
 
 def pickUp_bag(p):
+
+
     p.exec_action("lookAt", "front_person") # TODO
+
+
+    p.exec_action("speak", "Hello,I_will_help_you_carrying_your_bag_to_the_car.")
     # tell the operator to point at the bag
-    p.exec_action("speak", "Please_point_at_the_bag_I_should_pick_up.")
-    # tell the operator to 
-    p.exec_action("detectGesture", "pointing") # TODO
-    p.exec_action("detectBag", "") # TODO
+    p.exec_action("speak", "Sorry,_I_am_not_able_to_pick_up_the_bag.")
+    p.exec_action("speak", "Can_you_please_put_it_in_my_hand?.")
 
-    # grasp the bag
-    p.exec_action("grasp", "pointedBag") # TODO
+    #TODO present arm and opoen gripper
+    # p.exec_action()
 
-    # 
-    # p.add_ER('grasp', 'GraspFailed', ask_push_sentence +
-    #         '; waitFor_FreeRun; restart_action')
+    p.exec_action("speak", "Please_confirm_whe_you_have_placed_the_bag_in_my_hand.")
+
+    p.exec_action("activateRasa", "affirm")
+
+    p.exec_action("listen", "")
+
+    #TODO activate textinput if no speech answer
+    p.add_ER("listen", "timeout_15", "")
+
     
+    p.exec_action("")
 
 if __name__ == "__main__":
 
