@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Memory card game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<!-- jquery mobile -->
+		<link rel="stylesheet" href="js/jquery.mobile-1.4.5.min.css" />
+		<script src="js/jquery-1.7.2.min.js"></script>
+		<script src="js/jquery.mobile-1.4.5.min.js"></script>
+
+<!-- game -->
+  	<link href="js_game/MemoryGame.css" type="text/css" rel="stylesheet" />
+	  <script src="js_game/MemoryGame.js" type="text/javascript"></script>
+    <script src="js_game/Card.js" type="text/javascript"></script>
+		<script src="js_game/BrowserInterface.js" type="text/javascript"></script>
+
+    
+
+<!-- rosbridge -->
+  <script type="text/javascript" src="js/WebSocketTest.js"></script>
+	<script src="js/eventemitter2.js"></script>
+	<script src="js/roslib.js"></script>
+
+<style type="text/css">
+
+.ui-body-a {
+    background-color: white;
+
+}
+#level-form {
+    
+    background-color: white;
+    width: 700px;
+    height: 400px;
+    padding-top:10px;
+    text-align: center;
+    margin: 0 auto;
+    margin-top:100px;
+    z-index: 4;
+    border-radius: 20px;
+  font-size:25px;
+  
+}
+.ui-page-theme-a .ui-btn, html .ui-bar-a .ui-btn, html .ui-body-a .ui-btn{
+
+  border-width: 3px;
+  border-color: black;
+}
+#confirm-start, #restart{
+
+  background-color: green;
+  margin: 0 auto;
+  margin-top:30px;
+  width:60%;
+  height:80px;
+  font-size:30px;
+  border-width: 1px;
+}
+  .ui-mobile label{
+    
+    font-size:25px;
+  }
+#memory--app-container {
+  background-color: blue;
+  width:100%;
+  height:100%;
+  min-width:1100px;
+  min-height:600px;
+}
+
+
+#memory--cards {
+  margin:0 auto;
+  padding:0;
+  height:100%;
+  width:100%;
+  min-width:1100px;
+  list-style-type: none;
+  list-style-image: none;
+  position:relative;
+}
+
+#popupGameOver{
+  background-color: white;
+  text-align: center;
+  height:300px;
+  width:500px;
+}
+
+
+</style>
+
+<script>
+
+
+function Publish_log(entry){
+
+json_entry={"collection":log_collection ,"entry":entry}
+var str_entry=JSON.stringify(json_entry);
+ goal = new ROSLIB.Message({
+		data:str_entry
+
+  });
+
+  pub_log.publish(goal);
+}
+
+function Publish_interface_input(type,speech,img,params){
+
+var str_type=String(type);
+var str_speech=String(speech);
+var str_show=String(speech);
+var str_img=String(img);
+var str_params=String(params);
+
+
+console.log('Interface_command '+str_speech+'|'+str_img+'|'+str_params);
+//log_html('Published message ' + str_goal);	
+ goal = new ROSLIB.Message({
+		type:str_type,
+    txt_speech: str_speech,
+		txt_show: str_show,
+		img_show: str_img,
+		params: str_params
+
+  });
+ // Then we create the payload to be published. The object we pass in to ros.Message matches the 
+
+  // And finally, publish.
+  pub_interface_input.publish(goal);
+
+}
+
+
+var speechMessage = function(statuscode) {
+	console.log('speechMessage='+statuscode)
+
+    if (statuscode == 'clicked' ) {  //Click one card
+
+    }
+
+    else if (statuscode == 'match') { // Match
+			window.parent.Command_speech('Well done!');
+    }
+    else if (statuscode == 'fail' ) { // Fail
+			window.parent.Command_speech('Try again!');
+		}
+    else if (statuscode == 'over' ) { // Game over
+			window.parent.Command_speech('Done!');
+		}
+}
+
+
+ function EndGameMessage (score) {
+
+ $('#score_html').html('Result: '+score+'/ 100');
+  $('#popupGameOver').popup('open');
+    var message = "";
+
+    if (score == 100) {
+      message = "Perfect!"
+    }
+    else if (score >= 70 ) {
+      message = "well done!"
+    }
+    else if (score >= 50) {
+      message = "Well done!"
+    }
+    else {
+      message = "Game over";
+    }
+
+     window.parent.Command_speech(message);
+	 Publish_interface_input('DECIR',message,'','type='+show_text_enabled+'|time_speech=5000|show=1');
+  }
+
+</script>
+
+  </head>
+  <body >
+
+
+<div data-role="page" id="page_init" class="ui-body-a ">
+<div data-role="content" class="ui-body-a ">
+
+	<div  id="level-form" data-overlay-theme="a" data-theme="a" >
+    <font size="15px">Choose level</font>
+			<form id="level-choice" style="margin-top: 30px;">
+					<fieldset data-role="controlgroup" data-type="horizontal" >
+							
+							<input type="radio" name="memory--settings-grid" id="radio-choice-h-2a" value="2x3" checked="checked">
+							<label for="radio-choice-h-2a">Easy</label>
+							<input type="radio" name="memory--settings-grid" id="radio-choice-h-2b" value="3x4">
+							<label for="radio-choice-h-2b">Medium</label>
+							<input type="radio" name="memory--settings-grid" id="radio-choice-h-2c" value="4x5">
+							<label for="radio-choice-h-2c">Hard</label>
+							<input type="radio" name="memory--settings-grid" id="radio-choice-h-2d" value="5x6">
+							<label for="radio-choice-h-2d">Very hard</label>
+					</fieldset>
+          
+			</form>
+<button  id="confirm-start" data-icon="check" data-theme="b" text="Start" >START</button>
+
+	</div>
+
+
+
+</div><!-- /content -->
+
+
+
+
+
+</div><!-- /page -->
+<div data-role="page" id="page_game" class="ui-body-a ">
+<div data-role="content" class="ui-body-a ">
+	<div id="memory--app-container" >
+      <ul id="memory--cards">
+      </ul>
+	</div><!-- /ui-grid-b-->
+
+<!-- popup GameOver -->
+<div data-role="popup" id="popupGameOver" data-overlay-theme="a" data-theme="a" data-dismissible="false">
+		<div data-role="content" data-theme="d" data-mini="true" class="ui-corner-bottom ui-content">
+      <h1>Game over</h1>
+       <h2 id="score_html" size="5px"></h2>
+
+            <div style="text-align:center;font-size: 28px;" >
+                <button  id="restart" data-inline="true"  data-theme="b"  text="Volver a jugar" >Play again</button>
+            </div>
+        </div>
+</div>
+
+<!-- /popup GameOver -->
+
+</div><!-- /content -->
+
+</div><!-- /page -->
+
+<script type="text/javascript">
+
+$(function() {
+console.log('pagebeforechange');
+   //$('#popup-start').popup('open');
+//    $('#start-button').trigger('click');
+
+    $('#confirm-start').on('click', function () {
+
+    $(':mobile-pagecontainer').pagecontainer('change', '#page_game', {
+        transition: 'fade',
+        changeHash: false,
+        reverse: true
+    });
+
+        Start_game();
+        console.log('confirm-start');
+        //$('#popup-start').popup('close');
+				
+    });
+
+
+/*
+  $(document).on("pagecreate", "#page_game", function () {
+
+  
+
+    
+  });
+*/
+
+
+  $('#restart').on('click', function () {
+
+      $('#popupGameover').popup('close');
+
+    $(':mobile-pagecontainer').pagecontainer('change', '#page_init', {
+        transition: 'fade',
+        changeHash: false,
+        reverse: true
+    });
+  });
+
+});
+
+function Start_menu(){
+
+    $(':mobile-pagecontainer').pagecontainer('change', '#page_init', {
+        transition: 'fade',
+        changeHash: false,
+        reverse: true,
+        showLoadMsg: true
+    });
+}
+
+
+
+</script>
+
+</body>
+
+</html>

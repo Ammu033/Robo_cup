@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en" style="height: 100%">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css" crossorigin="anonymous">
+    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous"> -->
+
+    <!-- <link rel="stylesheet" href="/css/ladda.min.css"> -->
+    <link rel="stylesheet" href="/css/index.css">
+
+    <!-- Font Awesome Icons CSS -->
+    <link rel="stylesheet" href="/css/all.css" crossorigin="anonymous">
+    <!-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous"> -->
+
+    <title>The LCASTOR Robot App</title>
+
+  </head>
+
+  <body style="height: 100%;overflow:hidden;">
+    <div id="overlay"></div>
+    <!-- <div role="EB-alert" class="alert alert-danger text-dark font-weight-bold" role="alert" aria-atomic="true" style="font-size:20px;background-color: rgba(255, 0, 0, 0.8); border-color: black; display: true; width:100%; z-index:1000">My emergency buttons are pressed, I can't move until they are released!</div> -->
+    <div style="position: absolute; top: 5px; left: 5px; z-index:1000">
+        <div role="EB-alert" class="toast bg-danger shadow-lg" role="alert" aria-atomic="true" data-autohide="false" style="z-index:1000; font-size:15px">
+            <div class="toast-header">
+              <img src="/images/warning.png" class="rounded mr-2" style="width: 20px">
+              <strong class="mr-auto text-uppercase">Warning: navigation disabled</strong>
+            </div>
+            <div class="toast-body text-light">
+                My emergency buttons are pressed. Please release them to re-activate my motors.
+            </div>
+        </div>
+        <div role="localization-alert" class="toast bg-danger shadow-lg" role="alert" aria-atomic="true" data-autohide="false" style="z-index:1000; font-size:15px">
+            <div class="toast-header">
+              <img src="/images/warning.png" class="rounded mr-2" style="width: 20px">
+              <strong class="mr-auto text-uppercase">Warning: navigation disabled</strong>
+            </div>
+            <div class="toast-body text-light">
+                The localization accuracy is below a critical value. Please, more me around to improve it.
+            </div>
+        </div>
+        <div role="bumper-alert" class="toast bg-danger shadow-lg" role="alert" aria-atomic="true" data-autohide="false" style="z-index:1000; font-size:15px">
+            <div class="toast-header">
+              <img src="/images/warning.png" class="rounded mr-2" style="width: 20px">
+              <strong class="mr-auto text-uppercase">Warning: motors priority</strong>
+            </div>
+            <div class="toast-body text-light">
+                The motors priority is given to the joystick. Release it to allow me to move.
+            </div>
+        </div>
+        <!-- <div role="blocked-alert" class="toast bg-danger shadow-lg" role="alert" aria-atomic="true" data-autohide="false" style="z-index:1000; font-size:15px">
+            <div class="toast-header">
+              <img src="/images/warning.png" class="rounded mr-2" style="width: 20px">
+              <strong class="mr-auto text-uppercase">Warning: navigation disabled</strong>
+            </div>
+            <div class="toast-body text-light">
+                I am in a blocked area. Please push me outside of it or contact a member of staff.
+            </div>
+        </div> -->
+    </div>
+
+    <div role=header> </div>
+
+    <div role=content style="height: 500px">
+    </div>
+
+    <div role=modal></div>
+
+    <div role=listening-alert></div>
+
+    <div role=footer> </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="/js/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script> -->
+    <script src="/js/jquery-ui.js"></script>
+    <!-- <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script> -->
+    <script src="/js/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script> -->
+    <script src="/js/bootstrap.min.js" crossorigin="anonymous"></script>
+    <!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script> -->
+
+    <script src="/js/spin.min.js"></script>
+    <!-- <script src="/js/ladda.min.js"></script> -->
+
+    <!-- For some util function -->
+    <script src="/js/utilities.js"></script>
+    <!-- For communicating with ros -->
+    <script src="/js/ros-init-index.js"></script>
+    <!-- For allowuing switching between pages -->
+    <script src="/js/pageEvents.js"></script>
+    <!-- For showing notifications -->
+    <script src="/js/notifications.js"></script>
+    <!-- For volume control -->
+    <script src="/js/volume.js"></script>
+
+    <script>
+      Show_home();
+    </script>
+
+  </body>
+</html>

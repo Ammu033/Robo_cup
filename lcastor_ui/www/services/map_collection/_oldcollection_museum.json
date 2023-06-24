@@ -1,0 +1,108 @@
+{
+	"mapwidth": "1000",
+	"mapheight": "800",
+	"categories": [
+        {
+			"id": "highlights",
+			"title": "Highlights",
+			"color": "#c97310",
+			"show": "false"
+		},
+       {
+			"id": "collections",
+			"title": "Collections",
+			"color": "blue",
+			"show": "false"
+		}
+
+	],
+	"levels": [
+		{
+			"id": "collection",
+			"name": "0",
+			"title": "The collection",
+			"map": "images/collection-map.jpg",
+			"minimap": "images/collection-map.jpg",
+			"locations": [
+				{
+					"id": "weltonstone",
+					"title": "Welton-le-Wold stone axes",
+					"about": "",
+					"description": "<p>Between 1969 and 1972, Professor Alan Straw and Chris Alabaster (a schoolboy) discovered three hand axes, flint tools and animal bones in a quarry face at Welton-le-Wold. It was soon realised that these finds were important not just for their extreme age, but for their context within the quarry face.</p>",
+					"category": "highlights",
+					"link": "",
+					"x": "0.11",
+					"y": "0.60",
+					"zoom": "3",
+					"waypoint": "WayPoint1"
+				},
+              {
+					"id": "bonzeage",
+					"title": "Bronze Age gold",
+					"about": "",
+					"description": "<img src=\"/services/map_collection/images/collection_museum/bangle_746_440.jpg\" alt=\"Bronze Age\"><p>This gold neck torc and bracelet were found at Sudbrook and Baumber respectively, and represent the growing wealth of certain individuals in late Bronze Age Lincolnshire. They were both made between 900 and 700 BC, though it is not known where they were made, or what the source of the gold was. In both cases, the gold content is very high, though it is alloyed with silver and copper.</p>",
+					"category": "highlights",
+					"link": "",
+					"x": "0.22",
+					"y": "0.45",
+					"zoom": "2",
+					"waypoint": "WayPoint2"
+				},
+              {
+					"id": "anglosaxon",
+					"title": "Anglo Saxon grave goods",
+					"about": "",
+					"description": "<p>As Roman influence was withdrawn from Britain in the early 5th Century, a new cultural influence began to appear, brought by continental migrants known as Angles, Saxons, Jutes and Franks.",
+					"category": "highlights",
+					"link": "",
+					"x": "0.70",
+					"y": "0.29",
+					"zoom": "3",
+					"waypoint": "WayPoint3"
+				}
+
+
+			]
+		},
+		{
+			"id": "usher_g",
+			"name": "1",
+			"title": "Usher Ground Floor",
+			"map": "/services/map_collection/images/collection_museum/usher-map-g.jpg",
+			"minimap": "/services/map_collection/images/collection_museum/usher-map-g.jpg",
+			"locations": [
+                {
+					"id": "PeterDeWint",
+					"title": "Collection of paintings by Peter DeWint (1784–1849)",
+					"about": "",
+					"description": "<p></p>",
+					"category": "collections",
+					"link": "",
+					"x": "0.74",
+					"y": "0.55",
+					"zoom": "2"				}
+			]
+		},
+
+		{
+			"id": "usher_first",
+			"name": "2",
+			"title": "Usher First Floor",
+			"map": "/services/map_collection/images/collection_museum/usher-map-1.jpg",
+			"minimap": "/services/map_collection/images/collection_museum/usher-map-1.jpg",
+			"locations": [
+                              {
+					"id": "longcaseclock",
+					"title": "Longcase clock by Robert Sutton (1774–1835)",
+					"about": "",
+					"description": "<p></p>",
+					"category": "highlights",
+					"link": "",
+					"x": "0.15",
+					"y": "0.31",
+					"zoom": "0"
+				}
+			]
+		}
+	]
+}

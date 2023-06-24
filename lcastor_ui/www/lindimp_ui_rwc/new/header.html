@@ -1,0 +1,39 @@
+<header class="navbar navbar-collapse navbar-dark" style="background-color:#563C55">
+  <a class="navbar-brand">
+    <img id="collectionLogoImg" src="images/logo-collection.png" draggable="false" alt="">
+  </a>
+  <rwc-button-load-page
+  data-id="homeButton"
+  data-class="headerButton"
+  data-busy-class="headerButtonBusy"
+  data-clicked-class="headerButtonClicked"
+  data-text="Home"
+  data-href="index.html">
+  </rwc-button-load-page>
+  <div class="btn-group" role="group">
+      <rwc-button-action-start
+      data-id="volDownButton"
+      data-class="headerButton"
+      data-busy-class="headerButtonBusy"
+      data-clicked-class="headerButtonClicked"
+      data-text="&#128265;"
+      data-action="volumePercentChange"
+      data-action-parameters="-20"
+      data-always-enabled>
+      </rwc-button-action-start>
+      <rwc-button-action-start
+      data-id="volUpButton"
+      data-class="headerButton"
+      data-busy-class="headerButtonBusy"
+      data-clicked-class="headerButtonClicked"
+      data-text="&#128266;"
+      data-action="volumePercentChange"
+      data-action-parameters="20"
+      data-always-enabled>
+      </rwc-button-action-start>
+ </div>
+  <div class="navbar-item">
+    <img id="lincolnLogoImg" class="mr-1 pr-0" src="images/university.jpg" draggable="false" style="height: 110px; box-shadow: 1px 1px 15px #000000" alt="" >
+    <img id="lcasLogoImg" src="images/lcas.png" draggable="false" style="height: 110px; box-shadow: 1px 1px 15px #000000" alt="" >
+  </div>
+</header>
