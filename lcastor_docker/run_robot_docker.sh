@@ -2,7 +2,7 @@
 
 
 
-image_name=lcas.lincoln.ac.uk/lcastor/lcastor_base:ui
+image_name=lcas.lincoln.ac.uk/lcastor/lcastor_base
 
 xhost + local:docker
 
