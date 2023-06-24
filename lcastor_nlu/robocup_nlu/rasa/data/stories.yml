@@ -1,0 +1,38 @@
+version: "3.1"
+
+stories:
+
+- story: Robot starts conversation with a person, but it doesn't know the name of the person
+  steps:
+  - intent: greet
+  - action: action_check_person_name
+  - slot_was_set:
+    - person_name_known: false
+  - action: utter_greet_1
+  #- action: action_slot_reset
+
+- story: Robot offers help to a person, using his/her name
+  steps:
+  - intent: greet
+  - action: action_check_person_name
+  - slot_was_set:
+    - person_name_known: true
+  - action: utter_greet_2
+  - action: action_slot_reset
+
+- story: follow me
+  steps:
+  - intent: follow_me
+  - action: action_person_follow
+  - action: action_slot_reset
+
+#- story: go somewhere
+#  steps:
+#  - intent: go_to
+#    entities:
+#    - location
+#  - action: action_go_to
+#  - action: action_slot_reset
+
+
+

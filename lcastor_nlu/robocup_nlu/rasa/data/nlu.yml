@@ -1,0 +1,162 @@
+version: "3.1"
+nlu:
+- intent: out_of_scope
+  examples: |
+    - I want to order food
+    - What is 2 plus 2?
+    - Who's the US President?
+    - Can you bring me an object?
+    - can you grab an object?
+    - Can you cook?
+    - can you prepare a pizza?
+- intent: greet
+  examples: |
+    - hey
+    - hello
+    - hi
+    - hello there
+    - good morning
+    - good evening
+    - moin
+    - hey there
+    - let's go
+    - hey dude
+    - goodmorning
+    - goodevening
+    - good afternoon  
+    - hi, I am [leonardo](person_name)
+    - hello, I'm [ricardo](person_name)
+    - good morning, my name is [francesco](person_name)  
+    - I am [jacob](person_name)
+    - my name is [marc](person_name)
+    - I am [thomas](person_name)
+    - I am [charles](person_name)
+    - Hi, I am [sophy](person_name)
+    - my name is [helen](person_name)
+    - my name is [katherine](person_name)
+    - Hi, my name is [nico](person_name)
+- intent: affirm
+  examples: |
+    - yes
+    - indeed
+    - of course
+    - that sounds good
+    - correct
+- intent: deny
+  examples: |
+    - no
+    - never
+    - I don't think so
+    - don't like that
+    - no way
+    - not really
+- intent: robot_introduction
+  examples: |
+    - are you a robot?
+    - who are you?
+    - who is your creator?
+    - what is the name of your team?
+    - what is your name?
+    - what's your name?
+    - hello, what is your name?
+    - how the people call you?
+    - how old are you?
+    - are you a human?
+    - are you a person?
+    - which kind of robot are you?
+    - where are you from?
+    
+- intent: go_to
+  examples: |
+    - go to [kitchen](location)
+    - I would like you to go to the [dinning room](location)
+    - Can you go to the [lounge](location), please?
+    - go to the [living room](location)
+    - go to the [bedroom](location)
+    - go to the [toilet](location)
+- intent: follow_a_person
+  examples: |
+    - follow a person
+    - can you follow her?
+    - please follow him
+    - follow the person
+    - I need you to follow a person
+    - please follow a lady
+- intent: person_description
+  examples: |
+    - a [red](clothes_color) [shirt](clothes_type)
+    - a [blue](clothes_color) [pants](clothes_type)
+    - a [black](clothes_color) [sweater](clothes_type)
+    - a [white](clothes_color) [shoes](clothes_type)
+    - a [red](clothes_color) [jacket](clothes_type)
+    - a [green](clothes_color) [hat](clothes_type)
+    - a [white](clothes_color) [jumper](clothes_type)
+    - the [shirt](clothes_type) is [white](clothes_color) 
+    - the [pants](clothes_type) are [blue](clothes_color)
+    - the [sweater](clothes_type) is [white](clothes_color)
+    - the [hat](clothes_type) is [yellow](clothes_color)
+    - [shortpants](clothes_type)
+    - [red][red](clothes_color)
+    - the color is [blue](clothes_color) 
+    - it is [black](clothes_color)
+    - it is [white](clothes_color)
+    - it seems to be [black](clothes_color)
+    - [green](clothes_color)
+    - [yellow](clothes_color)
+    - he is wearing a [jumper](clothes_type)
+    - she has a [hat](clothes_type)
+    - a [hoodie](clothes_type)
+    - the person has a [jacket](clothes_type)
+    - [shoes](clothes_type)
+    - a [sweater](clothes_type)
+    - he is wearing [pants](clothes_type)
+    - a [shirt](clothes_type)
+    
+- intent: follow_me
+  examples: |
+    - follow me
+    - Can you follow me please?
+    - start following me
+    - you have to follow me
+    - please, follow me
+    - follow
+    - follow me please
+- intent: stop_task
+  examples: |
+    - stop following
+    - please, stop following me
+    - stop
+    - don't move
+    - pause
+    - wait
+    - stop the task
+    - do not grasp
+    - please, stop
+    - do not move
+    - can you pause?
+    - can you wait?
+- intent: grasp_object
+  examples: |
+    - can you take a [cup](object_name)
+    - can you pick up the [orange](object_name)
+    - can you grasp the [fruit](object_name) in front of you?
+    - please take the [bottle](object_name) on the table
+    - can you grab the [book](object_name) next to you?
+    - can you take an object?
+    - can you grasp an object?
+    - can you please grasp something?
+    - can you pick up an [apple](object_name)
+    - the object is a [box](object_name)
+    - the object is a [ball](object_name)
+    - grap a [banana](object_name)
+    - grasp a [chair](object_name)
+    - take a [remote](object_name)
+    - pick up a [bowl](object_name)
+    - grap a [cell phone](object_name)
+    - can you grasp an object for me?
+    - can you pick up an object for me?
+    - can you grasp something for me?
+    - are you capable to grasp an object?
+    - can you manipulate an object?
+    - take an object
+    - pick up an object

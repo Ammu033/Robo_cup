@@ -1,0 +1,137 @@
+version: '3.1'
+intents:
+#- affirm
+#- deny
+- greet
+- robot_introduction
+#- go_to
+#- follow_a_person
+- follow_me
+- stop_task
+#- grasp_object
+#- person_description
+
+entities:
+#- clothes_type
+#- clothes_color
+#- location
+#- object_name
+- person_name
+slots:
+#  location:
+#    type: text
+#    mappings:
+#    - type: from_entity
+#      entity: location
+#      intent: go_to
+#      not_intent: follow_a_person
+#  object_name:
+#    type: text
+#    mappings:
+#    - type: from_entity
+#      entity: object_name
+#      intent: grasp_object
+#      not_intent: person_description
+#      conditions:
+#      - active_loop: object_to_grasp_form
+#        requested_slot: object_name
+  person_name:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: person_name
+      intent: greet
+    - type: from_entity
+      entity: person_name
+      intent: robot_introduction        
+  person_name_known:
+    type: bool
+    mappings:
+    - type: custom
+#  clothes_color:
+#    type: text
+#    mappings:
+#    - type: from_text
+#      intent: person_description
+#      not_intent: grasp_object
+#      conditions:
+#      - active_loop: person_description_form
+#        requested_slot: clothes_color
+#    - type: from_text
+#      intent: follow_a_person
+#      not_intent: grasp_object
+#      conditions:
+#      - active_loop: person_description_form
+#        requested_slot: clothes_color
+#  clothes_type:
+#    type: text
+#    mappings:
+#    - type: from_text
+#      intent: person_description
+#      conditions:
+#      - active_loop: person_description_form
+#        requested_slot: clothes_type
+#    - type: from_text
+#      intent: follow_a_person
+#      conditions:
+#      - active_loop: person_description_form
+#        requested_slot: clothes_type
+#  person_authentication:
+#    type: bool
+#    mappings:
+#    - type: from_intent
+#      intent: affirm
+#      value: true
+#      conditions:
+#      - active_loop: person_description_form
+#        requested_slot: person_authentication
+#    - type: from_intent
+#      intent: deny
+#      value: false
+#      conditions:
+#      - active_loop: person_description_form
+#        requested_slot: person_authentication
+
+#forms:
+#  person_description_form:
+#    required_slots:
+#    - clothes_type
+#    - clothes_color
+#  object_to_grasp_form:
+#    required_slots:
+#    - object_name
+    
+responses:
+  utter_out_of_scope:
+  - text: Sorry, I can't handle that request.
+  - text: Sorry, that's not a skill I've learned yet.
+  utter_ask_rephrase:
+  - text: I'm sorry, I didn't quite understand that. Could you rephrase?
+  utter_greet_1:
+  - text: Hi! my name is Tiago, what is your name?
+  utter_greet_2:
+  - text: Nice to meet you {person_name}, what can I do for you?
+  utter_iamtiago:
+  - text: My name is TIAGO, I am a robot programed by the Robocup team at the University of Lincoln.
+  utter_default:
+  - text: I'm sorry, I can't help you.
+#  utter_ask_clothes_color:
+#  - text: Can you please tell me what is the color of the {clothes_type} that the person is wearing?
+#  utter_ask_clothes_type:
+#  - text: Can you please give me the name of any clothing peace that the person is wearing now?
+#  utter_ask_object_name:
+#  - text: Can you please give me the name of an object you want me to grasp?
+  utter_stop_task:
+  - text: Ok, I have stop
+actions:
+- action_check_person_name
+#- action_grasp_object
+- action_slot_reset
+- action_person_follow
+#- action_go_to
+- action_stop_task
+#- validate_person_description_form
+#- validate_object_to_grasp_form
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true

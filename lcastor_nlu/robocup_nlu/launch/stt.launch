@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+    <node pkg="robocup_nlp" type="stt.py" name="stt" output="screen" />
+</launch>
+
+
