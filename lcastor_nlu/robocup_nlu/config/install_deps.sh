@@ -24,13 +24,14 @@ pip install git+https://github.com/openai/whisper.git
 echo "Whisper installed"
 
 # Torch
-pip install --extra-index-url https://download.pytorch.org/whl/cu113
+#pip install --extra-index-url https://download.pytorch.org/whl/cu113
 pip install torch
 echo "Torch installed"
 
 # RASA
-pip install rasa
+pip3 install rasa==3.5.11
 pip3 install pyOpenSSL --upgrade
+pip install netifaces
 echo "Rasa installed"
 
 # FLASK

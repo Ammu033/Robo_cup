@@ -41,19 +41,20 @@ windows:
   cleck: "rostopic list"
 - name: stt
   panes:
-  - sleep 2; roslaunch robocup_nlp stt.launch 
+  - sleep 2; #roslaunch robocup_nlp stt.launch 
 - name: nlu
   panes:
   - sleep 2; roscd robocup_nlp/rasa ; rasa run
   - sleep 2; roscd robocup_nlp/rasa ; rasa run actions
   - sleep 25 ; rosrun robocup_nlp rasa_ros_bridge.py 
-#- name: tts
-#  panes:
-#  - sleep 5 ; rosrun robocup_nlp tiago_tts.py
+- name: tts
+  panes:
+  - sleep 5 ; rosrun robocup_nlp tiago_tts.py
 - name: conversation
   panes:
   - rostopic echo /user_speech
   - rostopic echo /robot_speech
   - rostopic echo /nlp/trigger
+  - rostopic echo /nlp/username
 #############################################################################################
 

@@ -11,8 +11,8 @@ from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.types import DomainDict
 from rasa_sdk.events import AllSlotsReset
 from rasa_sdk.events import SlotSet
-#import roslaunch
-#import rospy
+import roslaunch
+import rospy
 import time
 #from std_msgs.msg import Bool, String
 
@@ -49,16 +49,19 @@ class ActionPersonFollow(Action):
         #    dispatcher.utter_message(text="Following a person, python!")
         
         dispatcher.utter_message(text="Following you!")
-        """
-        import roslaunch
-        import rospy
-        rospy.init_node('rasa_actions', anonymous=True)	
+             
+        
+        rospy.init_node('rasa_actions', anonymous=True)
+        rospy.loginfo("ROS Person following started")
+        	
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
-        cli_args = ["/home/leo/catkin_ws/src/robocup_nlp/launch/trigger_publish.launch",'trigger:=True']
+        cli_args = ["/home/lcastor/ros_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/trigger_publish.launch",'trigger:=True']
+        #cli_args = ["/home/leo/catkin_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/trigger_publish.launch",'trigger:=True']
         roslaunch_args = cli_args[1:]
         roslaunch_file = [(roslaunch.rlutil.resolve_launch_arguments(cli_args)[0], roslaunch_args)]
         parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_file)
         parent.start()
+        """
         
         
         rospy.init_node('rasa_actions')	
@@ -66,11 +69,17 @@ class ActionPersonFollow(Action):
         pub_trigger.publish(True)
         
         
+        #import roslaunch
+        #import rospy
         rospy.init_node('rasa_actions', anonymous=True)	
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
         roslaunch.configure_logging(uuid)
-        launch_person_follow = roslaunch.parent.ROSLaunchParent(uuid, ["/home/leo/catkin_ws/src/robocup_human_sensing/launch/webcam.launch"])
+        #launch_person_follow = roslaunch.parent.ROSLaunchParent(uuid, ["/home/leo/catkin_ws/src/robocup_human_sensing/launch/webcam.launch"])
+        launch_person_follow = roslaunch.parent.ROSLaunchParent(uuid, ["/home/lcastor/ros_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/trigger_publish.launch"])
+        launch_person_follow.start()
 
+        
+        
         launch_person_follow.start()
         rospy.loginfo("ROS Person following started")
         """
@@ -89,17 +98,16 @@ class ActionStopTask(Action):
         domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 
         dispatcher.utter_message(text="I have stopped!")
-        """
-        import roslaunch
-        import rospy
+        
         rospy.init_node('rasa_actions', anonymous=True)	
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
-        cli_args = ["/home/leo/catkin_ws/src/robocup_nlp/launch/trigger_publish.launch",'trigger:=False']
+        cli_args = ["/home/lcastor/ros_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/trigger_publish.launch",'trigger:=False']
+        #cli_args = ["/home/leo/catkin_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/trigger_publish.launch",'trigger:=False']
         roslaunch_args = cli_args[1:]
         roslaunch_file = [(roslaunch.rlutil.resolve_launch_arguments(cli_args)[0], roslaunch_args)]
         parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_file)
         parent.start()
-        
+        """
         
         rospy.init_node('rasa_actions')	
         pub_trigger = rospy.Publisher("/nlp/trigger", Bool, queue_size=1)
@@ -147,6 +155,16 @@ class ActionCheckPersonName(Action):
         person_name = tracker.get_slot("person_name")
         if person_name!=None:
            #dispatcher.utter_message(text="Name is known, python!")
+           
+           rospy.init_node('rasa_actions', anonymous=True)	
+           uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+           cli_args = ["/home/lcastor/ros_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/username_publish.launch",'username:='+person_name]
+           #cli_args = ["/home/leo/catkin_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/username_publish.launch",'username:='+person_name]
+           roslaunch_args = cli_args[1:]
+           roslaunch_file = [(roslaunch.rlutil.resolve_launch_arguments(cli_args)[0], roslaunch_args)]
+           parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_file)
+           parent.start()
+           
            """
            rospy.init_node('rasa_actions')	
            #pub_trigger = rospy.Publisher("/nlp/trigger", Bool, queue_size=1)
@@ -160,13 +178,7 @@ class ActionCheckPersonName(Action):
            
            import roslaunch
            import rospy
-           rospy.init_node('rasa_actions', anonymous=True)	
-           uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
-           cli_args = ["/home/leo/catkin_ws/src/robocup_nlp/launch/username_publish.launch",'username:='+person_name]
-           roslaunch_args = cli_args[1:]
-           roslaunch_file = [(roslaunch.rlutil.resolve_launch_arguments(cli_args)[0], roslaunch_args)]
-           parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_file)
-           parent.start()
+           
            #roslaunch.configure_logging(uuid)
            #launch_person_follow = roslaunch.parent.ROSLaunchParent(uuid, ["/home/leo/catkin_ws/src/robocup_nlp/launch/username_publish.launch"])
            
