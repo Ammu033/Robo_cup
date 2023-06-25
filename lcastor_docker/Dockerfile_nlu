@@ -47,7 +47,7 @@ RUN pip install torch
 # echo "Torch installed"
 
 # RASA
-RUN pip install rasa
+RUN pip3 install rasa==3.5.11
 RUN pip3 install pyOpenSSL --upgrade
 # echo "Rasa installed"
 
@@ -60,7 +60,6 @@ RUN pip3 install flask
 # create workspace
 # RUN mkdir -p /ros_ws/src
 # RUN cd /ros_ws; . /opt/ros/${ROS_DISTRO}/setup.sh
-
 
 # RUN cd /ros_ws; rosdep install --from-paths src --ignore-src -r -y
 # RUN catkin build
