@@ -1,0 +1,8 @@
+.flip-clock-wrapper ul{
+  width: 40px;
+  height: 60px;
+
+}
+.flip-clock-wrapper ul li a div div.inn {
+  font-size: 25px;
+}

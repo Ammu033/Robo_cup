@@ -438,7 +438,6 @@ function Alternative_input(sentence) {
 
   // And finally, publish.
   ROS_TOPIC_HANDLES['/user_speech'].publish(msg);
-}
 
 function Start_tour_task(tour_key, duration=60*60) {
   console.log("start tour: " + tour_key);

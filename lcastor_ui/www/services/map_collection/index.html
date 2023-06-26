@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<!-- Meta -->
+		<meta charset="utf-8">
+		<title>Custom Interactive Map Plugin </title>
+
+		<!-- Viewport for Responsivity -->
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+
+
+		<!-- Stylesheets -->
+		<link href='http://fonts.googleapis.com/css?family=Maven+Pro:400,700' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" type="text/css" href="css/style.css">
+		<link rel="stylesheet" type="text/css" href="mapplic/mapplic.css">
+
+		<!-- Bootstrap CSS -->
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+  	<style>
+			#map-section {
+			    width: 100%;
+			    max-width: 100%;
+					height: 100%;
+			}
+
+			.mapplic-sidebar {
+			    background-color: #f8f8f8;
+			    width: 30%;
+			    height: 80%;
+			    float: right;
+			    top:0;
+				}
+			    position: relative;
+
+			  .mapplic-levels {
+			    position: absolute;
+			    top: 0;
+			    left: 0;
+			    margin: 10px;
+			    width: 150px;
+			    overflow: hidden;
+			}
+
+				.mapplic-pin{
+					background-size: 35px 40px;
+					width: 35px;
+					height: 40px;
+					margin-top: -39px;
+					margin-left: -17px;
+				}
+			 /* .mapplic-zoom-buttons{
+			    margin-left: 560px;
+			    margin-bottom: 50px;
+			    position: absolute;
+			  }
+			  .mapplic-zoom-buttons a {
+			    width: 38px;
+			    height: 38px;
+			}
+
+			  .mapplic-clear-button {
+
+			    margin-left: 560px;
+			    margin-bottom: 20px;
+			    width: 40px;
+			    height: 40px;
+			    position: absolute;
+
+			    } */
+
+			.mapplic-minimap {
+
+			    position: absolute;
+			    width: 80px;
+			    margin-left: 20px;
+			    margin-right: 20px;
+			}
+
+		</style>
+	</head>
+<body>
+
+    <!-- Site header -->
+    <div role=header> </div>
+
+    <!-- Site content -->
+    <div id="content">
+
+        <section id="map-section" class="inner over">
+
+            <!-- Map -->
+            <div class="map-container">
+                <div id="mapplic"></div>
+            </div>
+        </section>
+    </div>
+
+
+    <!-- Scripts -->
+    <script type="text/javascript" src="js/jquery-1.11.2.min.js"></script>
+    <script type="text/javascript" src="js/hammer.min.js"></script>
+    <script type="text/javascript" src="js/jquery.easing.js"></script>
+    <script type="text/javascript" src="js/jquery.mousewheel.js"></script>
+    <script type="text/javascript" src="js/smoothscroll.js"></script>
+    <script type="text/javascript" src="mapplic/mapplic.js"></script>
+
+		<!-- <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script> -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+    <!-- load ros -->
+    <script src="./../../js/ros-init-index.js"></script>
+    <!-- load notifications -->
+    <script src="./../../js/notifications.js"></script>
+    <!-- load page events -->
+    <script src="./../../js/pageEvents.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#mapplic').mapplic({
+                source: 'collection_museum.json',
+                height: 650,
+                animate: true,
+                mapfill: true,
+                sidebar: true,
+								search: false,
+                minimap: true,
+                deeplinking: true,
+                fullscreen: false,
+                hovertip: true,
+                developer: false,
+                maxscale: 6,
+								zoom: true
+            });
+
+            $('.usage').click(function(e) {
+                // e.preventDefault();
+
+                $('.editor-window').slideToggle(200);
+            });
+
+            $('.editor-window .window-mockup').click(function() {
+                $('.editor-window').slideUp(200);
+            });
+        });
+
+
+      function Navigation(waypoint){
+        console.log('Navigation'+waypoint);
+
+				var dialog={
+							"name":"#goalnav",
+							"parameters":[
+								{"name":"@robot_currentnode","type":"status","confidence":"","weight":"0.4", "check":"/topological_nav/curret_node"}
+							],
+							"request": [
+								{"speech":"Do you want to go to that place?","efficiency":""},
+								{"speech":"Do you need me to accompany you there?","efficiency":"" },
+								{"speech":"Do you want us to go there?","efficiency":"" }
+              ],
+							"usersays": [
+								{"speech":"(yes|ok) (.*)","button":"YES", "value":"yes"},
+								{"speech":"no (.*)","button":"NO",  "value":"no"}
+							],
+							"response":[
+								{"conditions":{"value":"yes"},"speech":["Ok! Follow me please", "Lets go!", "Please follow me"],"actions":{"name":"/topological_navigation", "goal":{"target":"@waypoint"}}},
+								{"conditions":{"value":"no"},"speech":[""],"actions":{"name":"", "goal":{"target":""}}}
+							]
+				}
+				var random_questions = [
+					'Do you want to go to that place?',
+					'Do you need me to accompany you there?',
+					'Do you want us to go there?'
+				]
+
+				var ask = random_questions[Math.floor(Math.random()*random_questions.length)];
+
+				var json_question = {
+					question: ask
+				}
+
+				Command_speech(ask);
+
+				Show_yn_question("Your answer:");
+      }
+    </script>
+
+	</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Speech Bubble</title>
+  <meta charset="utf-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <script src="../../js/jquery-1.7.2.min.js"></script>
+  <link rel="stylesheet" href="../../css/jquery.mobile-1.4.5.min.css" />
+
+  <script src="../../js/jquery.mobile-1.4.5.min.js"></script>
+
+
+
+  <!--speechbubble -->
+<link rel="stylesheet" href="./speech_tools.css">
+<script src="./speech_tools.js"></script>
+
+
+<!-- rosbridge -->
+<script type="text/javascript" src="../../js/WebSocketTest.js"></script>
+<script src="../../js/eventemitter2.js"></script>
+<script type="text/javascript" src="../../js/mjpegcanvas.js"></script>
+<script src="../../js/roslib.js"></script>
+
+<style type="text/css">
+
+  body{
+    background-color: black
+  }
+
+
+</style>
+
+
+
+
+</head>
+
+<body >
+
+<div id="robotspeech" ></div>
+<div id="userspeech" ></div>
+
+
+<div data-role="page" id="page_home" >
+
+  <div data-role="header" >
+    <h2>Header</h2>
+  </div>
+
+  <div id="main" role="main" class="ui-content">
+
+    <ul id ="list_services" data-role="listview"  data-inset="true">
+      <li>
+          <div class="ui-grid-a" class="ui-body-a ui-body" data-mini="true">
+  	        <div class="ui-block-a" style="width:70%">
+  	         <input type="text" data-clear-btn="true" name="text_speech" id="text_speech" value="" placeholder="Input text" >
+  	        </div>
+
+  	         <div class="ui-block-b" style="width:14%;margin-top:-5px;" >
+  		        <input type="button" data-icon="comment" data-iconpos="right" value="Send" data-mini="true" data-theme="b"  onclick="Show_speech()">
+  	        </div>
+          </div><!-- /ui-grid-solo -->
+      </li>
+  		<li>
+  		    <button onclick="Hide_speech()" data-theme="b" >CLOSE</button>
+  		</li>
+    </ul>
+
+  </div><!-- /content -->
+
+</div><!-- /page -->
+
+
+<script>
+
+  var Robotspeech;
+  var Userspeech;
+
+  $(function () {
+
+  	Robotspeech = new Bubble({
+      object: '#robotspeech'
+  	});
+
+  	Userspeech = new Bubble({
+      object: '#userpeech',
+  		type: 'thinking',
+  		origin: "bottom-left"
+  	});
+  });
+
+  function Show_speech(){
+
+    var str_txt=$('#text_speech').val();
+
+    Robotspeech.open(str_txt);
+    $('#text_speech').parent().find('a').trigger('click');
+
+  }
+
+  function Hide_speech(){
+
+  	Robotspeech.close();
+
+  }
+
+  function Show_question(data,target){
+
+
+
+  }
+  </script>
+</body>
+</html>
