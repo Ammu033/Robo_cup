@@ -13,6 +13,7 @@ from pnp_cmd_ros import *
 
 def pickUp_bag(p):
 
+    p.action_cmd("lookAtClosestPerson", "", "start")
 
     p.exec_action("lookAt", "front_person") # TODO
 
@@ -36,6 +37,8 @@ def pickUp_bag(p):
 
     
     p.exec_action("")
+
+    p.action_cmd("lookAtClosestPerson", "", "stop")
 
 if __name__ == "__main__":
 
