@@ -37,6 +37,7 @@ def PersonFollowing(p):
             time.sleep(0.1)
         
         p.action_cmd('followPerson', '', 'stop')
+        p.exec_action('goto', '0.0_0.0_0.0')
         p.exec_action('speak', 'Person_to_follow_lost')
 
 
