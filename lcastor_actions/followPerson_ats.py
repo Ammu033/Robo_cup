@@ -15,6 +15,7 @@ import math
 import actionlib
 import numpy as np
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
+import message_filters
 from AbstractAction import AbstractAction
 
 
@@ -25,7 +26,7 @@ ROSPARAM = '/lcastor_person_follower/personID_to_follow'
 """
 Starts and stops the object detection node
 """
-class followPerson(AbstractAction):
+class followPerson_ats(AbstractAction):
 
     def _start_action(self):
         rospy.loginfo('Starting to follow ' + " ".join(self.params) + ' ...')
@@ -39,24 +40,51 @@ class followPerson(AbstractAction):
         self.client.wait_for_server()
         
         # Robot pose and People subscribers
-        self.sub_robot_pose = rospy.Subscriber('/robot_pose', PoseWithCovarianceStamped, self.get_robot_2DPose)
-        self.sub_people = rospy.Subscriber('/people_tracker/people', People, self.cb_people)
+        self.sub_robot_pose = message_filters.Subscriber('/robot_pose', PoseWithCovarianceStamped)
+        self.sub_people = message_filters.Subscriber('/people_tracker/people', People)
+        self.ats = message_filters.ApproximateTimeSynchronizer([self.sub_robot_pose, self.sub_people], 1, 0.5)
+        self.ats.registerCallback(self.cb_ats)
+        
+        
+    def cb_ats(self, r: PoseWithCovarianceStamped, p: People):
+        self.get_robot_2DPose(r)
+        
+        if self.robot_pos_at_send_goal is not None and self.client.get_state() == actionlib.GoalStatus.ACTIVE:
+            travelled_dist = math.dist(self.robot_pos_at_send_goal, [self.robot_pose.x, self.robot_pose.y])
+            rospy.logwarn("TRAVELLED DISTANCE = " + str(travelled_dist))
+            if travelled_dist > CANCEL_DISTANCE: 
+                rospy.logerr("GOAL CANCELLED")
+                self.client.cancel_goal()
+                self.robot_pos_at_send_goal = None
+                
+        elif self.client.get_state() != actionlib.GoalStatus.ACTIVE:
+            # if rosparam is '' then return
+            personID = rospy.get_param(ROSPARAM)
+            if ROSPARAM == '': return
+                
+            # Get position of the person to follow
+            personToFollowPos = self.get_person_pos(p, personID)
+            if personToFollowPos is not None:
+                # Follow the person
+                rospy.logerr("GOAL SENT")
+                self.follow_person(personToFollowPos)
+
         
     
-    def cb_people(self, p: People):
-        # if goal already assigned then return
-        if self.client.get_state() == actionlib.GoalStatus.ACTIVE: return 
+    # def cb_people(self, p: People):
+    #     # if goal already assigned then return
+    #     if self.client.get_state() == actionlib.GoalStatus.ACTIVE: return 
         
-        # if rosparam is '' then return
-        personID = rospy.get_param(ROSPARAM)
-        if ROSPARAM == '': return
+    #     # if rosparam is '' then return
+    #     personID = rospy.get_param(ROSPARAM)
+    #     if ROSPARAM == '': return
             
-        # Get position of the person to follow
-        personToFollowPos = self.get_person_pos(p, personID)
-        if personToFollowPos is not None:
-            # Follow the person
-            rospy.logerr("GOAL SENT FIRST TIME")
-            self.follow_person(personToFollowPos)
+    #     # Get position of the person to follow
+    #     personToFollowPos = self.get_person_pos(p, personID)
+    #     if personToFollowPos is not None:
+    #         # Follow the person
+    #         rospy.logerr("GOAL SENT FIRST TIME")
+    #         self.follow_person(personToFollowPos)
 
 
     def get_robot_2DPose(self, r: PoseWithCovarianceStamped):
@@ -79,14 +107,6 @@ class followPerson(AbstractAction):
         self.robot_pose.x = r.pose.pose.position.x
         self.robot_pose.y = r.pose.pose.position.y
         self.robot_pose.theta = tf.transformations.euler_from_matrix(m)[2]
-        
-        if self.robot_pos_at_send_goal is not None and self.client.get_state() == actionlib.GoalStatus.ACTIVE:
-            travelled_dist = math.dist(self.robot_pos_at_send_goal, [self.robot_pose.x, self.robot_pose.y])
-            rospy.logwarn("TRAVELLED DISTANCE = " + str(travelled_dist))
-            if travelled_dist > CANCEL_DISTANCE: 
-                rospy.logerr("GOAL CANCELLED")
-                self.client.cancel_goal()
-                self.robot_pos_at_send_goal = None
 
 
     def get_person_pos(self, data: People, personToFollow):
@@ -147,7 +167,7 @@ class followPerson(AbstractAction):
         goal_msg.target_pose.pose.orientation.w = math.cos(goal_orientation / 2)
 
         self.client.send_goal(goal_msg)
-        # self.client.wait_for_result()
+        self.client.wait_for_result()
     
     
     def follow_person(self, personToFollowPos):
@@ -164,8 +184,8 @@ class followPerson(AbstractAction):
 
 
     def _stop_action(self):
-        self.sub_robot_pose.unregister()
-        self.sub_people.unregister()
+        self.sub_robot_pose.sub.unregister()
+        self.sub_people.sub.unregister()
         if self.client is not None: self.client.cancel_all_goals()
         
         self.params.append("done")
