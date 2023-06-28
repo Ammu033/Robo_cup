@@ -1,30 +1,164 @@
 version: "3.1"
 
 stories:
-
-- story: Robot starts conversation with a person, but it doesn't know the name of the person
+#########################################################################################################################################
+# FOR GENERAL PURPOSE
+#########################################################################################################################################  
+- story: robot listen for user verbal confirmation
   steps:
-  - intent: greet
-  - action: action_check_person_name
-  - slot_was_set:
-    - person_name_known: false
-  - action: utter_greet_1
-  #- action: action_slot_reset
+  - intent: planner_confirmation #this initial intention comes from the planner
+  - intent: affirm
+  - action: action_confirmation_confirmation #this will publish topic /rasa_confirmation=True
+  - action: action_slot_reset
 
-- story: Robot offers help to a person, using his/her name
+- story: robot listen for user verbal confirmation, but interpreted another intention
   steps:
-  - intent: greet
+  - intent: planner_confirmation #this initial intention comes from the planner
+  - or:
+    - intent: deny
+    - intent: person_name
+    - intent: person_drink
+    - intent: arrived_confirmation
+    - intent: thanks
+  - action: action_confirmation_false #this will publish topic /rasa_confirmation=False
+  - action: action_slot_reset
+##########################################################################################################################################
+- story: robot listen to guest saying thanks
+  steps:
+  - intent: planner_user_thanks #this initial intention comes from the planner
+  - action: action_confirmation_thanks #this will publish topic /rasa_confirmation=True
+  - action: action_slot_reset
+
+- story: robot listen to guest saying thanks, but interpreted another intention
+  steps:
+  - intent: planner_user_thanks #this initial intention comes from the planner
+  - or:
+    - intent: deny
+    - intent: affirm
+    - intent: person_drink
+    - intent: arrived_confirmation
+    - intent: person_name
+  - action: action_confirmation_false #this will publish topic /rasa_confirmation=False
+  - action: action_slot_reset
+#########################################################################################################################################  
+- story: robot listen for user answer to a yes/no question
+  steps:
+  - intent: planner_affirm_deny #this initial intention comes from the planner
+  - or:
+    - intent: affirm
+    - intent: deny
+  - action: action_confirmation_affirm_deny #this will publish topics /rasa_confirmation=True and /person_affirm_deny=$person_confirmation
+  - action: action_slot_reset
+
+- story: robot listen for user answer to a yes/no question, but interpreted another intention
+  steps:
+  - intent: planner_affirm_deny #this initial intention comes from the planner
+  - or:
+    - intent: person_name
+    - intent: person_drink
+    - intent: arrived_confirmation
+    - intent: thanks
+  - action: action_confirmation_false #this will publish topic /rasa_confirmation=False
+  - action: action_slot_reset
+#########################################################################################################################################  
+# FOR RECEPTIONIST
+#########################################################################################################################################  
+
+- story: robot listen to guest name and confirm to planner that it understood the name
+  steps:
+  - intent: planner_guest_name #this initial intention comes from the planner
+  - intent: person_name
   - action: action_check_person_name
   - slot_was_set:
     - person_name_known: true
-  - action: utter_greet_2
+  - action: action_confirmation_person_name #this will publish topics /rasa_confirmation=True and /guest_name=$person_name
   - action: action_slot_reset
 
-- story: follow me
+- story: robot listen to guest name, but interpreted another intention
   steps:
-  - intent: follow_me
-  - action: action_person_follow
+  - intent: planner_guest_name #this initial intention comes from the planner
+  - or:
+    - intent: deny
+    - intent: affirm
+    - intent: person_drink
+    - intent: arrived_confirmation
+    - intent: thanks
+  - action: action_confirmation_false #this will publish topic /rasa_confirmation=False
   - action: action_slot_reset
+
+- story: robot listen to guest name, but do not confirm to planner yet since it can not understand the name, robot ask the guest to rephrase
+  steps:
+  - intent: planner_guest_name #this initial intention comes from the planner
+  - intent: person_name
+  - action: action_check_person_name
+  - slot_was_set:
+    - person_name_known: false
+  #- action: utter_ask_rephrase
+  - action: action_confirmation_false #this will publish topic /rasa_confirmation=False
+  - action: action_slot_reset
+#########################################################################################################################################  
+- story: robot listen to guest favorite drink and confirm to planner that it understood the drink
+  steps:
+  - intent: planner_guest_drink #this initial intention comes from the planner
+  - intent: person_drink
+  - action: action_check_person_drink
+  - slot_was_set:
+    - person_drink_known: true
+  - action: action_confirmation_person_drink #this will publish topics /rasa_confirmation=True and /guest_drink=$person_drink
+  - action: action_slot_reset
+
+- story: robot listen to guest favorite drink, but interpreted another intention
+  steps:
+  - intent: planner_guest_drink #this initial intention comes from the planner
+  - or:
+    - intent: deny
+    - intent: affirm
+    - intent: person_name
+    - intent: arrived_confirmation
+    - intent: thanks
+  - action: action_confirmation_false #this will publish topic /rasa_confirmation=False 
+  - action: action_slot_reset
+
+- story: robot listen to guest favorite drink, but do not confirm to planner yet since it can not understand the drink, robot ask the guest to rephrase
+  steps:
+  - intent: planner_guest_drink #this initial intention comes from the planner
+  - intent: person_drink
+  - action: action_check_person_drink
+  - slot_was_set:
+    - person_drink_known: false
+  #- action: utter_ask_rephrase
+  - action: action_confirmation_false #this will publish topic /rasa_confirmation=False
+  - action: action_slot_reset
+#########################################################################################################################################  
+- story: robot listen to arrival confirmation from the guest
+  steps:
+  - intent: planner_user_confirm_arrived #this initial intention comes from the planner
+  - intent: arrived_confirmation
+  - action: action_confirmation_arrival #this will publish topics /rasa_confirmation=True
+  - action: action_slot_reset
+
+- story: robot listen to arrival confirmation from the guest, but interpreted another intention
+  steps:
+  - intent: planner_user_confirm_arrived #this initial intention comes from the planner
+  - or:
+    - intent: deny
+    - intent: affirm
+    - intent: person_name
+    - intent: person_drink
+    - intent: thanks
+  - action: action_confirmation_false #this will publish topic /rasa_confirmation=False 
+  - action: action_slot_reset  
+############################################################################################################################################  
+  
+  #- action: action_slot_reset
+#FOR CARRY MY LUGGAGE
+
+
+#- story: follow me
+#  steps:
+#  - intent: follow_me
+#  - action: action_person_follow
+#  - action: action_slot_reset
 
 #- story: go somewhere
 #  steps:

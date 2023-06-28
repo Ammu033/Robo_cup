@@ -2,12 +2,21 @@ version: "3.1"
 
 rules:
 
-- rule: Robot introduces itself to the user
+- rule: Ask the user to rephrase whenever they send a message with low NLU confidence
   steps:
-  - intent: robot_introduction
-  - action: utter_iamtiago
-  #wait_for_user_input: false
+  - intent: nlu_fallback
+  - action: utter_ask_rephrase
 
+#- rule: Robot introduces itself to the user
+#  steps:
+#  - intent: robot_introduction
+#  - action: utter_iamtiago
+
+#- rule: out-of-scope
+#  steps:
+#  - intent: out_of_scope
+#  - action: utter_out_of_scope
+  
 #- rule: Activate Person description form
 #  steps:
 #  - intent: follow_a_person
@@ -43,20 +52,10 @@ rules:
 #  - action: action_grasp_object
 #  - action: action_slot_reset
 
-- rule: Stop current action
-  steps:
-  - intent: stop_task
-  #- action: utter_stop_task
-  - action: action_stop_task
-  - action: action_slot_reset
-  #wait_for_user_input: false
-
-- rule: Ask the user to rephrase whenever they send a message with low NLU confidence
-  steps:
-  - intent: nlu_fallback
-  - action: utter_ask_rephrase
-
-- rule: out-of-scope
-  steps:
-  - intent: out_of_scope
-  - action: utter_out_of_scope
+#- rule: Stop current action
+#  steps:
+#  - intent: stop_task
+#  #- action: utter_stop_task
+#  - action: action_stop_task
+#  - action: action_slot_reset
+#  #wait_for_user_input: false

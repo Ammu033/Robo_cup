@@ -15,132 +15,184 @@ import roslaunch
 import rospy
 import time
 #from std_msgs.msg import Bool, String
-
-class ActionGoTo(Action):
+        
+class ActionConfirmationFalse(Action):
     def name(self) -> Text:
-        return "action_go_to"
+        return "action_confirmation_false"
 
     def run(self,
         dispatcher: CollectingDispatcher,
         tracker: Tracker,
         domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 
-        location = tracker.get_slot("location")
-        dispatcher.utter_message(text="I'm going to %s now!" % location)
-
-        # write here the code to interact with the robot
-
-        return []
-
-class ActionPersonFollow(Action):
-    def name(self) -> Text:
-        return "action_person_follow"
-
-    def run(self,
-        dispatcher: CollectingDispatcher,
-        tracker: Tracker,
-        domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-        
-        #clothes_type = tracker.get_slot("clothes_type")
-        #clothes_color = tracker.get_slot("clothes_color")
-        #if clothes_type!=None and clothes_color!=None:
-        #    dispatcher.utter_message(text="Ok, following a person with %s %s" % (clothes_color,clothes_type))
-        #else:
-        #    dispatcher.utter_message(text="Following a person, python!")
-        
-        dispatcher.utter_message(text="Following you!")
-             
-        
-        rospy.init_node('rasa_actions', anonymous=True)
-        rospy.loginfo("ROS Person following started")
-        	
-        uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
-        cli_args = ["/home/lcastor/ros_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/trigger_publish.launch",'trigger:=True']
-        #cli_args = ["/home/leo/catkin_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/trigger_publish.launch",'trigger:=True']
-        roslaunch_args = cli_args[1:]
-        roslaunch_file = [(roslaunch.rlutil.resolve_launch_arguments(cli_args)[0], roslaunch_args)]
-        parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_file)
-        parent.start()
-        """
-        
-        
-        rospy.init_node('rasa_actions')	
-        pub_trigger = rospy.Publisher("/nlp/trigger", Bool, queue_size=1)
-        pub_trigger.publish(True)
-        
-        
-        #import roslaunch
-        #import rospy
+        #dispatcher.utter_message(text="action_confirmation_false")        
         rospy.init_node('rasa_actions', anonymous=True)	
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
-        roslaunch.configure_logging(uuid)
-        #launch_person_follow = roslaunch.parent.ROSLaunchParent(uuid, ["/home/leo/catkin_ws/src/robocup_human_sensing/launch/webcam.launch"])
-        launch_person_follow = roslaunch.parent.ROSLaunchParent(uuid, ["/home/lcastor/ros_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/trigger_publish.launch"])
-        launch_person_follow.start()
-
-        
-        
-        launch_person_follow.start()
-        rospy.loginfo("ROS Person following started")
-        """
-
-        # write here the code to interact with the robot
-
-        return []
-        
-class ActionStopTask(Action):
-    def name(self) -> Text:
-        return "action_stop_task"
-
-    def run(self,
-        dispatcher: CollectingDispatcher,
-        tracker: Tracker,
-        domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-
-        dispatcher.utter_message(text="I have stopped!")
-        
-        rospy.init_node('rasa_actions', anonymous=True)	
-        uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
-        cli_args = ["/home/lcastor/ros_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/trigger_publish.launch",'trigger:=False']
+        cli_args = ["/home/lcastor/ros_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/bool_publish.launch",'topic_name:=rasa_confirmation','value:=False']
         #cli_args = ["/home/leo/catkin_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/trigger_publish.launch",'trigger:=False']
         roslaunch_args = cli_args[1:]
         roslaunch_file = [(roslaunch.rlutil.resolve_launch_arguments(cli_args)[0], roslaunch_args)]
         parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_file)
         parent.start()
-        """
-        
-        rospy.init_node('rasa_actions')	
-        pub_trigger = rospy.Publisher("/nlp/trigger", Bool, queue_size=1)
-        pub_trigger.publish(False)
-         
-        
-        # write here the code to interact with the robot
-        rospy.init_node('rasa_actions', anonymous=True)	
-        uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
-        roslaunch.configure_logging(uuid)
-        launch_person_follow = roslaunch.parent.ROSLaunchParent(uuid, ["/home/leo/catkin_ws/src/robocup_human_sensing/launch/webcam.launch"])
-        launch_person_follow.start()
-        launch_person_follow.shutdown()
-        rospy.loginfo("ROS Person following stopped")
-        """  
+
         return []
-        
-class ActionGraspObject(Action):
+
+class ActionConfirmationConfirmation(Action):
     def name(self) -> Text:
-        return "action_grasp_object"
-        
+        return "action_confirmation_confirmation"
 
     def run(self,
         dispatcher: CollectingDispatcher,
         tracker: Tracker,
         domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 
-        object_name = tracker.get_slot("object_name")
-        
-        dispatcher.utter_message(text="Grasping a %s!" % object_name)
-        
-        # write here the code to interact with the robot
+        #dispatcher.utter_message(text="action_confirmation_false")        
+        rospy.init_node('rasa_actions', anonymous=True)	
+        uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+        cli_args = ["/home/lcastor/ros_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/bool_publish.launch",'topic_name:=rasa_confirmation','value:=True']
+        #cli_args = ["/home/leo/catkin_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/trigger_publish.launch",'trigger:=False']
+        roslaunch_args = cli_args[1:]
+        roslaunch_file = [(roslaunch.rlutil.resolve_launch_arguments(cli_args)[0], roslaunch_args)]
+        parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_file)
+        parent.start()
 
+        return []
+
+class ActionConfirmationThanks(Action):
+    def name(self) -> Text:
+        return "action_confirmation_thanks"
+
+    def run(self,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        #dispatcher.utter_message(text="action_confirmation_false")        
+        rospy.init_node('rasa_actions', anonymous=True)	
+        uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+        cli_args = ["/home/lcastor/ros_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/bool_publish.launch",'topic_name:=rasa_confirmation','value:=True']
+        #cli_args = ["/home/leo/catkin_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/trigger_publish.launch",'trigger:=False']
+        roslaunch_args = cli_args[1:]
+        roslaunch_file = [(roslaunch.rlutil.resolve_launch_arguments(cli_args)[0], roslaunch_args)]
+        parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_file)
+        parent.start()
+
+        return []
+
+class ActionConfirmationArrival(Action):
+    def name(self) -> Text:
+        return "action_confirmation_arrival"
+
+    def run(self,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        #dispatcher.utter_message(text="action_confirmation_false")        
+        rospy.init_node('rasa_actions', anonymous=True)	
+        uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+        cli_args = ["/home/lcastor/ros_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/bool_publish.launch",'topic_name:=rasa_confirmation','value:=True']
+        #cli_args = ["/home/leo/catkin_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/trigger_publish.launch",'trigger:=False']
+        roslaunch_args = cli_args[1:]
+        roslaunch_file = [(roslaunch.rlutil.resolve_launch_arguments(cli_args)[0], roslaunch_args)]
+        parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_file)
+        parent.start()
+
+        return []
+
+class ActionConfirmationAffirmDeny(Action):
+    def name(self) -> Text:
+        return "action_confirmation_affirm_deny"
+
+    def run(self,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        slot_value= tracker.get_slot("person_confirmation")
+        
+        #dispatcher.utter_message(text="action_confirmation_false")        
+        rospy.init_node('rasa_actions', anonymous=True)	
+        uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+        
+        cli_args = ["/home/lcastor/ros_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/bool_publish.launch",'topic_name:=rasa_confirmation','value:=True']
+        #cli_args = ["/home/leo/catkin_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/trigger_publish.launch",'trigger:=False']
+        roslaunch_args = cli_args[1:]
+        roslaunch_file = [(roslaunch.rlutil.resolve_launch_arguments(cli_args)[0], roslaunch_args)]
+        parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_file)
+        parent.start()
+        
+        cli_args = ["/home/lcastor/ros_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/bool_publish.launch",'topic_name:=person_affirm_deny','value:='+str(slot_value)]
+        #cli_args = ["/home/leo/catkin_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/trigger_publish.launch",'trigger:=False']
+        roslaunch_args = cli_args[1:]
+        roslaunch_file = [(roslaunch.rlutil.resolve_launch_arguments(cli_args)[0], roslaunch_args)]
+        parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_file)
+        parent.start()
+        
+        return []
+    
+class ActionConfirmationPersonName(Action):
+    def name(self) -> Text:
+        return "action_confirmation_person_name"
+
+    def run(self,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        slot_value= tracker.get_slot("person_name")
+        
+        #dispatcher.utter_message(text="action_confirmation_false")        
+        rospy.init_node('rasa_actions', anonymous=True)	
+        uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+        
+        cli_args = ["/home/lcastor/ros_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/bool_publish.launch",'topic_name:=rasa_confirmation','value:=True']
+        #cli_args = ["/home/leo/catkin_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/trigger_publish.launch",'trigger:=False']
+        roslaunch_args = cli_args[1:]
+        roslaunch_file = [(roslaunch.rlutil.resolve_launch_arguments(cli_args)[0], roslaunch_args)]
+        parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_file)
+        parent.shutdown() # to close any previous node
+        parent.start()
+        
+        cli_args = ["/home/lcastor/ros_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/string_publish.launch",'topic_name:=guest_name','value:='+slot_value]
+        #cli_args = ["/home/leo/catkin_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/trigger_publish.launch",'trigger:=False']
+        roslaunch_args = cli_args[1:]
+        roslaunch_file = [(roslaunch.rlutil.resolve_launch_arguments(cli_args)[0], roslaunch_args)]
+        parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_file)
+        parent.shutdown() # to close any previous node
+        parent.start()
+        
+        return []
+
+class ActionConfirmationPersonDrink(Action):
+    def name(self) -> Text:
+        return "action_confirmation_person_drink"
+
+    def run(self,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        slot_value= tracker.get_slot("person_drink")
+        
+        #dispatcher.utter_message(text="action_confirmation_false")        
+        rospy.init_node('rasa_actions', anonymous=True)	
+        uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+        
+        cli_args = ["/home/lcastor/ros_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/bool_publish.launch",'topic_name:=rasa_confirmation','value:=True']
+        #cli_args = ["/home/leo/catkin_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/trigger_publish.launch",'trigger:=False']
+        roslaunch_args = cli_args[1:]
+        roslaunch_file = [(roslaunch.rlutil.resolve_launch_arguments(cli_args)[0], roslaunch_args)]
+        parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_file)
+        parent.start()
+        
+        cli_args = ["/home/lcastor/ros_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/string_publish.launch",'topic_name:=guest_drink','value:='+slot_value]
+        #cli_args = ["/home/leo/catkin_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/trigger_publish.launch",'trigger:=False']
+        roslaunch_args = cli_args[1:]
+        roslaunch_file = [(roslaunch.rlutil.resolve_launch_arguments(cli_args)[0], roslaunch_args)]
+        parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_file)
+        parent.start()
+               
         return []
 
 class ActionCheckPersonName(Action):
@@ -151,48 +203,33 @@ class ActionCheckPersonName(Action):
         dispatcher: CollectingDispatcher,
         tracker: Tracker,
         domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-
-        person_name = tracker.get_slot("person_name")
-        if person_name!=None:
-           #dispatcher.utter_message(text="Name is known, python!")
-           
-           rospy.init_node('rasa_actions', anonymous=True)	
-           uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
-           cli_args = ["/home/lcastor/ros_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/username_publish.launch",'username:='+person_name]
-           #cli_args = ["/home/leo/catkin_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/username_publish.launch",'username:='+person_name]
-           roslaunch_args = cli_args[1:]
-           roslaunch_file = [(roslaunch.rlutil.resolve_launch_arguments(cli_args)[0], roslaunch_args)]
-           parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_file)
-           parent.start()
-           
-           """
-           rospy.init_node('rasa_actions')	
-           #pub_trigger = rospy.Publisher("/nlp/trigger", Bool, queue_size=1)
-           pub_username = rospy.Publisher("/nlp/username", String, queue_size=1)
-           #pub_trigger.publish(robot.trigger)
-           pub_username.publish(person_name)
-           aux=0
-           while aux==0:
-               time.sleep(4)
-               aux=1
-           
-           import roslaunch
-           import rospy
-           
-           #roslaunch.configure_logging(uuid)
-           #launch_person_follow = roslaunch.parent.ROSLaunchParent(uuid, ["/home/leo/catkin_ws/src/robocup_nlp/launch/username_publish.launch"])
-           
-           #launch_person_follow.start()
-           rospy.loginfo("ROS username publisher started")
-           #time.sleep(0.5)
-           #launch_person_follow.shutdown()
-           #global username
-           #username=person_name
-           """
+        
+        #dispatcher.utter_message(text="action_check_person_name")
+        slot_value= tracker.get_slot("person_name")
+        if slot_value!=None:
            return [SlotSet("person_name_known", True)]
         else:
            #dispatcher.utter_message(text="Name is unknown, python!")
            return [SlotSet("person_name_known", False)]
+
+class ActionCheckPersonDrink(Action):
+    def name(self) -> Text:
+        return "action_check_person_drink"
+
+    def run(self,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        #dispatcher.utter_message(text="action_check_person_drink")
+        slot_value = tracker.get_slot("person_drink")
+        if slot_value!=None:
+           #dispatcher.utter_message(text="Name is known, python!")
+
+           return [SlotSet("person_drink_known", True)]
+        else:
+           #dispatcher.utter_message(text="Name is unknown, python!")
+           return [SlotSet("person_drink_known", False)]
 
 class ActionSlotReset(Action):
     def name(self):
@@ -201,6 +238,31 @@ class ActionSlotReset(Action):
         return[AllSlotsReset()]
 
 """
+class planner_class:
+    def __init__(self): #It is done only the first iteration
+        self.intention="none"
+    
+    def planner_intention_callback(self,msg):
+        intention=msg.data
+        self.intention=intention
+
+pub_hz=0.01 #main loop frequency
+# Main Script
+if __name__ == '__main__':   
+    planner=planner_class()
+    # Initialize our node    
+    rospy.init_node('han_velocity_control',anonymous=True)
+    rospy.Subscriber('planner_intention',String,planner.intention_callback)  
+    #Rate setup
+    rate = rospy.Rate(1/pub_hz)  # main loop frecuency in Hz
+    while not rospy.is_shutdown():	 
+        #Publish message to let twist_mux know about the han priority
+        rospy.loginfo("HOLA")
+        print("HAN_ACTION",planner.intention)
+        rate.sleep() #to keep fixed the publishing loop rate
+
+
+
 class ValidateObjectToGraspForm(FormValidationAction):
     def name(self) -> Text:
         return "validate_object_to_grasp_form"
@@ -288,4 +350,100 @@ if __name__ == '__main__':
         #pub_trigger.publish(robot.trigger)
         pub_username.publish(username)
         rate.sleep() #to keep fixed the publishing loop rate
-"""    
+"""  
+
+'''
+class ActionGoTo(Action):
+    def name(self) -> Text:
+        return "action_go_to"
+
+    def run(self,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        location = tracker.get_slot("location")
+        dispatcher.utter_message(text="I'm going to %s now!" % location)
+
+        # write here the code to interact with the robot
+
+        return []
+
+class ActionPersonFollow(Action):
+    def name(self) -> Text:
+        return "action_person_follow"
+
+    def run(self,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        #clothes_type = tracker.get_slot("clothes_type")
+        #clothes_color = tracker.get_slot("clothes_color")
+        #if clothes_type!=None and clothes_color!=None:
+        #    dispatcher.utter_message(text="Ok, following a person with %s %s" % (clothes_color,clothes_type))
+        #else:
+        #    dispatcher.utter_message(text="Following a person, python!")
+        
+        dispatcher.utter_message(text="Following you!")
+             
+        
+        rospy.init_node('rasa_actions', anonymous=True)
+        rospy.loginfo("ROS Person following started")
+        	
+        uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+        cli_args = ["/home/lcastor/ros_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/trigger_publish.launch",'trigger:=True']
+        #cli_args = ["/home/leo/catkin_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/trigger_publish.launch",'trigger:=True']
+        roslaunch_args = cli_args[1:]
+        roslaunch_file = [(roslaunch.rlutil.resolve_launch_arguments(cli_args)[0], roslaunch_args)]
+        parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_file)
+        parent.start()
+        """
+        
+        
+        rospy.init_node('rasa_actions')	
+        pub_trigger = rospy.Publisher("/nlp/trigger", Bool, queue_size=1)
+        pub_trigger.publish(True)
+        
+        
+        #import roslaunch
+        #import rospy
+        rospy.init_node('rasa_actions', anonymous=True)	
+        uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+        roslaunch.configure_logging(uuid)
+        #launch_person_follow = roslaunch.parent.ROSLaunchParent(uuid, ["/home/leo/catkin_ws/src/robocup_human_sensing/launch/webcam.launch"])
+        launch_person_follow = roslaunch.parent.ROSLaunchParent(uuid, ["/home/lcastor/ros_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/trigger_publish.launch"])
+        launch_person_follow.start()
+
+        
+        
+        launch_person_follow.start()
+        rospy.loginfo("ROS Person following started")
+        """
+
+        # write here the code to interact with the robot
+
+        return []
+'''
+
+'''        
+class ActionGraspObject(Action):
+    def name(self) -> Text:
+        return "action_grasp_object"
+        
+
+    def run(self,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        object_name = tracker.get_slot("object_name")
+        
+        dispatcher.utter_message(text="Grasping a %s!" % object_name)
+        
+        # write here the code to interact with the robot
+
+        return []
+'''
+
+  

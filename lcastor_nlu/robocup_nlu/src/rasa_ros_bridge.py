@@ -11,10 +11,8 @@ sender = "user"
 rasa_endpoint = "http://localhost:5005/webhooks/rest/webhook"
 # Setup ROS publisher
 pub = rospy.Publisher('robot_speech', String, queue_size=1)
-pub_trigger = rospy.Publisher("/nlp/trigger", Bool, queue_size=1)
-pub_username = rospy.Publisher("/nlp/username", String, queue_size=1)
            
-trigger=False
+send_speech=False
 username=""
 
 """
@@ -36,7 +34,6 @@ def rasa_action_go_to():
     return jsonify(res)
 """
 def send_to_rasa(msg):
-    global trigger, username
     text = msg
     rospy.loginfo('Heard message: "%s"  -- sending it to Rasa...' % text)
 
@@ -46,24 +43,31 @@ def send_to_rasa(msg):
         msg = String()
         msg.data = r["text"]
         pub.publish(msg)
-        """
-        if r["text"]=="Following you!" and trigger==False:
-            trigger=True   
-            pub_trigger.publish(trigger)
-        elif r["text"]=="I have stopped!" and trigger==True:
-            trigger=False
-        pub_trigger.publish(trigger)
-        #if username!=r["tracker"]["slots"]["person_name"] and r["tracker"]["slots"]["person_name"]!=None:
-        #    username=r["tracker"]["slots"]["person_name"]
-        #pub_username.publish(username)
-        """
 
 def subscribe_to_speech(msg):
-    header_phrase=["tiago","thiago","theago","khiago","robot","diego"]
-    for i in header_phrase:
-        if i in msg.data.lower():
-            send_to_rasa(msg.data)
-            break
+    global send_speech
+    if send_speech==True:
+        send_to_rasa(msg.data)
+    #header_phrase=["tiago","thiago","theago","khiago","robot","diego"]
+    #for i in header_phrase:
+    #    if i in msg.data.lower():
+    #        send_to_rasa(msg.data)
+    #        break
+
+def planner_intention_callback(msg):
+    global send_speech
+    raw_intention=msg.data
+    #x=raw_intention.replace("_", " ")
+    intention= "Rasa_" +raw_intention
+    send_to_rasa(intention)
+    #If ros planner triggered an action, then enable sending user speech to rasa
+    send_speech=True
+    
+
+def rasa_confirmation_callback(msg):
+    global send_speech
+    #If rasa returned something, then disable sending user speech to rasa
+    send_speech=False
          
 if __name__ == '__main__':
     time_init=time.time()  
@@ -71,6 +75,8 @@ if __name__ == '__main__':
     rospy.init_node('rasa_bridge')
     # Setup ROS subscription
     rospy.Subscriber('user_speech',String,subscribe_to_speech)
+    rospy.Subscriber('planner_intention',String,planner_intention_callback) 
+    rospy.Subscriber('rasa_confirmation',Bool,rasa_confirmation_callback) 
     #use same port as default RASA action server
     #app.run(host="0.0.0.0", port=5055)
     rospy.spin()
