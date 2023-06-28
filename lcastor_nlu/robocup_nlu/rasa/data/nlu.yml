@@ -92,6 +92,7 @@ nlu:
     - you can call me [katherine](person_name)
     - call me [nico](person_name)
     - people call me [maria](person_name)
+    - My name is [alex](person_name)
 
 - intent: person_drink
   examples: |

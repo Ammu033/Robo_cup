@@ -115,11 +115,11 @@ slots:
 #    required_slots:
 #    - object_name
     
-responses:
-  utter_default:
-  - text: I'm sorry, I can't help you.
-  utter_ask_rephrase:
-  - text: I'm sorry, I didn't quite understand that. Could you rephrase?
+#responses:
+#  utter_default:
+#  - text: I'm sorry, I can't help you.
+#  utter_ask_rephrase:
+#  - text: I'm sorry, I didn't quite understand that. Could you rephrase?
 #  utter_say_hi_and_ask_for_name:
 #  - text: Hello! my name is Tiago, what is your name?
 #  - text: Hello! my name is Tiago, how may I call you?
@@ -139,6 +139,7 @@ responses:
 #  utter_stop_task:
 #  - text: Ok, I have stop
 actions:
+- action_default_fallback
 - action_check_person_name #this will check if the name is part of the names in the database
 - action_check_person_drink #this will check if the drink is part of the drinks in the database
 - action_confirmation_false #this will publish topic /rasa_confirmation=False 

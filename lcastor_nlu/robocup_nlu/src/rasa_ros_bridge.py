@@ -34,6 +34,7 @@ def rasa_action_go_to():
     return jsonify(res)
 """
 def send_to_rasa(msg):
+    global send_speech
     text = msg
     rospy.loginfo('Heard message: "%s"  -- sending it to Rasa...' % text)
 
@@ -48,6 +49,7 @@ def subscribe_to_speech(msg):
     global send_speech
     if send_speech==True:
         send_to_rasa(msg.data)
+        send_speech=False #to avoid sending more than one sentence to rasa, only sending the first sentence captured by speech recognition
     #header_phrase=["tiago","thiago","theago","khiago","robot","diego"]
     #for i in header_phrase:
     #    if i in msg.data.lower():
