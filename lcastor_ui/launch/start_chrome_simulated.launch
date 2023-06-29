@@ -1,0 +1,10 @@
+<launch>
+
+  <node
+    name="start_chrome"
+    pkg="lindimp_ui"
+    type="start_chrome_simulated.sh"
+    output="screen">
+  </node>
+
+</launch>

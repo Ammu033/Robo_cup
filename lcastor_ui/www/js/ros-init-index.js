@@ -437,6 +437,7 @@ function Alternative_input(sentence) {
   });
 
   // And finally, publish.
+
   ROS_TOPIC_HANDLES['/user_speech'].publish(msg);
 }
 
