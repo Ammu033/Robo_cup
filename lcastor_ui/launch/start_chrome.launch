@@ -1,0 +1,10 @@
+<launch>
+
+  <node
+    name="start_chrome"
+    pkg="lcastor_ui"
+    type="start_chrome.sh"
+    output="screen">
+  </node>
+
+</launch>

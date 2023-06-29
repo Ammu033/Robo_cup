@@ -1,0 +1,18 @@
+{
+  "services": [
+    {
+      "id": "guided_tours_server",
+      "title":"Start a Test",
+      "image":"/images/RoboCupAtHome_logo.jpg",
+      "description":"",
+      "url":"./services/guided_tours/index.html"
+    },
+    {
+     "id": "map_page",
+     "title":"Explore House Map",
+     "image":"/images/collection-map.jpg",
+     "description":"",
+     "url":"./services/map_collection/index.html"
+   }
+  ]
+}
