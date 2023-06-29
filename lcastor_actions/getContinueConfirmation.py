@@ -18,21 +18,20 @@ Arguments:
     - pan angle
     - tile angle
 """
-class getTextInput(AbstractAction):
+class getContinueConfirmation(AbstractAction):
 
     def _start_action(self):
-        rospy.loginfo('Obtaining text input from UI: ' + " ".join(self.params) + ' ...')
+        rospy.loginfo('Obtaining confirmation input from UI: ' + " ".join(self.params) + ' ...')
         #self.starting_time = rospy.Time.now()
 
-        self.input = rospy.Publisher("/interface/showmodalInput", String, queue_size=10)
-        self.input_close = rospy.Publisher("/interface/showmodalInputclose", String, queue_size=10)
-        
-        rospy.Subscriber("/user_speech", String, self.__alt_sentence_cb)
-  
+        self.input = rospy.Publisher("/interface/showmodalcontinue", String, queue_size=10)
+        self.input_close = rospy.Publisher("/interface/showmodalcontinueclose", String, queue_size=10)
+        rospy.Subscriber("/interface/buttonPressed", String, self.__btn_cb)
+
         self.input.publish(str(" ".join(self.params)))
 
-    def __alt_sentence_cb(self, msg):
-        rospy.set_param("textInput", {"text": msg.data, "time_secs": rospy.get_time()})
+    def __btn_cb(self, msg):
+        # rospy.set_param("confirmation", {"text": msg.data, "time_secs": rospy.get_time()})
 
         self.params.append("done")
 
