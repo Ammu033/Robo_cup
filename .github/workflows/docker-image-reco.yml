@@ -1,12 +1,12 @@
-name: Docker Image CI NLU
+name: Docker Image CI reco
 
 on:
   push:
     branches: [ "main" ]
-    paths: ['lcastor_docker/Dockerfile_nlu']
+    paths: ['lcastor_docker/Dockerfile_recognition']
   pull_request:
     branches: [ "main" ]
-    paths: ['lcastor_docker/Dockerfile_nlu']
+    paths: ['lcastor_docker/Dockerfile_recognition']
 
 jobs:
   build:
@@ -38,7 +38,7 @@ jobs:
         file: ./lcastor_docker/Dockerfile
         platforms: linux/amd64
         push: true
-        tags: lcas.lincoln.ac.uk/lcastor/lcastor_base_nlu:${{ github.head_ref }}
+        tags: lcas.lincoln.ac.uk/lcastor/lcastor_base_reco:${{ github.head_ref }}
 #         run: docker build --file ./lcastor_docker/Dockerfile --tag lcas.lincoln.ac.uk/lcastor/lcastor_base:latest
         build-args: |
             UID=1001
@@ -51,7 +51,7 @@ jobs:
         file: ./lcastor_docker/Dockerfile
         platforms: linux/amd64
         push: ${{ github.event_name != 'pull_request' }}
-        tags: lcas.lincoln.ac.uk/lcastor/lcastor_base_nlu:latest
+        tags: lcas.lincoln.ac.uk/lcastor/lcastor_base_reco:latest
 #         run: docker build --file ./lcastor_docker/Dockerfile --tag lcas.lincoln.ac.uk/lcastor/lcastor_base:latest
         build-args: |
             UID=1001
