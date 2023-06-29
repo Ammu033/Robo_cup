@@ -15,6 +15,9 @@ from follow_operator import follow_operator
 
 def CarryMyLuggage(p):
 
+
+    p.exec_action("goto", "livingRoom")
+
     # 1. Picking up the bag: The robot picks up the bag pointed at by the operator.
     pickUp_bag(p) #TODO
 
@@ -25,7 +28,7 @@ def CarryMyLuggage(p):
 
 
     # 4. return to the arena
-    p.exec_action("goto", "arenaEntrance") # TODO
+    p.exec_action("goto", "arenaEntrance")
 
 if __name__ == "__main__":
 

@@ -52,10 +52,10 @@ class lookAtClosestPerson(AbstractAction):
         self.goal.goal.target.point.z = 1.7
 
         # send goal
-        self.ac.send_goal(self.goal.goal, done_cb=self._on_move_done)
+        self.ac.send_goal(self.goal.goal, done_cb=self._on_look_done)
         rospy.loginfo("Waiting for result...")
 
-    def _on_move_done(self, goalState, result):
+    def _on_look_done(self, goalState, result):
         print("Head movement DONE", goalState, result)
 
 
