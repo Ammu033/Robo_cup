@@ -16,7 +16,8 @@ ROSPARAM = 'lcastor_person_follower/personID_to_follow'
 
 def PersonFollowing(p):
     rospy.set_param(ROSPARAM, '')
-    while(True):
+    
+    while(not p.get_condition("IsCarReached")):
         p.exec_action('speak', 'Can_any_of_you_stand_in_front_of_me,_please?')
         
         p.exec_action('findClosestPersonToTrack', '')
@@ -25,20 +26,20 @@ def PersonFollowing(p):
         p.action_cmd('followPerson', '', 'start')
         
         dist_notification = time.time()
-        while not p.get_condition("IsPersonLost"):
-            
-            t = time.time() - dist_notification
+        while not p.get_condition("IsCarReached") and not p.get_condition("IsPersonLost"):
             # time check is needed in order to not say "slow down" 
             # at each instant the condition isPersonTooFar is True
+            t = time.time() - dist_notification
             if p.get_condition("IsPersonTooFar") and (t > SPEAK_TIMEOUT):
                 dist_notification = time.time()
                 p.exec_action('speak', 'Can_you_slow_down,_please?')
-                
             time.sleep(0.1)
         
         p.action_cmd('followPerson', '', 'stop')
         p.exec_action('speak', 'Person_to_follow_lost')
-        p.exec_action('goto', '0.0_0.0_0.0')
+        
+    # Go back to the initial position
+    p.exec_action('goto', '0.0_0.0_0.0')
 
 
 if __name__ == "__main__":
