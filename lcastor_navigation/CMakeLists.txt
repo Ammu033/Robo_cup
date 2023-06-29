@@ -52,7 +52,6 @@ catkin_python_setup()
    LocalizationStatus.msg
  )
 
-
 ## Generate services in the 'srv' folder
 add_service_files(
   FILES

@@ -26,7 +26,7 @@ class getTextInput(AbstractAction):
 
         self.input = rospy.Publisher("/interface/showmodalInput", String, queue_size=10)
         self.input_close = rospy.Publisher("/interface/showmodalInputclose", String, queue_size=10)
-        rospy.Subscriber("/user_speech", String, self.__alt_sentence_cb)
+        rospy.Subscriber("/alternative_stt", String, self.__alt_sentence_cb)
 
         self.input.publish(str(" ".join(self.params)))
 
