@@ -17,6 +17,8 @@ ROSPARAM = 'lcastor_person_follower/personID_to_follow'
 def PersonFollowing(p):
     rospy.set_param(ROSPARAM, '')
     
+    p.exec_action('setNavigationMode', 'MAP')
+    
     while(not p.get_condition("IsCarReached")):
         p.exec_action('speak', 'Can_any_of_you_stand_in_front_of_me,_please?')
         
@@ -40,6 +42,9 @@ def PersonFollowing(p):
         
     # Go back to the initial position
     p.exec_action('goto', '0.0_0.0_0.0')
+    
+    # Changing navigation mode to LOC
+    p.exec_action('setNavigationMode', 'LOC')
 
 
 if __name__ == "__main__":
