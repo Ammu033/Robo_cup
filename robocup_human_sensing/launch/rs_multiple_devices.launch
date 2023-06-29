@@ -1,0 +1,30 @@
+<launch>
+  <arg name="rs_serial_n2"    		default="141722061162"/> 	<!-- Note: Replace with actual serial number camera back -->
+  <arg name="rs_serial_n1"    		default="146222253484"/> 	<!-- Note: Replace with actual serial number camera front -->
+  <arg name="num_cam"                   default="1" />                  <!-- number of cameras, 1 or 2-->
+  <arg name="camera1"              	default="camera1"/>		<!-- Note: Replace with camera name -->
+  <arg name="camera2"              	default="camera2"/>		<!-- Note: Replace with camera name -->
+  <arg name="tf_prefix_camera1"         default="$(arg camera1)"/>
+  <arg name="tf_prefix_camera2"         default="$(arg camera2)"/>
+  <arg name="initial_reset"             default="false"/>
+  <arg name="reconnect_timeout"         default="6.0"/>
+
+  <group ns="$(arg camera1)">
+    <include file="$(find gofar_safety)/launch/rs_nodelet.launch.xml">
+      <arg name="serial_no"             value="$(arg rs_serial_n1)"/>
+      <arg name="tf_prefix"         		value="$(arg tf_prefix_camera1)"/>
+      <arg name="initial_reset"         value="$(arg initial_reset)"/>
+      <arg name="reconnect_timeout"     value="$(arg reconnect_timeout)"/>
+    </include>
+  </group>
+
+  <group ns="$(arg camera2)" if="$(eval arg('num_cam') == 2)">
+    <include file="$(find gofar_safety)/launch/rs_nodelet.launch.xml">
+      <arg name="serial_no"             value="$(arg rs_serial_n2)"/>
+      <arg name="tf_prefix"		          value="$(arg tf_prefix_camera2)"/>
+      <arg name="initial_reset"         value="$(arg initial_reset)"/>
+      <arg name="reconnect_timeout"     value="$(arg reconnect_timeout)"/>
+    </include>
+  </group>+
+
+</launch>
