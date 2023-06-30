@@ -6,16 +6,16 @@
 
 from typing import Any, Text, Dict, List
 
-from rasa_sdk import Action, Tracker,  FormValidationAction
+from rasa_sdk import Action, Tracker#,  FormValidationAction
 from rasa_sdk.executor import CollectingDispatcher
-from rasa_sdk.types import DomainDict
+#from rasa_sdk.types import DomainDict
 from rasa_sdk.events import AllSlotsReset
 from rasa_sdk.events import SlotSet
 from rasa_sdk.events import UserUtteranceReverted
-import roslaunch
+#import roslaunch
 import rospy
-import time
-#from std_msgs.msg import Bool, String
+#import time
+from std_msgs.msg import Bool, String
         
 class ActionConfirmationFalse(Action):
     def name(self) -> Text:
@@ -27,14 +27,19 @@ class ActionConfirmationFalse(Action):
         domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 
         #dispatcher.utter_message(text="action_confirmation_false")        
-        rospy.init_node('rasa_actions', anonymous=True)	
+        rospy.init_node('rasa_actions', anonymous=True)
+        pub_bool = rospy.Publisher("rasa_confirmation", Bool, queue_size=1)
+        rospy.sleep(1)
+        pub_bool.publish(False)
+        rospy.sleep(1)
+        '''	
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
         cli_args = ["/home/lcastor/ros_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/bool_publish.launch",'topic_name:=rasa_confirmation','value:=False']
         roslaunch_args = cli_args[1:]
         roslaunch_file = [(roslaunch.rlutil.resolve_launch_arguments(cli_args)[0], roslaunch_args)]
         parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_file)
         parent.start()
-
+        '''
         return []
 
 class ActionConfirmationConfirmation(Action):
@@ -48,13 +53,18 @@ class ActionConfirmationConfirmation(Action):
 
         #dispatcher.utter_message(text="action_confirmation_false")        
         rospy.init_node('rasa_actions', anonymous=True)	
+        pub_bool = rospy.Publisher("rasa_confirmation", Bool, queue_size=1)
+        rospy.sleep(1)
+        pub_bool.publish(True)
+        rospy.sleep(1)
+        '''
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
         cli_args = ["/home/lcastor/ros_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/bool_publish.launch",'topic_name:=rasa_confirmation','value:=True']
         roslaunch_args = cli_args[1:]
         roslaunch_file = [(roslaunch.rlutil.resolve_launch_arguments(cli_args)[0], roslaunch_args)]
         parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_file)
         parent.start()
-
+        '''
         return []
 
 class ActionConfirmationThanks(Action):
@@ -68,13 +78,18 @@ class ActionConfirmationThanks(Action):
 
         #dispatcher.utter_message(text="action_confirmation_false")        
         rospy.init_node('rasa_actions', anonymous=True)	
+        pub_bool = rospy.Publisher("rasa_confirmation", Bool, queue_size=1)
+        rospy.sleep(1)
+        pub_bool.publish(True)
+        rospy.sleep(1)
+        '''
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
         cli_args = ["/home/lcastor/ros_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/bool_publish.launch",'topic_name:=rasa_confirmation','value:=True']
         roslaunch_args = cli_args[1:]
         roslaunch_file = [(roslaunch.rlutil.resolve_launch_arguments(cli_args)[0], roslaunch_args)]
         parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_file)
         parent.start()
-
+        '''
         return []
 
 class ActionConfirmationArrival(Action):
@@ -88,13 +103,18 @@ class ActionConfirmationArrival(Action):
 
         #dispatcher.utter_message(text="action_confirmation_false")        
         rospy.init_node('rasa_actions', anonymous=True)	
+        pub_bool = rospy.Publisher("rasa_confirmation", Bool, queue_size=1)
+        rospy.sleep(1)
+        pub_bool.publish(True)
+        rospy.sleep(1)
+        '''
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
         cli_args = ["/home/lcastor/ros_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/bool_publish.launch",'topic_name:=rasa_confirmation','value:=True']
         roslaunch_args = cli_args[1:]
         roslaunch_file = [(roslaunch.rlutil.resolve_launch_arguments(cli_args)[0], roslaunch_args)]
         parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_file)
         parent.start()
-
+        '''
         return []
 
 class ActionConfirmationAffirmDeny(Action):
@@ -110,6 +130,16 @@ class ActionConfirmationAffirmDeny(Action):
         
         #dispatcher.utter_message(text="action_confirmation_false")        
         rospy.init_node('rasa_actions', anonymous=True)	
+        pub_bool = rospy.Publisher("rasa_confirmation", Bool, queue_size=1)
+        rospy.sleep(1)
+        pub_bool.publish(True)
+        rospy.sleep(1)
+        
+        pub_bool = rospy.Publisher("person_affirm_deny", Bool, queue_size=1)
+        rospy.sleep(1)
+        pub_bool.publish(slot_value)
+        rospy.sleep(1)
+        '''
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
         
         cli_args = ["/home/lcastor/ros_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/bool_publish.launch",'topic_name:=rasa_confirmation','value:=True']
@@ -123,7 +153,7 @@ class ActionConfirmationAffirmDeny(Action):
         roslaunch_file = [(roslaunch.rlutil.resolve_launch_arguments(cli_args)[0], roslaunch_args)]
         parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_file)
         parent.start()
-        
+        '''
         return []
     
 class ActionConfirmationPersonName(Action):
@@ -139,6 +169,16 @@ class ActionConfirmationPersonName(Action):
         
         #dispatcher.utter_message(text="action_confirmation_false")        
         rospy.init_node('rasa_actions', anonymous=True)	
+        pub_bool = rospy.Publisher("rasa_confirmation", Bool, queue_size=1)
+        rospy.sleep(1)
+        pub_bool.publish(True)
+        rospy.sleep(1)
+        
+        pub_bool = rospy.Publisher("guest_name", String, queue_size=1)
+        rospy.sleep(1)
+        pub_bool.publish(slot_value)
+        rospy.sleep(1)
+        '''
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
         
         cli_args = ["/home/lcastor/ros_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/bool_publish.launch",'topic_name:=rasa_confirmation','value:=True']
@@ -154,7 +194,7 @@ class ActionConfirmationPersonName(Action):
         parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_file)
         parent.shutdown() # to close any previous node
         parent.start()
-        
+        '''
         return []
 
 class ActionConfirmationPersonDrink(Action):
@@ -170,6 +210,16 @@ class ActionConfirmationPersonDrink(Action):
         
         #dispatcher.utter_message(text="action_confirmation_false")        
         rospy.init_node('rasa_actions', anonymous=True)	
+        pub_bool = rospy.Publisher("rasa_confirmation", Bool, queue_size=1)
+        rospy.sleep(1)
+        pub_bool.publish(True)
+        rospy.sleep(1)
+        
+        pub_bool = rospy.Publisher("guest_drink", String, queue_size=1)
+        rospy.sleep(1)
+        pub_bool.publish(slot_value)
+        rospy.sleep(1)
+        '''
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
         
         cli_args = ["/home/lcastor/ros_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/bool_publish.launch",'topic_name:=rasa_confirmation','value:=True']
@@ -183,7 +233,7 @@ class ActionConfirmationPersonDrink(Action):
         roslaunch_file = [(roslaunch.rlutil.resolve_launch_arguments(cli_args)[0], roslaunch_args)]
         parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_file)
         parent.start()
-               
+        '''       
         return []
 
 class ActionCheckPersonName(Action):
@@ -243,13 +293,19 @@ class ActionDefaultFallback(Action):
         dispatcher.utter_message(text="I'm sorry, I didn't quite understand that")
         
         rospy.init_node('rasa_actions', anonymous=True)	
+        pub_bool = rospy.Publisher("rasa_confirmation", Bool, queue_size=1)
+        rospy.sleep(1)
+        pub_bool.publish(False)
+        rospy.sleep(1)
+        '''
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
-        
+    
         cli_args = ["/home/lcastor/ros_ws/src/LCASTOR/lcastor_nlu/robocup_nlu/launch/bool_publish.launch",'topic_name:=rasa_confirmation','value:=False']
         roslaunch_args = cli_args[1:]
         roslaunch_file = [(roslaunch.rlutil.resolve_launch_arguments(cli_args)[0], roslaunch_args)]
         parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_file)
         parent.start()
+        '''
         
         # Revert user message which led to fallback.
         return [UserUtteranceReverted()]

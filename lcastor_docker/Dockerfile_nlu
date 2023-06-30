@@ -117,6 +117,9 @@ USER root
 RUN adduser root pulse-access
 RUN adduser lcastor pulse-access
 
+# For audio purposes
+RUN apt-get install -y jackd1
+
 # Fix pip not working properly
 # RUN wget https://files.pythonhosted.org/packages/00/3f/ea5cfb789dddb327e6d2cf9377c36d9d8607af85530af0e7001165587ae7/pyOpenSSL-22.1.0-py3-none-any.whl
 # RUN python3 -m easy_install pyOpenSSL-22.1.0-py3-none-any.whl
