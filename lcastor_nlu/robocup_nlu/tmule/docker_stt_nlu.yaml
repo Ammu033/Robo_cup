@@ -41,7 +41,9 @@ windows:
 - name: conversation
   panes:
   - rostopic echo /user_speech
-  - rostopic echo /robot_speech
+  - rostopic echo /guest_name
+  - rostopic echo /guest_drink
+  - rostopic echo /person_affirm_deny
   - rostopic echo /rasa_confirmation
   - rostopic echo /planner_intention
 #############################################################################################
