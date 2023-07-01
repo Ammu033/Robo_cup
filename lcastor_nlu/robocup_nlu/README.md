@@ -37,6 +37,7 @@ where `ROBOT_NUM` is the robot number (29, 89 or 125). Make sure that you are co
 * There are two Tmule sessions that have to be launched to run both the STT and NLU.
 * The first session is launched by using the file `~/robocup_nlu/tmule/conda_stt_nlu.yaml`. This config file only run the STT part (using Whisper) that publish a ROS topic with the user speech. This part can only be used outside the Docker container (due to problems getting access to microphone and GPU). 
 * The second session is launched by using the file `~/robocup_nlu/tmule/docker_stt_nlu.yaml`. This config file contains the NLU part (using RASA) and the necessary scripts to communicate Whisper, RASA and the Tiago planner using ROS topics. This part is run inside the container.
+* Make sure that the values of the parameters `CATKIN_WORKSPACE` `ROS_MASTER` `ROS_IP` inside the tmule config files are correct.
 
 NOTES:
 
