@@ -1,0 +1,230 @@
+/* Header buttons */
+div.headerButton{
+    font-size: 20px;
+    width: 12vw;
+    max-width: 100px;
+    display: inline-block;
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 8px;
+    border-color: #ffff00;
+    color: #ffff00;
+    background-color: none;
+    cursor:pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 100px;
+    margin-left: 3px;
+    margin-right: 3px;
+}
+
+div.headerButton:active{
+    font-size: 20px;
+    width: 12vw;
+    max-width: 100px;
+    display: inline-block;
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 8px;
+    border-color: grey;
+    color: grey;
+    background-color: none;
+    cursor:auto;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 100px;
+    margin-left: 3px;
+    margin-right: 3px;
+}
+
+div.headerButtonBusy{
+    font-size: 20px;
+    width: 12vw;
+    max-width: 100px;
+    display: inline-block;
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 8px;
+    border-color: grey;
+    color: grey;
+    background-color: none;
+    cursor:auto;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 100px;
+    margin-left: 3px;
+    margin-right: 3px;
+}
+
+div.headerButtonClicked{
+    font-size: 20px;
+    width: 12vw;
+    max-width: 100px;
+    display: inline-block;
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 8px;
+    border-color: grey;
+    color: grey;
+    background-color: none;
+    cursor:auto;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 100px;
+    margin-left: 3px;
+    margin-right: 3px;
+}
+
+#homeButton{
+    width: 17vw;
+    max-width: 150px;
+}
+
+@media only screen and (max-width: 1200px) {
+    #homeButton{
+        width: 17vw;
+        max-width: 150px;
+    }
+  }
+
+#volUpButton, #volDownButton{
+    font-size: 3vw;
+    font-weight: bold;
+}
+
+/* Home page */
+#tourPageLoadButton, #mapPageLoadButton{
+    width: 45vw !important;
+    margin-left: 1vw;
+    margin-right: 1vw;
+    margin-top: 10px;
+    border: 2px solid black;
+    box-shadow: 5px 5px 5px grey;   
+}
+
+/* Tours page */
+div.startTourButton{
+    text-align: center;
+    font-size: 20px;
+    width: 13vw;
+    max-width: 130px;
+    display: inline-block;
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 8px;
+    border-color: #563c55;
+    color: #ffff00;
+    background-color: #563C55;
+    cursor:pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+div.startTourButtonBusy{
+    text-align: center;
+    font-size: 20px;
+    width: 13vw;
+    max-width: 130px;
+    display: inline-block;
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 8px;
+    border-color: grey;
+    color: lightgray;
+    background-color: grey;
+    cursor:pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+div.startTourButton:active{
+    text-align: center;
+    font-size: 20px;
+    width: 13vw;
+    max-width: 130px;
+    display: inline-block;
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 8px;
+    border-color: grey;
+    color: black;
+    background-color: grey;
+    cursor:pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+div.startTourButtonClicked{
+    text-align: center;
+    font-size: 20px;
+    width: 13vw;
+    max-width: 130px;
+    display: inline-block;
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 8px;
+    border-color: grey;
+    color: black;
+    background-color: grey;
+    cursor:pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.describeExhibitButton, .goToExhibitButton{
+    display: block;
+    margin: 5px auto 5px auto !important;
+    height: 50px;
+    width: 100%;
+    font: arial;
+    font-size: 1.25rem;
+    color: white;
+    text-align: center;
+    line-height: 50px;
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 8px;
+}
+
+.describeExhibitButton{
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+}
+
+.goToExhibitButton{
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.describeExhibitButtonBusy, .goToExhibitButtonBusy{
+    display: block;
+    margin: 5px auto 5px auto !important;
+    height: 50px;
+    width: 100%;
+    font: arial;
+    font-size: 1.25rem;
+    background-color: grey; 
+    border-color: grey;
+    color: lightgray;
+    text-align: center;
+    line-height: 50px;
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 8px;
+}

@@ -1,0 +1,10 @@
+<launch>
+
+  <node
+    name="start_slimjet"
+    pkg="lindimp_ui"
+    type="start_slimjet_simulated.sh"
+    output="screen">
+  </node>
+
+</launch>

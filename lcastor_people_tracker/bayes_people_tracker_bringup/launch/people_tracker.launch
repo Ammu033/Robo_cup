@@ -1,8 +1,18 @@
 <launch>
+  
+  <!-- Leg detector -->
+  <include file="$(find detector_msg_to_pose_array)/launch/to_pose_array.launch"/>
+  <node pkg="leg_detector" type="leg_detector" name="leg_detector" args="scan:=scan $(find leg_detector)/config/trained_leg_detector.yaml" output="screen">
+    <param name="fixed_frame" type="string" value="odom"/>
+    <param name="publish_leg_markers" type="bool" value="false"/>
+    <param name="publish_people_markers" type="bool" value="true"/>
+  </node>
+
   <!-- 3D Object Detector -->
   <node pkg="object3d_detector" type="object3d_detector" name="object3d_detector" output="screen" respawn="false" >
     <param name='z_limit_min' value='-1.5'/>
     <param name='z_limit_max' value='0.5'/>
+    <param name='human_size_limit' value='true'/>
     <param name="model_file_name" type="string" value="$(find object3d_detector)/libsvm/pedestrian.model"/>
     <param name="range_file_name" type="string" value="$(find object3d_detector)/libsvm/pedestrian.range"/>
   </node>

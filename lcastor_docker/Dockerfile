@@ -20,7 +20,7 @@ RUN rm -rf /var/lib/apt/lists/* && \
     echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list && \
     apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
 RUN DEBIAN_FRONTEND=noninteractive apt update && \
-    DEBIAN_FRONTEND=noninteractive apt install -y ros-${ROS_DISTRO}-catkin ros-${ROS_DISTRO}-ros-base ros-${ROS_DISTRO}-vision-msgs ros-${ROS_DISTRO}-cv-bridge python3-catkin-tools python3-venv python3-pip python3-rosdep python3-rosinstall python-is-python3 --no-install-recommends && \
+    DEBIAN_FRONTEND=noninteractive apt install -y ros-${ROS_DISTRO}-catkin ros-${ROS_DISTRO}-ros-base ros-${ROS_DISTRO}-vision-msgs ros-${ROS_DISTRO}-cv-bridge ros-${ROS_DISTRO}-rosbridge-server python3-catkin-tools python3-venv python3-pip python3-rosdep python3-rosinstall python-is-python3 --no-install-recommends && \
     rosdep init && rosdep update
 RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
 
