@@ -34,7 +34,7 @@ echo " "
     echo " "
     exit 1
   else
-    echo "It will connect to tiago ${ROBOT_NUM}"
+    echo "It will connect to tiago ${ROBOT_NUM} ${ETH}"
   fi 
    echo "source /home/lcastor/ros_ws/src/LCASTOR/scripts/connect_tiago.sh ${ROBOT_NUM} ${ETH}" >> /home/lcastor/.bashrc
    catkin build

@@ -102,6 +102,13 @@ RUN wget https://files.pythonhosted.org/packages/00/3f/ea5cfb789dddb327e6d2cf937
 RUN python3 -m easy_install pyOpenSSL-22.1.0-py3-none-any.whl
 
 
+
+RUN cd /home/lcastor; mkdir weights; cd weights
+RUN wget https://github.com/swghosh/DeepFace/releases/download/weights-vggface2-2d-aligned/VGGFace2_DeepFace_weights_val-0.9034.h5.zip
+RUN unzip VGGFace2_DeepFace_weights_val-0.9034.h5.zip
+
+
+
 # Create entrypoint for image
 # COPY entrypoint.sh .
 ENTRYPOINT ["/bin/bash", "/home/lcastor/ros_ws/src/LCASTOR/lcastor_docker/entrypoint_recognition.sh"]
