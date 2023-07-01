@@ -1,14 +1,27 @@
-#! /usr/bin/env python3 
+import os
+import sys
+import tf
+import math
 
+try:
+    sys.path.insert(0, os.environ["PNP_HOME"] + '/actions')
+except:
+    print("Please set PNP_HOME environment variable to PetriNetPlans folder.")
+    sys.exit(1)
+
+import rospy
+import robocup_human_sensing
+from sensing_classes import Person
+from sensing_classes import face_identifier
 import rospy
 from robocup_human_sensing.msg import RegionOfInterest2D
 from robocup_human_sensing.msg import SoftBiometricsList
 from sensor_msgs.msg import Image, RegionOfInterest
 from cv_bridge import CvBridge
 from std_msgs.msg import String , ColorRGBA
-from face_id import face_identifier
-from age_id import age_identifier
-from gender_id import gender_identifier
+#from face_id import face_identifier
+#from age_id import age_identifier
+#from gender_id import gender_identifier
 #from color_detector import color_id
 import mediapipe as mp
 import math
@@ -16,14 +29,16 @@ import random
 import numpy as np
 import webcolors
 
-#camera_topic_rgb=rospy.get_param("/hs_people_identification/camera_topic_rgb")
+#from people_msgs.msg import People
+from geometry_msgs.msg import PoseWithCovarianceStamped, Pose2D
+from AbstractAction import AbstractAction
+
 camera_topic_rgb = '/xtion/rgb/image_raw'
 #camera_topic_depth=rospy.get_param("/hs_people_identification/camera_topic_depth") 
 #database_direct=rospy.get_param("/hs_people_identification/database_direct")
 database_direct = "/home/lcastor/ros_ws/src/LCASTOR/robocup_human_sensing/database/"
 #models_direct=rospy.get_param("/hs_people_identification/models_direct")
 models_direct = "/home/lcastor/ros_ws/src/LCASTOR/robocup_human_sensing/weights/"
-
 mp_face_detection = mp.solutions.face_detection
 rospy.set_param('learn' , 0)
 def normalized_to_pixel_coordinates(
@@ -51,86 +66,26 @@ MAX_SCALING_ROIS = 2
 cropped_face_width = 128
 cropped_face_height = 128
 
-
-class Person:
-    last_id = 0
-    def __init__(self):
-        self.id = "".join(random.choices("123456789010", k=3))
-        self.nb_frames_visible = 1
-        self.bb = None
-        self.emp_name = None
-        self.emp_dress_color = None
-        self.emp_hair_color = None
-        self.emp_skin_color = None
-        self.ready = False
-
-    
-    def initialise_publisher(self):
-        if self.ready:
-            return
-        self.roi_pub = rospy.Publisher("/humans/person/%s/roi" % self.id, RegionOfInterest , queue_size = 1)
-        self.cropped_pub = rospy.Publisher("/humans/person/%s/cropped" % self.id , Image , queue_size =1)
-        self.name_pub = rospy.Publisher("/humans/people/%s/name" % self.id, String , queue_size= 1)
-        #self.dress_color = rospy.Publisher("/humans/people/%s/dress_color"  % self.id , ColorRGBA , queue_size = 1)
-        #self.hair_color = rospy.Publisher("/humans/people/%s/hair_color"  %self.id , ColorRGBA , queue_size =1)
-        rospy.loginfo("New Person : %s" % self)
-        #self.skin_color = rospy.Publisher("/humans/people/%s/skin_color" %self.id , ColorRGBA , queue_size= 1)
-        self.ready = True
-    
-    def publish(self):
-        if not self.ready:
-            rospy.logerr("Trying to publish but publishers have not been created")
-            return
-        self.roi_pub.publish(self.bb)
-        self.name_pub.publish(self.emp_name)
-        #self.dress_color.publish(self.emp_dress_color)
-        #self.hair_color.publish(self.emp_hair_color)
-        #self.skin_color.publish(self.emp_skin_color)
-
-    def publish_images (self, src_image):
-        if not self.ready :
-            rospy.logerr("Trying to publish but publishers have not been created yet")
-            return
-        
-        self.cropped_pub.publish(CvBridge().cv2_to_imgmsg(src_image[self.bb.y_offset : self.bb.y_offset + self.bb.height , 
-                                                                    self.bb.x_offset : self.bb.x_offset + self.bb.width] , encoding = "bgr8"))
-    
-    def delete(self):
-
-        if not self.ready:
-            return
-
-        rospy.loginfo(
-            "Face [%s] lost. It remained visible for %s frames"
-            % (self, self.nb_frames_visible)
-        )
-
-        self.roi_pub.unregister()
-        self.cropped_pub.unregister()
-        self.name_pub.unregister()
-        #self.dress_color.unregister()
-        #self.hair_color.unregister()
-        #self.skin_color.unregister()
-
-        self.ready = False
-
-class RosPeopleDetect :
-    def __init__(self):
+class peopleDetection(AbstractAction):
+    def _start_action(self):
         self.detector = mp_face_detection.FaceDetection(model_selection = 1 , min_detection_confidence = 0.8)
         self.name = face_identifier(database_direct,models_direct)
         #self.gender = gender_identifier(models_direct)
         #self.age = age_identifier(models_direct)
         #self.dress_color_ = color_id(models_direct)
+        rospy.logerr(self.name)
+        rospy.set_param('modelLoaded' , True)
+
+
         self.single_pub = rospy.Publisher("/h_boxes_tracked" , RegionOfInterest2D , queue_size =1)
         self.bio_pub = rospy.Publisher("/biodata" , SoftBiometricsList , queue_size= 1)
         self.knownPeople = {}
+        
         self.is_shutting_down = False
         self.box_sub = rospy.Subscriber(camera_topic_rgb, Image, self.callback)
         rospy.loginfo('waiting for topics')
-        
-        
 
-
+    
     def distance_rois(self, bb1, bb2):
         x1, y1 = bb1.x_offset + bb1.width / 2, bb1.y_offset + bb1.height / 2
         x2, y2 = bb2.x_offset + bb2.width / 2, bb2.y_offset + bb2.height / 2
@@ -147,24 +102,7 @@ class RosPeopleDetect :
             ):
                 return person
         return None
-    
-    def closest_color(self, requested_colour):
-        min_colours = {}
-        for key, name in webcolors.CSS3_HEX_TO_NAMES.items():
-            r_c, g_c, b_c = webcolors.hex_to_rgb(key)
-            rd = (r_c - requested_colour[0]) ** 2
-            gd = (g_c - requested_colour[1]) ** 2
-            bd = (b_c - requested_colour[2]) ** 2
-            min_colours[(rd + gd + bd)] = name
-        return min_colours[min(min_colours.keys())]
-    def get_color_name(self, requested_colour):
-        try:
-            closest_name = actual_name = webcolors.rgb_to_name(requested_colour)
-        except ValueError:
-            closest_name = self.closest_color(requested_colour)
-            actual_name = None
-        return actual_name, closest_name
-    
+
     def SkipBoundingBox(self , rd):
         #area = rd[2] * rd[3]
         #rd[4] is img_width rd[5] is img_height
@@ -173,10 +111,7 @@ class RosPeopleDetect :
         condition_3 = rd[0] < (rd[4]*0.2) or rd[0] > (rd[4] * 0.8)
         return condition_1 or condition_2 or condition_3
 
-    
-    
     def callback(self, image_data):
-
         image = CvBridge().imgmsg_to_cv2(image_data , desired_encoding = "bgr8")
         img_height , img_width , _ = image.shape
         rospy.loginfo('waiting for people_roi')
@@ -232,45 +167,15 @@ class RosPeopleDetect :
 
                     name_id = int(self.name.register_new_face(cropped_img , face_x , face_y , face_w , face_h))
                     rospy.set_param('LastSavedid' , name_id)
+                    rospy.set_param('learn' , 0)
+                    rospy.set_param('personSaved' , 1)
                     is_found = True
                 else:
                     name_id  , is_found  = self.name.name_teller(cropped_img , face_x , face_y , face_w , face_h)
-                #gender_id = self.gender.gender_teller(cropped_img , face_x , face_y , face_w , face_h)
-                #age_id = self.age.age_teller(cropped_img , face_x , face_y , face_w , face_h)
-                #biometrics.age.append(age_id)
-                #biometrics.gender.append(gender_id)
                 if not is_found:
                     continue
                 name_msg.data = name_id
                 person.emp_name = name_id
-                #pr_mask = self.dress_color_.Color(image)
-                #for j in range(3):
-                #    image[: , : , j] = np.multiply(image[: , :  , j] , pr_mask[: , : , 1])
-                #print(image.shape)
-                #cropped_dress = image[roi_data.y[i] : roi_data.y[i] + roi_data.h[i],
-                #                    roi_data.x[i] : roi_data.x[i] + roi_data.w[i]]
-                #dress_color = np.mean(cropped_dress[cropped_dress[ : , : , 1] != 0 ] , axis =0)
-                #print(dress_color)
-                #for j in range(3):
-                #    image[: , : , j] = np.multiply(image[: , :  , j] , pr_mask[: , : , 1])
-                #print(image.shape)
-                #cropped_dress = image[roi_data.y[i] : roi_data.y[i] + roi_data.h[i],
-                #                    roi_data.x[i] : roi_data.x[i] + roi_data.w[i]]
-                #dress_color = np.mean(cropped_dress[cropped_dress[ : , : , 1] != 0 ] , axis =0)
-                #dc = self.get_color_name([dress_color[2] , dress_color[1] , dress_color[0]])[1]
-                #person.emp_dress_color  = dc
-                #emp_dress = dc
-                #file = open(str(name_id)+'.txt' , 'w')
-                #file.write("%s \n %s \n %s \n" % (str(dc) , str(0) , str(0) ))
-                #file.close()
-                #person.dress_color = dress_filter[roi_data.y[i] : roi_data.y[i] + roi_data.h[i],
-                #                    roi_data.x[i] : roi_data.x[i] + roi_data.w[i]]
-                #print(person.dress_color.shape)
-                #name_id = name_msg.data
-                # Color based Info to be added 
-                #skin_color
-                #hair_color
-                #dress_color
                 self.knownPeople[person.id] = person
             if name_id :
                 ids_a[i] = (int(name_id))
@@ -285,15 +190,17 @@ class RosPeopleDetect :
             if id not in currentIds:
                 self.knownPeople[id].delete()
                 del self.knownPeople[id]
-        
-        #for _, people in self.knownPeople.items():
-        #    if people.ready:
-        #        if not self.is_shutting_down:
-        #            person.publish()
-        #        if not self.is_shutting_down:
-        #            person.publish_images(image)
+    
+    def _stop_action(self):
+        self.box_sub.unregister()
+        rospy.loginfo("Stopping PeopleDetection")
+        #rospy.set_param(ROSPARAM, self.person_to_follow.name)
+        self.params.append("done")
+    
+    @classmethod
+    def is_goal_reached(cls, params):
+        reached = False
+        if len(params) > 0 and params[-1] == "done":
+            reached = True
+        return reached
 
-if __name__=="__main__":
-    rospy.init_node('people_identifier')
-    detector = RosPeopleDetect()
-    rospy.spin()

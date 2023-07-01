@@ -16,7 +16,7 @@ docker run --privileged --network host \
            -v $(pwd)/../:/home/lcastor/ros_ws/src/LCASTOR \
            -v /dev/dri:/dev/dri \
            --rm \
-           --entrypoint /home/lcastor/ros_ws/src/LCASTOR/lcastor_docker/robot_entrypoint.sh \
+           --entrypoint /home/lcastor/ros_ws/src/LCASTOR/lcastor_docker/robot_entrypoint_recognition.sh \
            -it ${image_name}  \
            $1 $2
            #--name "${image_name/:/-}" \
