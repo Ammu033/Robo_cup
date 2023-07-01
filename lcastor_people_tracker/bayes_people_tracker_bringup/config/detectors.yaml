@@ -3,8 +3,15 @@ bayes_people_tracker:
     cv_noise_params:                                           # The noise for the constant velocity prediction model
         x: 1.4
         y: 1.4
-        std_limit: 1.0                                         # upper limit for the standard deviation of the estimated position 
+        std_limit: 5.0                                         # upper limit for the standard deviation of the estimated position 
     detectors:                                                 # Add detectors under this namespace
+        leg_detector:                                          # Name of detector (used internally to identify them). Has to be unique.
+            topic: "/to_pose_array/leg_detector"               # The topic on which the geometry_msgs/PoseArray is published
+            cartesian_noise_params:                            # The noise for the cartesian observation model
+                x: 0.2
+                y: 0.2
+            observation_model: "CARTESIAN"
+            matching_algorithm: "NNJPDA"                       # The algorthim to match different detections. NN = Nearest Neighbour, NNJPDA = NN Joint Probability Data Association
         object3d_detector:
             topic: "/object3d_detector/poses"
             observation_model: "CARTESIAN"
