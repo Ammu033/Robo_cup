@@ -1,0 +1,62 @@
+version: "3.1"
+
+rules:
+
+- rule: Ask the user to rephrase whenever they send a message with low NLU confidence
+  steps:
+  - intent: nlu_fallback
+#  - action: utter_ask_rephrase
+  - action: action_default_fallback
+
+#- rule: Robot introduces itself to the user
+#  steps:
+#  - intent: robot_introduction
+#  - action: utter_iamtiago
+
+#- rule: out-of-scope
+#  steps:
+#  - intent: out_of_scope
+#  - action: utter_out_of_scope
+  
+#- rule: Activate Person description form
+#  steps:
+#  - intent: follow_a_person
+#  - action: person_description_form
+#  - active_loop: person_description_form
+
+#- rule: Submit Person description form
+#  condition: 
+#  - active_loop: person_description_form 
+#  steps:
+#  - action: person_description_form
+#  - active_loop: null
+#  - slot_was_set:
+#    - requested_slot: null
+#  - action: action_person_follow
+#  - action: action_slot_reset
+#  #wait_for_user_input: false
+
+#- rule: Activate Object to grasp form
+#  steps:
+#  - intent: grasp_object
+#  - action: object_to_grasp_form
+#  - active_loop: object_to_grasp_form
+
+#- rule: Submit Object to grasp form
+#  condition: 
+#  - active_loop: object_to_grasp_form
+#  steps:
+#  - action: object_to_grasp_form
+#  - active_loop: null
+#  - slot_was_set:
+#    - requested_slot: null
+#  - action: action_grasp_object
+#  - action: action_slot_reset
+
+#- rule: Stop current action
+#  steps:
+#  - intent: stop_task
+#  #- action: utter_stop_task
+#  - action: action_stop_task
+#  - action: action_slot_reset
+#  #wait_for_user_input: false

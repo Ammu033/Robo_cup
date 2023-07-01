@@ -1,0 +1,301 @@
+version: "3.1"
+nlu:
+
+#####################################
+# Planner intentions ################   
+- intent: planner_confirmation
+  examples: |
+    - Rasa_confirmation
+    - rasa_confirmation
+      
+- intent: planner_user_confirm_arrived
+  examples: |
+    - Rasa_user_confirm_arrived
+    - rasa_user_confirm_arrived
+
+- intent: planner_user_thanks
+  examples: |
+    - Rasa_user_user_thanks
+    - rasa_user_user_thanks
+
+- intent: planner_guest_name
+  examples: |
+    - Rasa_guest_name
+    - rasa_guest_name
+
+- intent: planner_guest_drink
+  examples: |
+    - Rasa_guest_drink
+    - rasa_guest_drink
+
+- intent: planner_affirm_deny
+  examples: |
+    - Rasa_affirm_deny
+    - rasa_affirm_deny
+    
+####################################
+# User intentions ##################    
+- intent: affirm
+  examples: |
+    - yes
+    - indeed
+    - is correct
+    - that is correct
+    - that's correct
+    - correct
+    - confirm
+    - true
+    - that is true
+    - yeah
+    - that's right
+    - you are right
+    - confirmed
+    - ok
+    - that is ok
+    - that's ok
+    - affirm
+    - affirmative
+
+- intent: deny
+  examples: |
+    - no
+    - wrong
+    - that's wrong
+    - I don't think so
+    - it is wrong
+    - not true
+    - not correct
+    - not really
+    - no way
+    - mistake
+    - you got it wrong
+    - you are wrong
+    - this is a mistake
+    - that is not correct
+    - you are not correct
+    - that is not my name
+    - that is not what I said
+    - that's not what I said
+    - deny
+
+- intent: person_name
+  examples: |
+    - I am [leonardo](person_name)
+    - I'm [ricardo](person_name)
+    - my name is [francesco](person_name)  
+    - I am [jacob](person_name)
+    - my name is [marc](person_name)
+    - I am [thomas](person_name)
+    - I am [charles](person_name)
+    - I am [sophy](person_name)
+    - my name is [helen](person_name)
+    - you can call me [katherine](person_name)
+    - call me [nico](person_name)
+    - people call me [maria](person_name)
+    - My name is [alex](person_name)
+
+- intent: person_drink
+  examples: |
+    - A [hot coffee](person_drink)
+    - I really like [black coffee](person_drink)
+    - I love [cappuccino](person_drink)
+    - I drink [latte](person_drink)
+    - My favorite drink is [espresso](person_drink)
+    - My favorite drink is [mocha](person_drink)
+    - My favorite drink is [macchiato](person_drink)
+    - My favorite drink is [americano coffee](person_drink)
+    - Any kind of [tea](person_drink)
+    - My favorite is a [soda](person_drink)
+    - I like any kind of [iced tea](person_drink)
+    - I like [coke](person_drink)
+    - I like [coca cola](person_drink)
+    - I really like [coca cola zero](person_drink)
+    - My favorite drink is [pepsi](person_drink)
+    - My favorite drink is [fanta](person_drink)
+    - I really like [red bull](person_drink)
+    - I really like [sprite](person_drink)
+    - I really like [seven up](person_drink)
+    - I really like [7 up](person_drink)
+    - I really like [dr pepper](person_drink)
+    - I really like [doctor pepper](person_drink)
+    - I am fan of [canada dry](person_drink)
+    - I am fan of [nestea](person_drink)
+    - I would like to have a glass of [wine](person_drink)
+    - I really like [red wine](person_drink)
+    - I am fan of [beer](person_drink)
+    - a [cocktail](person_drink)
+    - a [mojito](person_drink)
+    - a would love a shot of [tequila](person_drink)
+    - I drink [whisky](person_drink)
+    - a glass of [water](person_drink)
+    - a bottle of [water](person_drink)
+    - glass of [still water](person_drink)
+    - bottle of [sparkling water](person_drink)
+    - a love to drink [apple juice](person_drink)
+    - a love to drink [orange juice](person_drink)    
+    - I drink [fresh juice](person_drink)       
+    - a glass of [juice](person_drink)
+    - I would like a [bloody mary](person_drink)
+    - I really like the [cosmopolitan](person_drink)
+    - I will drink a [gin and tonic](person_drink)
+    - a drink I really like is [margarita](person_drink)
+    - I drink [martini](person_drink)
+- intent: arrived_confirmation
+  examples: |
+    - we are here
+    - That's it
+    - we are here
+    - we have arrived
+    - it is here
+    - you can stop
+    - please stop
+
+- intent: thanks
+  examples: |
+    - thanks
+    - thank you
+    - thank you for helping me
+    - thank you very much for your service
+    - thank you for carrying my luggage
+    - I appreciate your help, thank you
+
+#- intent: greet
+#  examples: |
+#    - hey
+#    - hello
+#    - hi
+#    - hello there
+#    - good morning
+#    - good evening
+#    - hey there
+#    - hey dude
+#    - good afternoon  
+
+    
+#- intent: out_of_scope
+#  examples: |
+#    - I want to order food
+#    - What is 2 plus 2?
+#    - Who's the US President?
+#    - Can you bring me an object?
+#    - can you grab an object?
+#    - Can you cook?
+#    - can you prepare a pizza?
+
+     
+#- intent: go_to
+#  examples: |
+#    - go to [kitchen](location)
+#    - I would like you to go to the [dinning room](location)
+#    - Can you go to the [lounge](location), please?
+#    - go to the [living room](location)
+#    - go to the [bedroom](location)
+#    - go to the [toilet](location)
+
+#- intent: follow_a_person
+#  examples: |
+#    - follow a person
+#    - can you follow her?
+#    - please follow him
+#    - follow the person
+#    - I need you to follow a person
+#    - please follow a lady
+
+#- intent: robot_introduction
+#  examples: |
+#    - are you a robot?
+#    - who are you?
+#    - who is your creator?
+#    - what is the name of your team?
+#    - what is your name?
+#    - what's your name?
+#    - hello, what is your name?
+#    - how the people call you?
+#    - how old are you?
+#    - are you a human?
+#    - are you a person?
+#    - which kind of robot are you?
+#    - where are you from?
+
+#- intent: person_description
+#  examples: |
+#    - a [red](clothes_color) [shirt](clothes_type)
+#    - a [blue](clothes_color) [pants](clothes_type)
+#    - a [black](clothes_color) [sweater](clothes_type)
+#    - a [white](clothes_color) [shoes](clothes_type)
+#    - a [red](clothes_color) [jacket](clothes_type)
+#    - a [green](clothes_color) [hat](clothes_type)
+#    - a [white](clothes_color) [jumper](clothes_type)
+#    - the [shirt](clothes_type) is [white](clothes_color) 
+#    - the [pants](clothes_type) are [blue](clothes_color)
+#    - the [sweater](clothes_type) is [white](clothes_color)
+#    - the [hat](clothes_type) is [yellow](clothes_color)
+#    - [shortpants](clothes_type)
+#    - [red][red](clothes_color)
+#    - the color is [blue](clothes_color) 
+#    - it is [black](clothes_color)
+#    - it is [white](clothes_color)
+#    - it seems to be [black](clothes_color)
+#    - [green](clothes_color)
+#    - [yellow](clothes_color)
+#    - he is wearing a [jumper](clothes_type)
+#    - she has a [hat](clothes_type)
+#    - a [hoodie](clothes_type)
+#    - the person has a [jacket](clothes_type)
+#    - [shoes](clothes_type)
+#    - a [sweater](clothes_type)
+#    - he is wearing [pants](clothes_type)
+#    - a [shirt](clothes_type)
+    
+#- intent: follow_me
+#  examples: |
+#    - follow me
+#    - Can you follow me please?
+#    - start following me
+#    - you have to follow me
+#    - please, follow me
+#    - follow
+#    - follow me please
+
+#- intent: stop_task
+#  examples: |
+#    - stop following
+#    - please, stop following me
+#    - stop
+#    - don't move
+#    - pause
+#    - wait
+#    - stop the task
+#    - please, stop
+#    - do not move
+#    - can you pause?
+#    - can you wait?
+
+#- intent: grasp_object
+#  examples: |
+#    - can you take a [cup](object_name)
+#    - can you pick up the [orange](object_name)
+#    - can you grasp the [fruit](object_name) in front of you?
+#    - please take the [bottle](object_name) on the table
+#    - can you grab the [book](object_name) next to you?
+#    - can you take an object?
+#    - can you grasp an object?
+#    - can you please grasp something?
+#    - can you pick up an [apple](object_name)
+#    - the object is a [box](object_name)
+#    - the object is a [ball](object_name)
+#    - grap a [banana](object_name)
+#    - grasp a [chair](object_name)
+#    - take a [remote](object_name)
+#    - pick up a [bowl](object_name)
+#    - grap a [cell phone](object_name)
+#    - can you grasp an object for me?
+#    - can you pick up an object for me?
+#    - can you grasp something for me?
+#    - are you capable to grasp an object?
+#    - can you manipulate an object?
+#    - take an object
+#    - pick up an object
+
+
+
