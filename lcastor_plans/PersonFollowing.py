@@ -18,22 +18,24 @@ def PersonFollowing(p):
     rospy.set_param(ROSPARAM, '')
     
     p.exec_action('setNavigationMode', 'MAP')
+
     p.action_cmd('getYesNoConfirmation', 'Have_we_arrived?', 'start')
+
     
     while(not p.get_condition("IsYesConfirmed")):
         p.exec_action('speak', 'Can_any_of_you_stand_in_front_of_me,_please?')
         
         p.exec_action('findClosestPersonToTrack', '')
         
-        p.exec_action('speak', 'What_is_your_name?')
+        #p.exec_action('speak', 'What_is_your_name?')
         
-        p.exec_action('activateRasa', '')
+        #p.exec_action('activateRasa', '')
         
         # FIXME: add an action to store the name
         
         # FIXME: to be fixed
-        p.exec_action('speak', "Hey_" + str(rospy.get_param(NAME)) + ",_I_am_following_you")
-        # p.exec_action('speak', "Hey_person_" + str(rospy.get_param(ROSPARAM)) + ",_I_am_following_you")
+        #p.exec_action('speak', "Hey_" + str(rospy.get_param(NAME)) + ",_I_am_following_you")
+        p.exec_action('speak', "Hey_person_" + str(rospy.get_param(ROSPARAM)) + ",_I_am_following_you")
         
         p.action_cmd('followPerson', '', 'start')
         
@@ -48,7 +50,7 @@ def PersonFollowing(p):
             time.sleep(0.1)
         
         p.action_cmd('followPerson', '', 'stop')
-        p.exec_action('speak', 'Person_to_follow_lost')
+        if not p.get_condition("IsYesConfirmed"): p.exec_action('speak', 'Person_to_follow_lost')
         
     # Go back to the initial position
     p.action_cmd('getYesNoConfirmation', '', 'stop')

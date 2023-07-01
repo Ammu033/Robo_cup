@@ -20,16 +20,16 @@ class setNavigationMode(AbstractAction):
         rospy.loginfo('Changing Navigation Mode to ' + " ".join(self.params) + ' ...')
         
         # action which execute this command rosservice call /pal_navigation_sm "input: 'NAV_MODE'" 
-        NAV_MODE = self.param[0]
+        NAV_MODE = self.params[0]
 
-        rospy.wait_for_service('/pal_navigation')
+        rospy.wait_for_service('/pal_navigation_sm')
         change_navmode = rospy.ServiceProxy('/pal_navigation_sm', Acknowledgment)
         res = change_navmode.call(NAV_MODE)
-        
-        if res[0]:
-            rospy.loginfo('Navigation Mode change successfully')
-        else:
-            rospy.loginfo('Navigation Mode error: ' + str(res[1]))
+        print(res)
+        #if res[0]:
+        #    rospy.loginfo('Navigation Mode change successfully')
+        #else:
+        #    rospy.loginfo('Navigation Mode error: ' + str(res[1]))
         
         
         self._stop_action()
