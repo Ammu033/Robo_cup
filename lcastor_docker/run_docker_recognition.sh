@@ -1,6 +1,6 @@
 #!/bin/bash
 
-image_name=lcas.lincoln.ac.uk/lcastor/lcastor_recognition
+image_name=lcas.lincoln.ac.uk/lcastor/lcastor_base_reco
 
 xhost + local:docker
 
