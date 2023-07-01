@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<launch>
+  
+  <!-- parameters for rosnode -->
+  <arg name="value"  default="" />
+  <arg name="topic_name"  default="" />
+  
+  <!-- Person detection rosnode -->
+  <node name="string_topic" pkg="robocup_nlu" type="string_topic.py" >
+    <param name="value" value="$(arg value)" />
+    <param name="topic_name" value="$(arg topic_name)" />
+    
+  </node>
+
+</launch>
+

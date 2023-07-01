@@ -55,7 +55,7 @@ class followPerson(AbstractAction):
         personToFollowPos = self.get_person_pos(p, personID)
         if personToFollowPos is not None:
             # Follow the person
-            rospy.logerr("GOAL SENT FIRST TIME")
+            # rospy.logerr("GOAL SENT FIRST TIME")
             self.follow_person(personToFollowPos)
 
 
@@ -82,9 +82,9 @@ class followPerson(AbstractAction):
         
         if self.robot_pos_at_send_goal is not None and self.client.get_state() == actionlib.GoalStatus.ACTIVE:
             travelled_dist = math.dist(self.robot_pos_at_send_goal, [self.robot_pose.x, self.robot_pose.y])
-            rospy.logwarn("TRAVELLED DISTANCE = " + str(travelled_dist))
+            # rospy.logwarn("TRAVELLED DISTANCE = " + str(travelled_dist))
             if travelled_dist > CANCEL_DISTANCE: 
-                rospy.logerr("GOAL CANCELLED")
+                # rospy.logerr("GOAL CANCELLED")
                 self.client.cancel_goal()
                 self.robot_pos_at_send_goal = None
 

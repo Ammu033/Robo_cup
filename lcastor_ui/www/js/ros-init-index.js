@@ -1,5 +1,5 @@
 var TOPICS = {
-    '/alternative_stt': 'std_msgs/String',
+    '/user_speech': 'std_msgs/String',
     '/interface/status': 'std_msgs/String',
     '/interface/enable': 'std_msgs/String',
     '/interface/disable': 'std_msgs/String',
@@ -437,7 +437,8 @@ function Alternative_input(sentence) {
   });
 
   // And finally, publish.
-  ROS_TOPIC_HANDLES['/alternative_stt'].publish(msg);
+
+  ROS_TOPIC_HANDLES['/user_speech'].publish(msg);
 }
 
 function Start_tour_task(tour_key, duration=60*60) {
