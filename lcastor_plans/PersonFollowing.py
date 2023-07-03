@@ -23,6 +23,7 @@ def PersonFollowing(p):
 
     
     while(not p.get_condition("IsYesConfirmed")):
+
         p.exec_action('speak', 'Can_any_of_you_stand_in_front_of_me,_please?')
         
         p.exec_action('findClosestPersonToTrack', '')
@@ -40,13 +41,16 @@ def PersonFollowing(p):
         p.action_cmd('followPerson', '', 'start')
         
         dist_notification = time.time()
+
         while not p.get_condition("IsYesConfirmed") and not p.get_condition("IsPersonLost"):
+
             # time check is needed in order to not say "slow down" 
             # at each instant the condition isPersonTooFar is True
             t = time.time() - dist_notification
             if p.get_condition("IsPersonTooFar") and (t > SPEAK_TIMEOUT):
                 dist_notification = time.time()
                 p.exec_action('speak', 'Can_you_slow_down,_please?')
+
             time.sleep(0.1)
         
         p.action_cmd('followPerson', '', 'stop')

@@ -24,6 +24,7 @@ def pickUp_bag(p):
     p.exec_action("speak", "Can_you_please_put_it_in_my_hand?.")
 
     #TODO present arm and opoen gripper
+
     p.exec_action("armAction", "offerGripper")
     p.exec_action("gripperAction", "open")
     # p.exec_action()
@@ -34,13 +35,17 @@ def pickUp_bag(p):
 
     p.exec_action("listen", "")
 
+
+
     #TODO activate textinput if no speech answer
     p.add_ER("listen", "timeout_15", "")
 
     
     p.exec_action("")
 
+
     p.action_cmd("lookAtClosestPerson", "", "stop")
+
 
 if __name__ == "__main__":
 
