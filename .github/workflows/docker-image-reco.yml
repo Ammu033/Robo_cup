@@ -35,11 +35,10 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         context: .
-        file: ./lcastor_docker/Dockerfile
+        file: ./lcastor_docker/Dockerfile_recognition
         platforms: linux/amd64
         push: true
         tags: lcas.lincoln.ac.uk/lcastor/lcastor_base_reco:${{ github.head_ref }}
-#         run: docker build --file ./lcastor_docker/Dockerfile --tag lcas.lincoln.ac.uk/lcastor/lcastor_base:latest
         build-args: |
             UID=1001
             GID=1001
@@ -48,11 +47,10 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         context: .
-        file: ./lcastor_docker/Dockerfile
+        file: ./lcastor_docker/Dockerfile_recognition
         platforms: linux/amd64
         push: ${{ github.event_name != 'pull_request' }}
         tags: lcas.lincoln.ac.uk/lcastor/lcastor_base_reco:latest
-#         run: docker build --file ./lcastor_docker/Dockerfile --tag lcas.lincoln.ac.uk/lcastor/lcastor_base:latest
         build-args: |
             UID=1001
             GID=1001

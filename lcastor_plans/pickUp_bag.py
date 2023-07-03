@@ -24,7 +24,10 @@ def pickUp_bag(p):
     p.exec_action("speak", "Can_you_please_put_it_in_my_hand?.")
 
     #TODO present arm and opoen gripper
-    # p.exec_action
+
+    p.exec_action("armAction", "offerGripper")
+    p.exec_action("gripperAction", "open")
+    # p.exec_action()
 
     p.exec_action("speak", "Please_confirm_whe_you_have_placed_the_bag_in_my_hand.")
 

@@ -12,7 +12,8 @@ pip install SpeechRecognition
 echo "SpeechRecognition installed"
 
 # PyAudio
-sudo apt install python3-pyaudio
+sudo apt install portaudio19-dev
+pip install pyaudio
 echo "PyAudio installed"
 
 # Rospkg
