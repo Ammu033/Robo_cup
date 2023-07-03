@@ -14,7 +14,7 @@ from std_msgs.msg import Bool
 from sensor_msgs.msg import LaserScan
 from AbstractTopicCondition import AbstractTopicCondition
 
-class isDoorOpen(AbstractTopicCondition):
+class IsDoorOpen(AbstractTopicCondition):
     _topic_name = "/scan"
     _topic_type = LaserScan
 
