@@ -1,0 +1,161 @@
+version: '3.1'
+intents:
+- planner_confirmation
+- planner_user_confirm_arrived
+- planner_user_thanks
+- planner_guest_name
+- planner_guest_drink
+- planner_affirm_deny
+- affirm #this also works for confirmation intent from planner
+- deny
+- person_name
+- person_drink
+- arrived_confirmation
+- thanks
+#- greet
+#- robot_introduction
+#- go_to
+#- follow_a_person
+#- follow_me
+#- stop_task
+#- grasp_object
+#- person_description
+
+entities:
+- person_name
+- person_drink
+#- person_confirmation
+
+slots:
+  person_name:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: person_name
+      intent: person_name       
+  person_name_known:
+    type: bool
+    mappings:
+    - type: custom
+  person_drink:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: person_drink
+      intent: person_drink      
+  person_drink_known:
+    type: bool
+    mappings:
+    - type: custom
+  planner_intention: # the value is set in the actions.py. Options are: guest_name, guest_drink, confirmation, user_confirm_arrived, user_thanks, affirm_deny
+    type: text
+    mappings:
+    - type: custom
+#  location:
+#    type: text
+#    mappings:
+#    - type: from_entity
+#      entity: location
+#      intent: go_to
+#      not_intent: follow_a_person
+#  object_name:
+#    type: text
+#    mappings:
+#    - type: from_entity
+#      entity: object_name
+#      intent: grasp_object
+#      not_intent: person_description
+#      conditions:
+#      - active_loop: object_to_grasp_form
+#        requested_slot: object_name
+#  clothes_color:
+#    type: text
+#    mappings:
+#    - type: from_text
+#      intent: person_description
+#      not_intent: grasp_object
+#      conditions:
+#      - active_loop: person_description_form
+#        requested_slot: clothes_color
+#    - type: from_text
+#      intent: follow_a_person
+#      not_intent: grasp_object
+#      conditions:
+#      - active_loop: person_description_form
+#        requested_slot: clothes_color
+#  clothes_type:
+#    type: text
+#    mappings:
+#    - type: from_text
+#      intent: person_description
+#      conditions:
+#      - active_loop: person_description_form
+#        requested_slot: clothes_type
+#    - type: from_text
+#      intent: follow_a_person
+#      conditions:
+#      - active_loop: person_description_form
+#        requested_slot: clothes_type
+  person_confirmation:
+    type: bool
+    mappings:
+    - type: from_intent
+      intent: affirm
+      value: true
+    - type: from_intent
+      intent: deny
+      value: false
+
+#forms:
+#  person_description_form:
+#    required_slots:
+#    - clothes_type
+#    - clothes_color
+#  object_to_grasp_form:
+#    required_slots:
+#    - object_name
+    
+#responses:
+#  utter_default:
+#  - text: I'm sorry, I can't help you.
+#  utter_ask_rephrase:
+#  - text: I'm sorry, I didn't quite understand that. Could you rephrase?
+#  utter_say_hi_and_ask_for_name:
+#  - text: Hello! my name is Tiago, what is your name?
+#  - text: Hello! my name is Tiago, how may I call you?
+#  - text: Hello! my name is Tiago, what can I call you?
+#  - text: Hello! my name is Tiago, how should I address you?
+#  utter_use_name_and_ask_for_drink:
+#  - text: Nice to meet you {person_name}, may I ask you what is your favorite drink?
+#  utter_out_of_scope:
+#  - text: Sorry, I can't handle that request.
+#  - text: Sorry, that's not a skill I've learned yet.  
+#  utter_ask_clothes_color:
+#  - text: Can you please tell me what is the color of the {clothes_type} that the person is wearing?
+#  utter_ask_clothes_type:
+#  - text: Can you please give me the name of any clothing peace that the person is wearing now?
+#  utter_ask_object_name:
+#  - text: Can you please give me the name of an object you want me to grasp?
+#  utter_stop_task:
+#  - text: Ok, I have stop
+actions:
+- action_default_fallback
+- action_check_person_name #this will check if the name is part of the names in the database
+- action_check_person_drink #this will check if the drink is part of the drinks in the database
+- action_confirmation_false #this will publish topic /rasa_confirmation=False 
+- action_confirmation_confirmation #this will publish topic /rasa_confirmation=True
+- action_confirmation_thanks #this will publish topic /rasa_confirmation=True
+- action_confirmation_arrival #this will publish topic /rasa_confirmation=True
+- action_confirmation_affirm_deny #this will publish topics /rasa_confirmation=True and /person_affirm_deny=$person_confirmation (Bool)
+- action_confirmation_person_name #this will publish topics /rasa_confirmation=True and /guest_name=$person_name (String)
+- action_confirmation_person_drink #this will publish topics /rasa_confirmation=True and /guest_drink=$person_drink (String)
+- action_slot_reset
+#- action_person_follow
+#- action_stop_task
+#- action_go_to
+#- action_grasp_object
+#- validate_person_description_form
+#- validate_object_to_grasp_form
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true

@@ -14,8 +14,6 @@ from pal_interaction_msgs.msg import TtsActionGoal, TtsAction, TtsGoal
 NODE_NAME = 'lcastor_person_detection'
 NODE_RATE = 100 # [Hz]
 SPEAK_TIMEOUT = 15.0 # [s]
-# FIELD_OF_VIEW = 60 # [°]
-# DIST_THRESH = 3 # [m]
 FIELD_OF_VIEW = float(rospy.get_param("/lcastor_person_detection/field_of_view"))
 DIST_DETECTION_THRESH = float(rospy.get_param("/lcastor_person_detection/dist_detection_threshold"))
 DIST_FOLLOW_THRESH = float(rospy.get_param("/lcastor_person_detection/dist_follow_threshold"))
