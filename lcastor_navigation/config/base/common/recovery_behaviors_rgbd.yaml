@@ -8,11 +8,11 @@ recovery_behaviors:
 
 costmap_reset_far:
   reset_distance: 3.0
-  layer_names: ["obstacle_laser_layer"]
+  layer_names: ["obstacle_laser_layer", "obstacle_rgbd_layer"]
 
 costmap_reset_close:
   reset_distance: 1.5
-  layer_names: ["obstacle_laser_layer"]
+  layer_names: ["obstacle_laser_layer", "obstacle_rgbd_layer"]
 
 rotate_recovery:
   sim_granularity: 0.017

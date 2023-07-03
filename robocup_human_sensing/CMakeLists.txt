@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(lcastor_navigation)
+project(robocup_human_sensing)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -8,8 +8,9 @@ project(lcastor_navigation)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  roscpp
   rospy
-  octomap_server
+  std_msgs
   message_generation
 )
 
@@ -47,16 +48,24 @@ catkin_python_setup()
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
- add_message_files(
+add_message_files(
    FILES
-   LocalizationStatus.msg
+#   Message1.msg
+#   Message2.msg
+   BodyPosture.msg
+   Gesture.msg
+   IdsList.msg
+   RegionOfInterest2D.msg
+   SoftBiometrics.msg
+   SoftBiometricsList.msg
  )
 
 ## Generate services in the 'srv' folder
-add_service_files(
-  FILES
-  FindLocation.srv
-)
+# add_service_files(
+#   FILES
+#   Service1.srv
+#   Service2.srv
+# )
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -67,8 +76,8 @@ add_service_files(
 
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
-  DEPENDENCIES
-  std_msgs  # Or other packages containing msgs
+   DEPENDENCIES
+   std_msgs
 )
 
 ################################################
@@ -100,28 +109,12 @@ generate_messages(
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
-#catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES lcastor_description
-#  CATKIN_DEPENDS tiago_description
-#  DEPENDS system_lib
-#)
-
-SET(optional_dependencies "")
-IF(apriltag_ros_FOUND)
-   SET(optional_dependencies ${optional_dependencies} apriltag_ros)
-ENDIF(apriltag_ros_FOUND)
-
 catkin_package(
-  # INCLUDE_DIRS include
-  LIBRARIES rtabmap_sync rtabmap_sync_plugins rtabmap_slam_plugins
-  CATKIN_DEPENDS cv_bridge roscpp sensor_msgs nav_msgs image_transport
-                 nodelet message_filters rtabmap_msgs rtabmap_conversions
-                 actionlib actionlib_msgs cv_bridge geometry_msgs move_base_msgs
-                 pluginlib std_msgs std_srvs tf tf2_ros visualization_msgs
-                 rtabmap_util rtabmap_sync ${optional_dependencies}
-                 message_runtime
-  # CFG_EXTRAS extra_configs.cmake
+#  INCLUDE_DIRS include
+#  LIBRARIES robocup_human_sensing
+#  CATKIN_DEPENDS roscpp rospy std_msgs
+#  DEPENDS system_lib
+  CATKIN_DEPENDS message_runtime
 )
 
 ###########
@@ -137,7 +130,7 @@ include_directories(
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/lcastor_description.cpp
+#   src/${PROJECT_NAME}/robocup_human_sensing.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -148,7 +141,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/lcastor_description_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/robocup_human_sensing_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -174,10 +167,10 @@ include_directories(
 
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
-catkin_install_python(PROGRAMS
-  scripts/lcastor_select_location.py
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+# catkin_install_python(PROGRAMS
+#   scripts/my_python_script
+#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+# )
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
@@ -212,7 +205,7 @@ catkin_install_python(PROGRAMS
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_lcastor_description.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_robocup_human_sensing.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

@@ -43,7 +43,9 @@ def pickUp_bag(p):
     
     p.exec_action("")
 
+
     p.action_cmd("lookAtClosestPerson", "", "stop")
+
 
 if __name__ == "__main__":
 

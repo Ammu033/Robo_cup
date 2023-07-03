@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<launch>
+  
+  <arg name="database_direct" default="" /> 
+  <arg name="models_direct" default="" /> 
+  <arg name="camera_topic_rgb" default="" /> 
+  <arg name="camera_topic_depth" default="" /> 
+
+  <!-- Start darknet and ros wrapper -->
+  <node pkg="robocup_human_sensing" type="people_identifier.py" name="hs_people_identification" output="screen" >
+    <param name="database_direct" value="$(arg database_direct)"/>
+    <param name="models_direct" value="$(arg models_direct)"/>
+    <param name="camera_topic_rgb" value="$(arg camera_topic_rgb)"/>
+    <param name="camera_topic_depth" value="$(arg camera_topic_depth)"/>
+  </node>
+  
+</launch>

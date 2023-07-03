@@ -24,6 +24,7 @@ def PersonFollowing(p):
     while(not p.get_condition("IsYesConfirmed")):
         p.exec_action('speak', 'Can_you_stand_in_front_of_me,_please?')
         # p.exec_action('speak', 'Can_any_of_you_stand_in_front_of_me,_please?')
+
         
         p.exec_action('findClosestPersonToTrack', '')
 
@@ -34,6 +35,7 @@ def PersonFollowing(p):
         
         display_notification = time.time()
         dist_notification = time.time()
+
         while not p.get_condition("IsYesConfirmed") and not p.get_condition("IsPersonLost"):
             
             # Please confirm task finished notification
