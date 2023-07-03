@@ -18,8 +18,7 @@ class personIdentification(AbstractAction):
     def _start_action(self):
         #NOTE: Assume self.params is a list of strings which contains the type of identifications we want to start (i.e., face, tshirt, hair... ) 
         rospy.loginfo('Starting person identification node ' + " ".join(self.params) + ' ...')
-<<<<<<< HEAD
-=======
+
         
         if self.params[0] == "learn":
             rospy.set_param('learn' , 1)
@@ -28,7 +27,7 @@ class personIdentification(AbstractAction):
         self._stop_action()
         
 
->>>>>>> 542d019 (Conditions for PersonDetection)
+
 
         #TODO: here put the code necessary to start the person identification node so that it's ready to receive identification requests
 

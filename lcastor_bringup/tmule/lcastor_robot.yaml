@@ -69,4 +69,4 @@ windows:
   - name: rviz
     tags: ['viz']
     panes:
-      - 'rviz -d "$(rospack find tiago_2dnav)/config/rviz/navigation_public_sim.rviz"'
+      - 'rviz -d "$(rospack find lcastor_navigation)/config/rviz/navigation_public_sim.rviz"'
