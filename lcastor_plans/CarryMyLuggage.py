@@ -11,24 +11,38 @@ import time
 import pnp_cmd_ros
 from pnp_cmd_ros import *
 from pickUp_bag import pickUp_bag
-from follow_operator import follow_operator
-
+from PersonFollowing import PersonFollowing
+from OfferGripper import OfferGripper
 def CarryMyLuggage(p):
+    
+    # 1. Wait for the door open
+    while(not p.get_condition("IsDoorOpen")): continue
 
+    # 2. Go to the living room
+    p.exec_action("gotoRoom", "livingroom")
 
-    p.exec_action("goto", "livingRoom")
+    # 3. Picking up the bag: The robot picks up the bag pointed at by the operator.
+    pickUp_bag(p)
 
-    # 1. Picking up the bag: The robot picks up the bag pointed at by the operator.
-    pickUp_bag(p) #TODO
+    # 4. Setting Navigation Mode to MAPPING.
+    p.exec_action('setNavigationMode', 'MAP')
+    
+    # 5. Display "Have we arrived?" msg on the display
+    p.action_cmd('getYesNoConfirmation', 'Have_we_arrived?', 'start')
 
-    # 2. Following the operator: The robot should inform the operator when it is ready to follow them.
-    follow_operator(p) #TODO
+    # 5. Following the operator: The robot should inform the operator when it is ready to follow them.
+    PersonFollowing(p) 
+    p.action_cmd('getYesNoConfirmation', '', 'stop')
 
-    # 3. after reaching the car, the operator takes the bag back and thanks the robot.
-
-
-    # 4. return to the arena
-    p.exec_action("goto", "arenaEntrance")
+    # 6. after reaching the car, the operator takes the bag back and thanks the robot.
+    OfferGripper(p, "Please_confirm_you_took_the_bag_from_my_hand.")
+    
+    # 7. Go back to the initial position
+    p.exec_action('goto', '0.0_0.0_0.0')
+    
+    # 8. Setting Navigation Mode to LOCALISATION.
+    p.exec_action('setNavigationMode', 'LOC')
+    
 
 if __name__ == "__main__":
 
