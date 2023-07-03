@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="config_direct" default="" />
+    <arg name="openpose_direct" default="" />
+    <arg name="models_direct" default="" />  
+    <arg name="camera_topic_rgb" default="" /> 
+    <arg name="camera_topic_depth" default="" /> 
+    
+    <node pkg="robocup_human_sensing" type="gesture_estimation.py" name="hs_gesture_estimation" output="screen" >
+        <param name="config_direct" value="$(arg config_direct)"/>
+        <param name="openpose_direct" value="$(arg openpose_direct)"/>
+        <param name="models_direct" value="$(arg models_direct)"/>
+        <param name="camera_topic_rgb" value="$(arg camera_topic_rgb)"/>
+        <param name="camera_topic_depth" value="$(arg camera_topic_depth)"/>
+    </node>
+
+</launch>
+
+

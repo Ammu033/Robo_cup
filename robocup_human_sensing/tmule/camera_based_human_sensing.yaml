@@ -1,0 +1,61 @@
+---
+session: lcastor_hs
+init_cmd: |
+  #exec /bin/bash
+  cd @TMULE_CONFIG_DIR@ || true
+  set -o pipefail
+  function export_default () {
+    var_name="$1"
+    var_default="$2"
+    eval $var_name="${!var_name:-$var_default}"
+    export $var_name
+    echo "  $0 -> $var_name=${!var_name}"
+  }
+  
+
+  #########################################################################################
+  # HUMAN-AWARE NAVIGATION PARAMETERS
+  export_default CATKIN_WORKSPACE "$HOME/catkin_ws"
+  export_default CONFIG_DIRECT "$(rospack find robocup_human_sensing)/config/" #directory of robocup_human_sensing config file
+  export_default OPENPOSE_DIRECT "$CATKIN_WORKSPACE/src/openpose/" #directory of openpose
+  export_default DATABASE_DIRECT "$(rospack find robocup_human_sensing)/database/" # directory of the database with faces
+  export_default MODELS_DIRECT "$(rospack find robocup_human_sensing)/models/" # directory of the models for face, gender, color, gesture recognition
+  export_default CONDA_VIRT_ENV "lcastor_hs" # name of the virtual environment with the necessary packages
+  export_default BAG_FILE "$HOME/Documents/cofruit/bags/placeuk_2022-10-18-09-13-04.bag" #full name of the bag file to be reproduced 
+  export_default USE_BAG false #if "true", a bag file is launched instead of getting on-line data from the Tiago camera
+  export_default CAMERA_TOPIC_RGB "/camera1/color/image_raw" # name of the rgb image topic to be subscribed "/camera/color/image_raw" "/webcam/image_raw"
+  export_default CAMERA_TOPIC_DEPTH "/camera1/aligned_depth_to_color/image_raw" # name of the depth image topic to be subscribed
+  ##############################################################################################
+  # Source ROS
+  source $CATKIN_WORKSPACE/devel/setup.bash
+  #########################################################################################
+  #Set up ROS MASTER AND ROS IP
+  #export_default ROS_IP "192.168.0.224" #Zotac IP address
+  #export_default ROS_MASTER "192.168.0.101" #NUC IP address, as MASTER
+  #export ROS_MASTER_URI="http://$ROS_MASTER:11311/"
+  #export ROS_IP=$ROS_IP  
+ 
+  #############################################################################################
+
+windows:
+- name: bag_files
+  panes:
+  - sleep 2 ; if $USE_BAG ; then roslaunch robocup_human_sensing bags_data_rgbd.launch bag_file:=$BAG_FILE ; fi
+  check: "rostopic list || ! $USE_BAG"
+- name: tiago_camera
+  panes:
+  #- sleep 2 ; if ! $USE_BAG ; then roslaunch robocup_human_sensing webcam.launch ; fi #just used for testing darknet detection with a webcam
+  - sleep 2 ; if ! $USE_BAG ; then roslaunch robocup_human_sensing rs_multiple_devices.launch ; fi #just used for testing darknet detection with a realsense
+  cleck: "rostopic list | grep -q /camera/color/image_raw || $USE_BAG"
+- name: camera_detector
+  panes:
+  - sleep 2 ; roslaunch robocup_human_sensing hs_camera_detector.launch image:=$CAMERA_TOPIC_RGB
+  #- sleep 2 ; conda activate $CONDA_VIRT_ENV ; roslaunch robocup_human_sensing hs_people_identifier.launch database_direct:=$DATABASE_DIRECT models_direct:=$MODELS_DIRECT camera_topic_rgb:=$CAMERA_TOPIC_RGB camera_topic_depth:=$CAMERA_TOPIC_DEPTH
+- name: gesture_estimation
+  panes:
+  - sleep 2 ; roslaunch robocup_human_sensing hs_gesture_estimation.launch config_direct:=$CONFIG_DIRECT openpose_direct:=$OPENPOSE_DIRECT models_direct:=$MODELS_DIRECT camera_topic_rgb:=$CAMERA_TOPIC_RGB camera_topic_depth:=$CAMERA_TOPIC_DEPTH
+- name: visualization
+  panes:
+  - rosrun web_video_server web_video_server
+#############################################################################################
+

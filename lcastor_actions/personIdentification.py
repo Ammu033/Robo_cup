@@ -18,15 +18,17 @@ class personIdentification(AbstractAction):
     def _start_action(self):
         #NOTE: Assume self.params is a list of strings which contains the type of identifications we want to start (i.e., face, tshirt, hair... ) 
         rospy.loginfo('Starting person identification node ' + " ".join(self.params) + ' ...')
+        
+        if self.params[0] == "learn":
+            rospy.set_param('learn' , 1)
+        elif self.params[0] == "eval":
+            rospy.set_param('learn' , 0)
 
-        #TODO: here put the code necessary to start the person identification node so that it's ready to receive identification requests
+
 
     def _stop_action(self):
         #TODO: here put the code necessary to stop the person identification node (must clean all resources)
-        
-
-        self.params.append("done")
-        rospy.loginfo('STOPPED personIdentification action')
+        self.params.append('done')
 
     @classmethod
     def is_goal_reached(cls, params):
