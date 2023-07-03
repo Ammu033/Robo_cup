@@ -30,9 +30,14 @@ class isPersonDetected(AbstractTopicCondition):
         return l
     
     def evaluate(self , params):
-        id_to_check = rospy.get_param(params[0]+"/id")
-        print(id_to_check)
-        condition = True
-        for i in range(4):
-            condition = (id_to_check in self.last_value[i]) and condition
+        if len(params) > 0:
+            id_to_check = rospy.get_param(params[0]+"/id")
+            print(id_to_check)
+            condition = True
+            for i in range(4):
+                condition = (id_to_check in self.last_value[i]) and condition
+        else:
+            condition = True
+            for i in range(4):
+                condition = (len(self.last_value[i]) > 0) and condition
         return condition

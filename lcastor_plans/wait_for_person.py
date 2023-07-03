@@ -16,14 +16,12 @@ def wait_for_person(p):
     # TODO this should be calibrated to make sure that a person is identifiable from the camera view
     p.exec_action('moveHead', '0_0')
 
-    #  
-    p.action_cmd("detectPerson", "", "start")
+    # 
+    while not p.get_condition("IsPersonDetected"):
+        time.sleep(2)
+    
 
 
-    while p.get_condition("PersonDetection_false"):
-        time.sleep(3)
-
-    p.action_cmd("detectPerson", "", "stop")
 
 
 
