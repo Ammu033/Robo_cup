@@ -38,7 +38,7 @@ RUN pip install rospkg
 # echo "rospkg installed"
 
 # Whisper
-RUN pip install git+https://github.com/openai/whisper.git
+# RUN pip install git+https://github.com/openai/whisper.git
 # echo "Whisper installed"
 
 # Torch
