@@ -26,6 +26,7 @@ class lookAtClosestPerson(AbstractAction):
         rospy.loginfo('Head movement action to closest person ' + " ".join(self.params) + ' ...')
         #self.starting_time = rospy.Time.now()
 
+
         self.ac = actionlib.SimpleActionClient("/head_controller/point_head_action", PointHeadAction)
         rospy.loginfo("Connecting to /head_controller/point_head_action AS...")
         self.ac.wait_for_server()
@@ -33,7 +34,32 @@ class lookAtClosestPerson(AbstractAction):
 
         self.last_sent = rospy.get_time()
 
-        self.sub = rospy.Subscriber("/people_tracker/pose", PoseStamped, self.__on_pose_cb)
+        self.sub= rospy.Subscriber("/h_boxes_tracked", RegionOfInterest2D, self.__on_ROI_cb)
+        # self.sub = rospy.Subscriber("/people_tracker/pose", PoseStamped, self.__on_pose_cb)
+
+    def __on_ROI_cb(self, msg):
+        if (rospy.get_time() - self.last_sent) < 2.:
+            return
+
+        if len(msg.data) > 0:
+            # create goal
+            self.goal = PointHeadActionGoal()
+            # rospy.loginfo(self.goal)
+            self.goal.goal.pointing_frame = "xtion_optical_frame"
+            self.goal.goal.pointing_axis.x = 0.0
+            self.goal.goal.pointing_axis.y = 0.0
+            self.goal.goal.pointing_axis.z = 1.0
+            self.goal.goal.target.header.frame_id = msg.header.frame_id
+            self.goal.goal.target.point.x = msg.data.x[0] + (msg.data.w[0] // 2)
+            self.goal.goal.target.point.y = msg.data.y[0] + (msg.data.h[0] * 0.9)
+            self.goal.goal.target.point.z = 1.5
+
+            self.last_sent = rospy.get_time()
+
+            
+            # # send goal
+            self.ac.send_goal(self.goal.goal, done_cb=self._on_look_done)
+            rospy.loginfo("Waiting for result...")
 
     def __on_pose_cb(self, msg):
         if (rospy.get_time() - self.last_sent) < 2.:
