@@ -13,7 +13,7 @@ def pointcloud_callback(pc_msg):
 
     # Filter based on distance
     filtered_cloud = pcl.PointCloud()
-    distance_threshold_min = 2.0  # Minimum distance threshold
+    distance_threshold_min = 0.5  # Minimum distance threshold
     distance_threshold_max = 5.0  # Maximum distance threshold
     filter_indices = []
     for i in range(cloud.size):
