@@ -24,15 +24,17 @@ class gotoRoom(AbstractAction):
                          "bed": "bedroom",
                          "bagpack" : "livingroom"}
         
-        self.room_dict = {"kitchen" : [-2.97, 0.4, 180],
-                          "bedroom" : [3.6, -11.0, 90],
-                          "livingroom" : [-2.31, -5.3, 0]}
+        # The following coordinates are based on the Robocup house arena
+        self.room_dict = {"kitchen" : [6.83, 0.211, 180],
+                          "bedroom" : [6.91, -3.56, 90],
+                          "livingroom" : [-2.74, 0.314, 0],
+                          "diningroom" : [2.18, -3.39, 90]}
         #NOTE: Assume self.params is a list of strings the first element is the name of the node to navigate to
         rospy.loginfo('Going to ' + " ".join(self.params) + ' ...')
 
         print(self.params)
-        if "r" in self.params[0]:
-            self.coordinates = self.room_dict[self.params[1]]
+        if "r" in self.params[0] and self.params[1] in self.room_dict:
+                self.coordinates = self.room_dict[self.params[1]]
         else: 
             self.room = self.obj_dict[self.params[0]]
             self.coordinates = self.room_dict[self.room]
