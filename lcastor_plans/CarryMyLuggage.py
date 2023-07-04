@@ -16,10 +16,10 @@ from OfferGripper import OfferGripper
 def CarryMyLuggage(p):
     
     # 1. Wait for the door open
-    while(not p.get_condition("IsDoorOpen")): continue
+    # while(not p.get_condition("IsDoorOpen")): continue
 
     # 2. Go to the living room
-    p.exec_action("gotoRoom", "livingroom")
+    # p.exec_action("gotoRoom", "livingroom")
 
     # 3. Picking up the bag: The robot picks up the bag pointed at by the operator.
     pickUp_bag(p)
@@ -29,6 +29,8 @@ def CarryMyLuggage(p):
     
     # 5. Display "Have we arrived?" msg on the display
     p.action_cmd('getYesNoConfirmation', 'Have_we_arrived?', 'start')
+    
+    p.action_cmd('moveTorso', '0.0')
 
     # 5. Following the operator: The robot should inform the operator when it is ready to follow them.
     PersonFollowing(p) 
@@ -39,6 +41,8 @@ def CarryMyLuggage(p):
     
     # 7. Go back to the initial position
     p.exec_action('goto', '0.0_0.0_0.0')
+    
+    p.action_cmd('moveTorso', '0.2')
     
     # 8. Setting Navigation Mode to LOCALISATION.
     p.exec_action('setNavigationMode', 'LOC')
