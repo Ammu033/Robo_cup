@@ -17,7 +17,7 @@ def wait_for_person(p):
     p.exec_action('moveHead', '0_0')
 
     # 
-    while not p.get_condition("IsPersonDetected"):
+    while not p.get_condition("IsPersonInRange_1.2"):
         time.sleep(2)
     
 
