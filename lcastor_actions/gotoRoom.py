@@ -25,20 +25,31 @@ class gotoRoom(AbstractAction):
                          "bagpack" : "livingroom"}
         
         # The following coordinates are based on the Robocup house arena
-        self.room_dict = {"kitchen" : [6.83, 0.211, 180],
-                          "bedroom" : [6.91, -3.56, 90],
-                          "livingroom" : [-2.74, 0.314, 0],
-                          "diningroom" : [2.18, -3.39, 90]}
+        self.room_dict = {"kitchen" : [6.83, 0.211, 0.0, 0.0, 0.99, -0.02],
+                          "bedroom" : [6.91, -3.56, 0.0, 0.0, 0.45, 0.89],
+                          "livingroom" : [0.78, 1.87, 0.0, 0.0, 0.45, 0.89],
+                          "diningroom" : [5.19, 2.08, 0.0, 0.0, 0.02, 0.99],
+                          "sink" : [4.32, 1.07, 0.0, 0.0, 0.93, -0.36],
+                          "table" : [5.19, 2.08, 0.0, 0.0, 0.02, 0.99],
+                          "cabinet" : [5.00, 2.93, 0.0, 0.0, 0.64, 0.76],
+                          "fridge" : [4.82, -0.23, 0.0, 0.0, 0.99, -0.02],
+                          "couch1" : [3.00, 1.68, 0.0, 0.0, 0.88, 0.47],
+                          "couch2" : [0.78, 1.87, 0.0, 0.0, 0.45, 0.89],
+                          "receptionentrance" : [0.06, -0.18, 0.0, 0.0, 0.99, 0.12],
+                          "inspectionpoint" : [2.0, -2.33, 0.0, 0.0, -0.83, 0.54],
+                          "entranceinspection" : [-1.38, 0.13, 0.0, 0.0, -0.05, 0.99]
+                          }
         #NOTE: Assume self.params is a list of strings the first element is the name of the node to navigate to
         rospy.loginfo('Going to ' + " ".join(self.params) + ' ...')
 
-        print(self.params)
         if "r" in self.params[0] and self.params[1] in self.room_dict:
                 self.coordinates = self.room_dict[self.params[1]]
         else: 
             self.room = self.obj_dict[self.params[0]]
             self.coordinates = self.room_dict[self.room]
 
+        print(self.params)
+        print(self.coordinates)
         if len(self.params) < 1:
             rospy.logwarn("Wrong use of action, pass the coordinates the robots needs to reach in /map frame as X_Y_Theta")
         else:
@@ -53,8 +64,12 @@ class gotoRoom(AbstractAction):
             self.goal_msg.target_pose.header.stamp = rospy.Time.now()
             self.goal_msg.target_pose.pose.position.x = float(self.coordinates[0])
             self.goal_msg.target_pose.pose.position.y = float(self.coordinates[1])
-            self.goal_msg.target_pose.pose.orientation.z = math.sin(float(self.coordinates[2]) / 2)
-            self.goal_msg.target_pose.pose.orientation.w = math.cos(float(self.coordinates[2]) / 2)
+            self.goal_msg.target_pose.pose.orientation.x = 0.0
+            self.goal_msg.target_pose.pose.orientation.y = 0.0
+            self.goal_msg.target_pose.pose.orientation.z = float(self.coordinates[4])
+            self.goal_msg.target_pose.pose.orientation.w = float(self.coordinates[5])
+            # self.goal_msg.target_pose.pose.orientation.z = math.sin(float(self.coordinates[2]) / 2)
+            # self.goal_msg.target_pose.pose.orientation.w = math.cos(float(self.coordinates[2]) / 2)
 
             self.client.send_goal(self.goal_msg, done_cb=self._on_goTo_done)
             rospy.loginfo("Waiting for goTo result...")

@@ -170,13 +170,10 @@ class ActionConfirmationPersonName(Action):
         #dispatcher.utter_message(text="action_confirmation_false")        
         rospy.init_node('rasa_actions', anonymous=True)	
         pub_bool = rospy.Publisher("rasa_confirmation", Bool, queue_size=1)
+        pub_name = rospy.Publisher("guest_name", String, queue_size=1, latch=True)
         rospy.sleep(1)
         pub_bool.publish(True)
-        rospy.sleep(1)
-        
-        pub_bool = rospy.Publisher("guest_name", String, queue_size=1)
-        rospy.sleep(1)
-        pub_bool.publish(slot_value)
+        pub_name.publish(slot_value)
         rospy.sleep(1)
         '''
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
@@ -211,13 +208,11 @@ class ActionConfirmationPersonDrink(Action):
         #dispatcher.utter_message(text="action_confirmation_false")        
         rospy.init_node('rasa_actions', anonymous=True)	
         pub_bool = rospy.Publisher("rasa_confirmation", Bool, queue_size=1)
+        pub_drink = rospy.Publisher("guest_drink", String, queue_size=1, latch=True)
         rospy.sleep(1)
         pub_bool.publish(True)
-        rospy.sleep(1)
-        
-        pub_bool = rospy.Publisher("guest_drink", String, queue_size=1)
-        rospy.sleep(1)
-        pub_bool.publish(slot_value)
+
+        pub_drink.publish(slot_value)
         rospy.sleep(1)
         '''
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)

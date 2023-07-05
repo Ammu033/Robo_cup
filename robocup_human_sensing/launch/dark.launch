@@ -27,8 +27,8 @@
   </node>
 
 
- <!--<include file="$(find darknet_ros)/launch/darknet_ros.launch"/>
-<node pkg="robocup_human_sensing" type="people_roi.py" name="people_roi"/> -->
+ <!--<include file="$(find darknet_ros)/launch/darknet_ros.launch"/> -->
+<node pkg="robocup_human_sensing" type="people_roi.py" name="people_roi"/>
 <!-- <node pkg="person_detection" type="extractor.py" name="extractor"/>
  --><!--<node pkg="robocup_human_sensing" type="people_identifier.py" name="people_identifier"/> -->
 </launch>
