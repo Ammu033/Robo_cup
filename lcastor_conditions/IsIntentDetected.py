@@ -26,6 +26,6 @@ class IsIntentDetected(AbstractTopicCondition):
 
         if self.last_value is not None and len(self.last_value) > 0:
             # this returns true when a sentence was received and is not onlder than a minute ago
-            if (rospy.get_time() - self.last_value[1]) < 60.:
+            if (rospy.get_time() - self.last_value[1]) < 10.:
                 return self.last_value[0]
         return False
