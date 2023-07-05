@@ -61,6 +61,7 @@ cropped_face_height = 128
 
 class peopleDetection:
     def __init__(self):
+        rospy.set_param('modelLoaded' , False)
         self.detector = mp_face_detection.FaceDetection(model_selection = 1 , min_detection_confidence = 0.8)
         self.name = face_identifier(database_direct,models_direct)
         #self.gender = gender_identifier(models_direct)
@@ -136,9 +137,9 @@ class peopleDetection:
 
             else :
                 rospy.loginfo('Inside People Id and Recog')
-                if (self.SkipBoundingBox([roi_data.x[i] , roi_data.y[i] , roi_data.w[i] , roi_data.h[i] , img_width , img_height])):
-                    rospy.loginfo('Skipping Box')
-                    continue
+                #if (self.SkipBoundingBox([roi_data.x[i] , roi_data.y[i] , roi_data.w[i] , roi_data.h[i] , img_width , img_height])):
+                #    rospy.loginfo('Skipping Box')
+                #    continue
                 cropped_img = image[roi_data.y[i] : roi_data.y[i] + roi_data.h[i],
                                     roi_data.x[i] : roi_data.x[i] + roi_data.w[i]]
                 detection = self.detector.process(cropped_img ).detections

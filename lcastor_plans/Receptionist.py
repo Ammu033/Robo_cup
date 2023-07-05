@@ -22,7 +22,7 @@ from pnp_cmd_ros import *
 def Receptionist(p):
     
     rospy.set_param('personSaved' , 0)
-    rospy.set_param('modelLoaded' , False)
+    #rospy.set_param('modelLoaded' , False)
     #p.action_cmd('peopleDetection' , "" , "start")
     #p.exec_action('personIdentification' , "launch")
 
@@ -38,10 +38,21 @@ def Receptionist(p):
     #p.action_cmd('Recog' , "" , "start")
 
 
-    p.exec_action('speak' , 'Hi_I_am_tiago,_welcome_to_the_party!')
+    p.exec_action('speak' , 'Hi,_I_am_tiago,_welcome_to_the_party!')
     p.exec_action('speak' , 'Can_you_stand_there_and_look_at_my_eyes,_please?')
-    while not p.get_condition("isPersonDetected"):
+    detected = False
+    # while not detected:
+    start_time = rospy.get_time()
+    detected = p.get_condition("isPersonDetected")
+    while not detected:
+        if rospy.get_time() - start_time > 10.:
+            p.exec_action('speak' , 'Please_move_a_bit,_so_I_can_see_you_better.')
+            start_time = rospy.get_time()
+
+        detected = p.get_condition("isPersonDetected")
         time.sleep(1)
+
+
     #p.exec_action('findClosestPersonToTrack' , '')
     p.exec_action('personIdentification' , 'learn' )
     while not rospy.get_param('personSaved'): time.sleep(0.1)

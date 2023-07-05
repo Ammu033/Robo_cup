@@ -146,6 +146,7 @@ class face_identifier:
 		#for (x , y , w , h ) in faces: 
 		#if w > 100 :
 		detected_face = data[int(y):int(y+h), int(x):int(x+w)] #crop detected face
+		rospy.loginfo(detected_face.size)
 		detected_face = cv2.resize(detected_face, self.img_target_size) #resize to 152x152
 		##img_copy = img
 		img_pixels = image.img_to_array(detected_face)

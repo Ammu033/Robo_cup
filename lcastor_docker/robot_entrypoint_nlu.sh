@@ -53,11 +53,16 @@ echo " "
     echo "It will connect to tiago ${ROBOT_NUM}"
   fi 
    echo "source /home/lcastor/ros_ws/src/LCASTOR/scripts/connect_tiago.sh ${ROBOT_NUM} ${ETH}" >> /home/lcastor/.bashrc
+
    catkin build
    source /home/lcastor/ros_ws/devel/setup.bash
-   tmule -c $(rospack find robocup_nlu)/tmule/docker_stt_nlu.yaml -W 3 launch
+   echo "function s(){  tmule -c $(rospack find robocup_nlu)/tmule/docker_stt_nlu.yaml -W 3 launch ; }" >> /home/lcastor/.bashrc
+   echo "function t(){  tmule -c $(rospack find robocup_nlu)/tmule/docker_stt_nlu.yaml terminate ; }" >> /home/lcastor/.bashrc
+   echo "function r(){  tmule -c $(rospack find robocup_nlu)/tmule/docker_stt_nlu.yaml -W 3 relaunch ; }" >> /home/lcastor/.bashrc
 
    exec su lcastor 
+    tmule -c $(rospack find robocup_nlu)/tmule/docker_stt_nlu.yaml -W 3 launch
+
   
    
 

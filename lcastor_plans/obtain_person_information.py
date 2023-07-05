@@ -40,7 +40,7 @@ def obtain_person_information(p, person, info):
             p.exec_action("saveGuestData", "setdrink_" + person)
         
 
-        confirmed = confirm_information(person, info)
+        confirmed = confirm_information(p, person, info)
 
 
 if __name__ == "__main__":

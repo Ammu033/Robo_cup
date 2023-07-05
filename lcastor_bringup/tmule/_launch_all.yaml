@@ -28,16 +28,16 @@ windows:
   - name: core
     tags: ['core']
     panes:
-      - 'cd $DOCKER_FOLDER; ./run_robot_docker.sh'
+      - 'cd $DOCKER_FOLDER; ./run_robot_docker.sh 125 1'
   - name: nlu 
     tags: ['core', 'nlu']
     panes:
-      - 'cd $DOCKER_FOLDER; ./run_robot_docker_nlu.sh'
+      - 'cd $DOCKER_FOLDER; ./run_robot_docker_nlu.sh 125 1'
   - name: reco
     tags: ['core', 'reco']
     panes: 
-      - 'cd $DOCKER_FOLDER; ./run_robot_docker_recognition.sh'
+      - 'cd $DOCKER_FOLDER; ./run_robot_docker_recognition.sh 125 1'
   - name: whisper
     tags: ['core', 'whisper']
     panes:
-    - 'tmule -c $(rospack find robocup_nlu)/tmule/conda_stt_nlu.yaml -W 3 launch'
+    - 'source $HOME/ros_ws/devel/setup.bash; tmule -c $(rospack find robocup_nlu)/tmule/conda_stt_nlu.yaml -W 3 launch'

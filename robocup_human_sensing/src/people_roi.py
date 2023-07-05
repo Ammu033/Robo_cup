@@ -7,8 +7,8 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 from std_msgs.msg import UInt64
 
-DEPTH_IMAGE_TOPIC = 'xtion/depth/image_raw'
-OBJECT_DETECTION_TOPIC = 'darknet_ros/bounding_boxes'
+DEPTH_IMAGE_TOPIC = '/xtion/depth/image_raw'
+OBJECT_DETECTION_TOPIC = '/darknet_ros/bounding_boxes'
 PERSON_CLASS = 'person'
 rospy.init_node('people_roi')
 pub = rospy.Publisher('/people_roi' , RegionOfInterest2D  ,queue_size = 10)
@@ -27,18 +27,23 @@ def callback(data):
             #msg.w.append( data.bounding_boxes[i].xmax - data.bounding_boxes[i].xmin)
             #msg.h.append( data.bounding_boxes[i].ymax - data.bounding_boxes[i].ymin)
             #msg.c.append( data.bounding_boxes[i].probability)
-            person_centroid = [(data.bounding_boxes[i].ymin + data.bounding_boxes[i].ymax) / 2 , (data.bounding_boxes[i].xmin  + data.bounding_boxes[i].xmax)/2]
-            people_depth_info.append(depth_data_np[person_centroid])
-    min_index = people_depth_info.index(min(people_depth_info))
-    closed_person_pub.publish(min(people_depth_info))
-    msg.ids.append(min_index)
-    msg.x.append( data.bounding_boxes[min_index].xmin)
-    msg.y.append( data.bounding_boxes[min_index].ymin)
-    msg.w.append( data.bounding_boxes[min_index].xmax - data.bounding_boxes[min_index].xmin)
-    msg.h.append( data.bounding_boxes[min_index].ymax - data.bounding_boxes[min_index].ymin)
-    msg.c.append( data.bounding_boxes[min_index].probability)
+            # person_centroid = [int((data.bounding_boxes[i].ymin + data.bounding_boxes[i].ymax) / 2 ), int((data.bounding_boxes[i].xmin  + data.bounding_boxes[i].xmax)/2)]
+            # rospy.loginfo(person_centroid)
+            people_depth_info.append(
+                depth_data_np[int((data.bounding_boxes[i].ymin + data.bounding_boxes[i].ymax) / 2 ), int((data.bounding_boxes[i].xmin  + data.bounding_boxes[i].xmax)/2)]
+            )
+    rospy.loginfo("d" + str(people_depth_info))
+    if len(people_depth_info) > 0:
+        min_index = people_depth_info.index(min(people_depth_info))
+        closed_person_pub.publish(min(people_depth_info))
+        msg.ids.append(min_index)
+        msg.x.append( data.bounding_boxes[min_index].xmin)
+        msg.y.append( data.bounding_boxes[min_index].ymin)
+        msg.w.append( data.bounding_boxes[min_index].xmax - data.bounding_boxes[min_index].xmin)
+        msg.h.append( data.bounding_boxes[min_index].ymax - data.bounding_boxes[min_index].ymin)
+        msg.c.append( data.bounding_boxes[min_index].probability)
     
-    msg.ids.append()
+    # msg.ids.append()
     rospy.loginfo(msg)
     pub.publish(msg)
 
