@@ -1,0 +1,43 @@
+session: lcastor_sim
+init_cmd: |
+  echo " "
+  echo " "
+  echo " "
+  echo "Running Initialisation" | awk '{ gsub("Running Initialisation", "\033[1;21m\033[1;30m&\033[0m"); print }' ;
+
+  #exec /bin/bash
+  cd @TMULE_CONFIG_DIR@ || true
+  set -o pipefail
+  function export_default () {
+    var_name="$1"
+    var_default="$2"
+    eval $var_name="${!var_name:-$var_default}"
+    export $var_name
+    echo "  $0 -> $var_name=${!var_name}"
+  }
+  
+
+  export_default DOCKER_FOLDER $(pwd)/../../lcastor_docker/
+
+windows:
+  - name: pc_checks
+    tags: ['core']
+    panes:
+      - htop
+      - nvtop
+  - name: core
+    tags: ['core']
+    panes:
+      - 'cd $DOCKER_FOLDER; ./run_robot_docker.sh 125 1'
+  - name: nlu 
+    tags: ['core', 'nlu']
+    panes:
+      - 'cd $DOCKER_FOLDER; ./run_robot_docker_nlu.sh 125 1'
+  - name: reco
+    tags: ['core', 'reco']
+    panes: 
+      - 'cd $DOCKER_FOLDER; ./run_robot_docker_recognition.sh 125 1'
+  - name: whisper
+    tags: ['core', 'whisper']
+    panes:
+    - 'source $HOME/ros_ws/devel/setup.bash; tmule -c $(rospack find robocup_nlu)/tmule/conda_stt_nlu.yaml -W 3 launch'
