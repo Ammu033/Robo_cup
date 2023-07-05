@@ -1,0 +1,12 @@
+<launch>
+  <arg name="lcastor_ui_home" default="$(find lcastor_ui)"/>
+
+  <node
+    name="start_ui"
+    pkg="lcastor_ui"
+    type="start_ui.sh"
+    output="screen"
+    args="$(arg lcastor_ui_home)">
+  </node>
+  
+</launch>
