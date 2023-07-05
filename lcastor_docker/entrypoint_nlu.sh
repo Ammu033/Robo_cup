@@ -34,7 +34,10 @@ echo " "
 
    catkin build
    source /home/lcastor/ros_ws/devel/setup.bash
+  #  tmule -c $(rospack find robocup_nlu)/tmule/docker_stt_nlu.yaml -W 3 launch
    exec su lcastor
+   tmule -c $(rospack find robocup_nlu)/tmule/docker_stt_nlu.yaml -W 3 launch
+
 
 } || {
 

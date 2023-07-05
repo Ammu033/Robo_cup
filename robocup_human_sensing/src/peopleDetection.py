@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os
 import sys
 import tf
@@ -30,7 +31,7 @@ camera_topic_rgb = '/xtion/rgb/image_raw'
 #database_direct=rospy.get_param("/hs_people_identification/database_direct")
 database_direct = "/home/lcastor/ros_ws/src/LCASTOR/robocup_human_sensing/database/"
 #models_direct=rospy.get_param("/hs_people_identification/models_direct")
-models_direct = "/home/lcastor/ros_ws/src/LCASTOR/robocup_human_sensing/weights/"
+models_direct = "/home/lcastor/ros_ws/"
 mp_face_detection = mp.solutions.face_detection
 rospy.set_param('learn' , 0)
 def normalized_to_pixel_coordinates(

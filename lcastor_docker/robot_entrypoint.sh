@@ -43,6 +43,7 @@ echo " "
 
    catkin build
    source /home/lcastor/ros_ws/devel/setup.bash
+   tmule -c $(rospack find lcastor_bringup)/tmule/lcastor_simulated.yaml -W 3 launch
    exec su lcastor 
   
    

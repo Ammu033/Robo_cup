@@ -7,6 +7,7 @@ import os
 from os import listdir
 import numpy as np
 
+import tensorflow as tf
 from tensorflow.keras.models import Model, Sequential
 from tensorflow.keras.layers import Input, Convolution2D, LocallyConnected2D, MaxPooling2D, Flatten, Dense, Dropout, Activation
 from PIL import Image
@@ -15,6 +16,13 @@ from tensorflow.keras.applications.imagenet_utils import preprocess_input
 from tensorflow.keras.preprocessing import image
 import matplotlib.pyplot as plt
 from tensorflow.keras.models import model_from_json
+import tensorflow as tf
+gpus = tf.config.experimental.list_physical_devices('GPU')
+try:
+    tf.config.experimental.set_virtual_device_configuration(gpus[0], [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=3036)])
+except RuntimeError as e:
+    print(e)
+
 import sys
 import copy
 import random

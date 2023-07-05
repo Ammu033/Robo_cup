@@ -19,6 +19,7 @@ echo " "
 
    catkin build
    source /home/lcastor/ros_ws/devel/setup.bash
+   tmule -c $(rospack find robocup_human_sensing)/tmule/reco_launch.yaml launch
    exec su lcastor
 
 } || {

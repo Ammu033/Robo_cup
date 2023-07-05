@@ -23,6 +23,8 @@ echo " "
    catkin build
    source /home/lcastor/ros_ws/devel/setup.bash
    exec su lcastor
+   tmule -c $(rospack find lcastor_bringup)/tmule/lcastor_simulated.yaml -W 3 launch
+
 
 } || {
 
