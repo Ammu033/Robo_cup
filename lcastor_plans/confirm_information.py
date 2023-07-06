@@ -36,7 +36,7 @@ def confirm_information(p, person, info):
         time.sleep(1)
 
     try:
-        confirmed = rospy.wait_for_message('/person_affirm_deny', Bool, timeout=10.)
+        confirmed = rospy.wait_for_message('/person_affirm_deny', Bool, timeout=10.).data
     except Exception  as e:
         confirmed = False    
 

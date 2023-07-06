@@ -39,7 +39,7 @@ def look_for_person(p , person):
             if not start_angle >= 1.3:
                 person_found = True
                 p.exec_action('saveGuestData' , 'setloc_' + person)
-                p.exec_action('saveGuestData' , 'setheadangle_' +person+'_'  + str(start_angle))
+                p.exec_action('saveGuestData' , 'setheadangle_' +person+'_'  + '0.0')
             if counter > 0:
                 break
     return person_found
