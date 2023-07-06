@@ -15,7 +15,7 @@ init_cmd: |
 
   ##############################################################################################
   # Source ROS
-  export_default CATKIN_WORKSPACE "$HOME/catkin_ws"
+  export_default CATKIN_WORKSPACE "$HOME/ros_ws"
   export_default USE_WHISPER true # true if you want to use speech recognition
   export_default CONDA_DIRECT "$HOME/anaconda3 || $HOME/miniconda3" # directory where conda or minicoda is installed 
   export_default CONDA_VIRT_ENV "lcastor_nlu2" # name of the virtual environment with the necessary packages

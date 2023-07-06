@@ -29,6 +29,7 @@ class saveGuestData(AbstractAction):
         #    json_obj  = json.dumps(rospy.get_param(self.params[1]) , indent=4)
         #    with open(self.params[0] + '.json' , "w") as outfile:
         #    	outfile.write(json_obj)
+        self.params.append('done')
 
     def get_position(self):
         now = rospy.Time()

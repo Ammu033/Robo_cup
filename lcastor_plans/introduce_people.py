@@ -14,7 +14,7 @@ from look_for_person import look_for_person
 import rospy
 
 
-def indtroduce_people(p , person1 , person2):
+def introduce_people(p , person1 , person2):
     x_y_of_people = [rospy.get_param('person1'  + '/x') , rospy.get_param('person1' + '/y')]
     person1_found = look_for_person(p, person1)
     person2_found = look_for_person(p, person2)
