@@ -18,14 +18,15 @@ class activateRasa(AbstractAction):
         rospy.loginfo('Obtaining detecting intent from user input: ' + " ".join(self.params) + ' ...')
         #self.starting_time = rospy.Time.now()
 
-        self.input = rospy.Publisher("/planner_intention", String, queue_size=10)
+        self.input = rospy.Publisher("/planner_intention", String, queue_size=1)
 
         if len(self.params) > 0:
             rospy.sleep(0.5)
             self.input.publish(str("_".join(self.params)))#
         else:
             rospy.logwarn("Wrong use of activateIntent action, you should pass the intent name!")
-
+        
+        rospy.sleep(1)
         self.params.append("done")
 
     def _stop_action(self):

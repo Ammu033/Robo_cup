@@ -14,37 +14,15 @@ from OfferGripper import OfferGripper
 
 def pickUp_bag(p):
 
-    p.action_cmd("lookAtClosestPerson", "", "start")
-
-    p.exec_action("lookAt", "front_person") # TODO
-
+    # p.action_cmd("lookAtClosestPerson", "", "start")
 
     p.exec_action("speak", "Hello,I_will_help_you_carrying_your_bag_to_the_car.")
-    # tell the operator to point at the bag
     p.exec_action("speak", "Sorry,_I_am_not_able_to_pick_up_the_bag.")
-    p.exec_action("speak", "Can_you_please_put_it_in_my_hand?.")
+    p.exec_action("speak", "Can_you_please_put_it_in_my_hand?")
     
     OfferGripper(p, "Please_confirm_when_you_have_placed_the_bag_in_my_hand.")
-
-    # #TODO present arm and opoen gripper
-    # p.exec_action("armAction", "offerGripper")
-    # p.exec_action("gripperAction", "open")
-    # # p.exec_action()
-
-    # p.exec_action("speak", "Please_confirm_whe_you_have_placed_the_bag_in_my_hand.")
-
-    # p.exec_action("activateRasa", "affirm")
-
-    # p.exec_action("listen", "")
-
-    # #TODO activate textinput if no speech answer
-    # p.add_ER("listen", "timeout_15", "")
-
     
-    p.exec_action("")
-
-
-    p.action_cmd("lookAtClosestPerson", "", "stop")
+    # p.action_cmd("lookAtClosestPerson", "", "stop")
 
 
 if __name__ == "__main__":

@@ -30,10 +30,13 @@ def Receptionist(p):
 
     
     # p.exec_action('gotoRoom' , 'r_couch1') #TODO PUT BACK
+    time.sleep(10)
+    p.exec_action('moveHead', '-0.7_0.3')
     p.exec_action('speak' , 'Hello_John,_I_am_your_receptionist_for_this_party!')
     p.exec_action('speak', 'Please,_come_in_front_of_me.')
     p.exec_action('speak' , 'Can_you_stand_in_front_of_me_and_look_at_my_eyes,_please?')
 
+    p.exec_action('moveHead', '0_0.3')
     wait_for_person(p)
     p.exec_action('saveGuestData' , 'setloc_host')
 
@@ -78,9 +81,9 @@ def Receptionist(p):
     obtain_person_information(p , 'guest1' , 'name')
     obtain_person_information(p , 'guest1' , 'drink')
     p.exec_action('speak' , 'Please_follow_me_to_the_party,_' + rospy.get_param('guest1/name'))
-    p.exec_action('gotoRoom' , 'r_couch1') #TODO PUT BACK 
+    p.exec_action('gotoRoom' , 'r_couch2') #TODO PUT BACK 
     introduce_people(p, 'host' , 'guest1')
-    p.exec_action('gotoRoom' , 'r_couch1') #TODO PUT BACK
+    p.exec_action('gotoRoom' , 'r_couch2') #TODO PUT BACK
     p.exec_action('speak' , 'Please_be_seated_on_the_couch_' + str(rospy.get_param('/guest1/name')))
     time.sleep(10)
     p.exec_action('speak' , 'I_will_now_go_to_the_entrance_and_wait_for_other_guests,_feel_at_home!!!')

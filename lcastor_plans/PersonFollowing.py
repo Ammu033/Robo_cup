@@ -10,39 +10,33 @@ except:
 import time
 import pnp_cmd_ros
 from pnp_cmd_ros import *
+from std_msgs.msg import Bool
+
 
 SPEAK_TIMEOUT = 5 # [s]
 ROSPARAM = 'lcastor_person_follower/personID_to_follow'
+QUESTION_TIMEOUT = 10
 
 def PersonFollowing(p):
     rospy.set_param(ROSPARAM, '')
-        
-    # p.exec_action('setNavigationMode', 'MAP')
+    msg_missed = True
     
-    # p.action_cmd('getYesNoConfirmation', 'Have_we_arrived?', 'start')
-
-    while(not p.get_condition("IsYesConfirmed")):
-        p.exec_action('speak', 'Can_you_stand_in_front_of_me,_please?')
-        # p.exec_action('speak', 'Can_any_of_you_stand_in_front_of_me,_please?')
-
+    taskFinished = False
+    starting_time = rospy.get_time()
+    while(not taskFinished):
         
+        p.exec_action('speak', 'Can_you_stand_2_meters_in_front_of_me,_please?')
+        time.sleep(2)
         p.exec_action('findClosestPersonToTrack', '')
 
-        p.exec_action('speak', "Hey_person_" + str(rospy.get_param(ROSPARAM)) + ",_I_am_following_you")
-        p.exec_action('speak', 'Please confirm on my display when we arrive to the destination')
+        p.exec_action('speak', "Hey_you,_I_am_following_you._Please_start_moving.")
+        # p.exec_action('speak', "Hey_person_" + str(rospy.get_param(ROSPARAM)) + ",_I_am_following_you")
         
         p.action_cmd('followPerson', '', 'start')
         
-        display_notification = time.time()
         dist_notification = time.time()
 
-        while not p.get_condition("IsYesConfirmed") and not p.get_condition("IsPersonLost"):
-            
-            # Please confirm task finished notification
-            t_display = time.time() - display_notification
-            if (t_display > 2*SPEAK_TIMEOUT):
-                display_notification = time.time()
-                p.exec_action('speak', 'Please confirm on my display when we arrive to the destination')
+        while not taskFinished and not p.get_condition("IsPersonLost"):
             
             # IsPersonTooFar notification
             t_dist = time.time() - dist_notification
@@ -50,17 +44,25 @@ def PersonFollowing(p):
                 dist_notification = time.time()
                 p.exec_action('speak', 'Can_you_slow_down,_please?')
                 
-            time.sleep(0.1)
-        
+            time.sleep(5)
+            
         p.action_cmd('followPerson', '', 'stop')
-        if not p.get_condition("IsYesConfirmed"): p.exec_action('speak', 'Person_to_follow_lost')
-        
-    # # Go back to the initial position
-    # p.action_cmd('getYesNoConfirmation', '', 'stop')
-    # p.exec_action('goto', '0.0_0.0_0.0')
-    
-    # # Changing navigation mode to LOC
-    # p.exec_action('setNavigationMode', 'LOC')
+        # p.exec_action('speak', 'Person_to_follow_lost')
+        if rospy.get_time() - starting_time > 30:
+            start = rospy.get_time()
+            while msg_missed:
+                if rospy.get_time() - start > 30:
+                    break
+                p.exec_action("speak", 'Have_we_arrived?_Please_come_to_me,_and_say_yes_or_no!')
+                p.exec_action("activateRasa", "affirm_deny")
+                try:
+                    taskFinished = rospy.wait_for_message('/person_affirm_deny', Bool, timeout = QUESTION_TIMEOUT).data
+                    msg_missed = False
+                except:
+                    msg_missed = True
+                
+
+
 
 
 if __name__ == "__main__":

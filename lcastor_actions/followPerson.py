@@ -1,4 +1,5 @@
 import os
+import math
 import sys
 
 try:
@@ -16,7 +17,7 @@ import actionlib
 import numpy as np
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from AbstractAction import AbstractAction
-
+import numpy as np
 
 DES_DIST = 1 # [m] #FIXME: to convert into a rosparam
 CANCEL_DISTANCE = 0.75 # [m] #FIXME: to convert into a rosparam
@@ -41,18 +42,42 @@ class followPerson(AbstractAction):
         # Robot pose and People subscribers
         self.sub_robot_pose = rospy.Subscriber('/robot_pose', PoseWithCovarianceStamped, self.get_robot_2DPose)
         self.sub_people = rospy.Subscriber('/people_tracker/people', People, self.cb_people)
-        
-    
+        self.lastTrackedPerson = None
+        self.lastTrackedPos = None
+
+
+    def is_person_lost(self, p:People):
+        personID = rospy.get_param(ROSPARAM)
+        for person in p.people:
+            if person.name == personID: 
+                return False
+        return True
+
+
     def cb_people(self, p: People):
         # if goal already assigned then return
         if self.client.get_state() == actionlib.GoalStatus.ACTIVE: return 
-        
+        rospy.logerr(self.client.get_state())
         # if rosparam is '' then return
         personID = rospy.get_param(ROSPARAM)
-        if ROSPARAM == '': return
-            
+        rospy.logerr('personID' + str(personID))
+        rospy.logerr('lastTrackedPerson' + str(self.lastTrackedPerson))
+
+        if self.is_person_lost(p) and self.lastTrackedPerson is not None:
+            dist = [math.sqrt((self.lastTrackedPos[0] - person.position.x)**2 + (self.lastTrackedPos[1] - person.position.y)**2) for person in p.people]
+            rospy.logerr(dist)
+            rospy.logerr(min(dist))
+            if min(dist) < 1.5: 
+                index = np.argmin(dist)
+                personID = p.people[index].name
+            else:
+                return
+        self.lastTrackedPerson = personID
+
         # Get position of the person to follow
         personToFollowPos = self.get_person_pos(p, personID)
+        self.lastTrackedPos = personToFollowPos
+
         if personToFollowPos is not None:
             # Follow the person
             # rospy.logerr("GOAL SENT FIRST TIME")

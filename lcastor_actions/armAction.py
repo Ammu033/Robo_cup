@@ -15,7 +15,7 @@ from play_motion_msgs.msg import PlayMotionAction, PlayMotionActionGoal
 """
 Starts and stops the object detection node
 """
-class gripperAction(AbstractAction):
+class armAction(AbstractAction):
 
     def _start_action(self):
         
@@ -38,6 +38,7 @@ class gripperAction(AbstractAction):
 
     def _on_motion_done(self, goalState, result):
         print("arm motion DONE", goalState, result)
+        #rospy.Time.sleep(0)
         self.params.append("done")
 
     def _stop_action(self):

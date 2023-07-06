@@ -37,6 +37,7 @@ def obtain_person_information(p, person, info):
             if rospy.get_time() - start_time > 10.:
                 p.exec_action('speak' , 'Please_repeat_louder,_I_did_not_understand_you.')
                 start_time = rospy.get_time()
+                p.exec_action('activateRasa', "guest_"+info)
 
             detected = p.get_condition("IsIntentDetected")
             time.sleep(1)
