@@ -15,6 +15,7 @@ class saveGuestData(AbstractAction):
             rospy.set_param(self.params[1].lower()+'/x' , p[0] )
             rospy.set_param(self.params[1].lower() + "/y" , p[1] )
             rospy.set_param(self.params[1].lower() + '/w' ,  o[3])
+            rospy.set_param(self.params[1].lower() + '/head_angle' , 0.0)
         if(self.params[0].lower() == "setheadangle"):
             rospy.set_param(self.params[1].lower() + '/head_angle' , self.param[2])
         elif(self.params[0].lower() == "setid"):
