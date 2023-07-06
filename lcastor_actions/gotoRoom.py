@@ -12,30 +12,55 @@ from AbstractAction import AbstractAction
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 import actionlib
 import math
-
+from std_msgs import String
 """
 Starts and stops the object detection node
 """
+
+ROS_PARAM = "/gotoRoom/status"
 class gotoRoom(AbstractAction):
 
     def _start_action(self):
-
+        rospy.set_param(ROS_PARAM, "")
+        rospy.Publisher("/gotoRoom/status", String)
         self.obj_dict = {"cup": "kitchen",
                          "bed": "bedroom",
                          "bagpack" : "livingroom"}
         
         # The following coordinates are based on the Robocup house arena
-        self.room_dict = {"kitchen" : [6.83, 0.211, 0.0, 0.0, 0.99, -0.02],
+        self.room_dict = {"bed" :[6.70, -3.83, 0.0, 0.0,  0.70, -0.70 ],
+                          "bedsidetable" : [7.01, -3.83, 0.0, 0.0, 0.0, 1.0],
+                          "shelf" : [4.45, -4.57, 0.0, 0.0, 0.70, -0.70],
+                          "trashbin" : [7.43, -1.04, 0.0, 0.0, 0.38, -0.92],
+                          "dishwasher" : [6.88, 1.20, 0.0, 0.0, 0.0, 1.0],
+                          "pottedplant": [7.43, 3.37, 0.0, 0.0, 0.38, 0.92],
+                          "kitchentable" : [5.9, 1.7, 0.0, 0.0, 0.38, 0.92],
+                          "chairs" : [6.91, 1.73, 0.0, 0.0, 0.70, 0.70],
+                          "pantry" : [5.39, 1.75, 0.0, 0.0, 0.71, 0.70],
+                          "refrigerator" : [4.82, -0.23, 0.0, 0.0, 0.99, -0.02],
+                          "sink" : [4.32, 1.07, 0.0, 0.0, 0.93, -0.36],
+                          "cabinet" : [2.62, -3.42, 0.0, 0.0, 0.0, 1.0],
+                          "coatrack" : [-0.254, 4.32, 0.0, 0.0, 0.95, -0.30],
+                          "desk" : [2.62, -3.42, 0.0, 0.0, 1.0, 0.0],
+                          "armchair" : [-0.0735, -3.42, 0.0, 0.0, 0.0, 1.0],
+                          "desklamp" : [1.58, -4.61, 0.0, 0.0, 0.70, 0.70 ],
+                          "wastebasket" : [2.37, -4.5, 0.0, 0.88, 0.46],
+                          "tvstand" : [0.216, -0.502, 0.0, 0.0, 0.70, -0.70],
+                          "storagerack" : [2.35, -0.61, 0.0, 0.0, 0.0, 1.0], 
+                          "lamp" : [3.09, 2.09, 0.0, 0.0, 0.70, 0.70],
+                          "sidetables" : [2.09, 1.41, 0.0, 0.0, 0.70, 0.70],
+                          "sofa" : [3.00, 1.10, 0.0, 0.0, 0.88, 0.47],
+                          "bookshelf" : [0.109, 2.25, 0.0, 0.0, 1, 0.0],
+                          "entrance" : [-1.38, 0.13, 0.0, 0.0, -0.05, 0.99],
+                          "exit" : [-0.289, -2.63, 0.0, 0.0, 1, 0.0],
+                          "table" : [5.19, 2.08, 0.0, 0.0, 0.02, 0.99],
+                          "coffetable" : [5.39, 1.75, 0.0, 0.0, 0.95, 0.28],
+                          "couch1" : [3.00, 1.10, 0.0, 0.0, 0.88, 0.47],
+                          "couch2" : [0.52, 1.10, 0.0, 0.0, 0.45, 0.89],
+                          "kitchen" : [6.83, 0.211, 0.0, 0.0, 0.99, -0.02],
                           "bedroom" : [6.91, -3.56, 0.0, 0.0, 0.45, 0.89],
                           "livingroom" : [0.78, 1.87, 0.0, 0.0, 0.45, 0.89],
                           "diningroom" : [5.19, 2.08, 0.0, 0.0, 0.02, 0.99],
-                          "sink" : [4.32, 1.07, 0.0, 0.0, 0.93, -0.36],
-                          "table" : [5.19, 2.08, 0.0, 0.0, 0.02, 0.99],
-                          "cabinet" : [5.39, 1.75, 0.0, 0.0, 0.71, 0.70],
-                          "coffetable" : [5.39, 1.75, 0.0, 0.0, 0.95, 0.28],
-                          "fridge" : [4.82, -0.23, 0.0, 0.0, 0.99, -0.02],
-                          "couch1" : [3.00, 1.10, 0.0, 0.0, 0.88, 0.47],
-                          "couch2" : [0.52, 1.10, 0.0, 0.0, 0.45, 0.89],
                           "receptionentrance" : [0.06, -0.18, 0.0, 0.0, 0.99, 0.12],
                           "inspectionpoint" : [2.0, -2.33, 0.0, 0.0, -0.83, 0.54],
                           "entranceinspection" : [-1.38, 0.13, 0.0, 0.0, -0.05, 0.99]
@@ -46,35 +71,46 @@ class gotoRoom(AbstractAction):
         if "r" in self.params[0] and self.params[1] in self.room_dict:
                 self.coordinates = self.room_dict[self.params[1]]
         else: 
-            self.room = self.obj_dict[self.params[0]]
-            self.coordinates = self.room_dict[self.room]
+            if self.params[0] in self.obj_dict.keys():
+                self.room = self.obj_dict[self.params[0]]
+                self.coordinates = self.room_dict[self.room]
+            else:
+                self.coordinates = None
+
 
         print(self.params)
         print(self.coordinates)
-        if len(self.params) < 1:
-            rospy.logwarn("Wrong use of action, pass the coordinates the robots needs to reach in /map frame as X_Y_Theta")
+
+        self.client = actionlib.SimpleActionClient('/move_base', MoveBaseAction)
+
+        if self.coordinates != None:
+            if len(self.params) < 1:
+                rospy.logwarn("Wrong use of action, pass the coordinates the robots needs to reach in /map frame as X_Y_Theta")
+            else:
+                rospy.loginfo("Connecting to /move_base AS...")
+                self.client.wait_for_server()
+                rospy.loginfo("Connected.")
+
+                # Create goal
+                self.goal_msg = MoveBaseGoal()
+                self.goal_msg.target_pose.header.frame_id = "map"
+                self.goal_msg.target_pose.header.stamp = rospy.Time.now()
+                self.goal_msg.target_pose.pose.position.x = float(self.coordinates[0])
+                self.goal_msg.target_pose.pose.position.y = float(self.coordinates[1])
+                self.goal_msg.target_pose.pose.orientation.x = 0.0
+                self.goal_msg.target_pose.pose.orientation.y = 0.0
+                self.goal_msg.target_pose.pose.orientation.z = float(self.coordinates[4])
+                self.goal_msg.target_pose.pose.orientation.w = float(self.coordinates[5])
+                # self.goal_msg.target_pose.pose.orientation.z = math.sin(float(self.coordinates[2]) / 2)
+                # self.goal_msg.target_pose.pose.orientation.w = math.cos(float(self.coordinates[2]) / 2)
+
+                self.client.send_goal(self.goal_msg, done_cb=self._on_goTo_done)
+                rospy.loginfo("Waiting for goTo result...")
+                # self.client.wait_for_result()
+                rospy.set_param(ROS_PARAM, "Succeded")
         else:
-            self.client = actionlib.SimpleActionClient('/move_base', MoveBaseAction)
-            rospy.loginfo("Connecting to /move_base AS...")
-            self.client.wait_for_server()
-            rospy.loginfo("Connected.")
-
-            # Create goal
-            self.goal_msg = MoveBaseGoal()
-            self.goal_msg.target_pose.header.frame_id = "map"
-            self.goal_msg.target_pose.header.stamp = rospy.Time.now()
-            self.goal_msg.target_pose.pose.position.x = float(self.coordinates[0])
-            self.goal_msg.target_pose.pose.position.y = float(self.coordinates[1])
-            self.goal_msg.target_pose.pose.orientation.x = 0.0
-            self.goal_msg.target_pose.pose.orientation.y = 0.0
-            self.goal_msg.target_pose.pose.orientation.z = float(self.coordinates[4])
-            self.goal_msg.target_pose.pose.orientation.w = float(self.coordinates[5])
-            # self.goal_msg.target_pose.pose.orientation.z = math.sin(float(self.coordinates[2]) / 2)
-            # self.goal_msg.target_pose.pose.orientation.w = math.cos(float(self.coordinates[2]) / 2)
-
-            self.client.send_goal(self.goal_msg, done_cb=self._on_goTo_done)
-            rospy.loginfo("Waiting for goTo result...")
-            # self.client.wait_for_result()
+            rospy.set_param(ROS_PARAM, "Failed")
+            self._stop_action()
 
     def _on_goTo_done(self, goalState, result):
         print("goToRoom DONE", goalState, result)
@@ -83,7 +119,7 @@ class gotoRoom(AbstractAction):
 
     def _stop_action(self):
         self.client.cancel_all_goals()
-        self.params.append("interrupted")
+        self.params.append("done")
         rospy.loginfo('STOPPED goto action')
 
     @classmethod
