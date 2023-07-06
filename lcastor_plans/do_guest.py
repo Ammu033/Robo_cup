@@ -46,7 +46,7 @@ def do_guest(p, guest):
         saved = rospy.get_param('personSaved')
     
     if not saved:
-        rospy.set_param('/{}/id'.format(guest) , 15384)
+        rospy.set_param('LastSavedid' , 15384)
 
     p.exec_action('saveGuestData' , 'setid_{}'.format(guest))
 

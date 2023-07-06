@@ -11,6 +11,7 @@ import time
 import pnp_cmd_ros
 from pnp_cmd_ros import *
 from std_msgs.msg import Bool
+import rospy
 
 def confirm_information(p, person, info):
 

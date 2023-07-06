@@ -50,7 +50,7 @@ def Receptionist(p):
         saved = rospy.get_param('personSaved')
         time.sleep(1)
     if not saved:
-        rospy.set_param('/host/id' , 15384)
+        rospy.set_param('LastSavedid' , 15384)
 
     p.exec_action('saveGuestData' , 'setid_host')
     

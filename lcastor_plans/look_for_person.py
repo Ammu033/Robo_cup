@@ -11,6 +11,7 @@ import time
 import pnp_cmd_ros
 from pnp_cmd_ros import *
 from wait_for_person import wait_for_person
+import rospy
 
 def look_for_person(p , person):
     person_x = rospy.get_param(person + '/x')
@@ -33,13 +34,13 @@ def look_for_person(p , person):
                     #p.exec_action('goto' , str(person_x) + str(person_y) + str(person_w +( 0.57 * counter)))# TODDO
                     person_found  = True
                     p.exec_action('saveGuestData' , 'setloc_' + person)
-                    p.exec_action('saveGuestData' , 'setheadangle_' +person+'_'  + str(start_angle))
+                    p.exec_action('saveGuestData' , 'setheadangle_' +person+'_'  + '0.0')
                     break
                 p.exec_action('moveHead' , str(start_angle) + "_0.0")
             if not start_angle >= 1.3:
                 person_found = True
                 p.exec_action('saveGuestData' , 'setloc_' + person)
-                p.exec_action('saveGuestData' , 'setheadangle_' +person+'_'  + '0.0')
+                p.exec_action('saveGuestData' , 'setheadangle_' +person+'_'  + str(start_angle))
             if counter > 0:
                 break
     return person_found

@@ -1,5 +1,6 @@
 import os
 import sys
+import rospy
 
 try:
     sys.path.insert(0, os.environ["PNP_HOME"] + '/scripts')
