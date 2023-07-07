@@ -23,11 +23,13 @@ def obtain_person_information(p, person, info):
         if info == "name":
             
             p.exec_action('speak', "Can_you_please_tell_me_your_name?")
+            p.exec_action('speak' , '.')
             p.exec_action('activateRasa', "guest_name")
 
         elif info == "drink":
             
             p.exec_action('speak', "Can_you_please_tell_me_your_favourite_drink?")
+            p.exec_action('speak' , '.')
             p.exec_action('activateRasa', "guest_drink")
 
         # TODO add touchscreen input if too long
@@ -37,6 +39,7 @@ def obtain_person_information(p, person, info):
         while not detected:
             if rospy.get_time() - start_time > 10.:
                 p.exec_action('speak' , 'Please_repeat_louder,_I_did_not_understand_you.')
+                p.exec_action('speak' , '.')
                 start_time = rospy.get_time()
                 p.exec_action('activateRasa', "guest_"+info)
 
