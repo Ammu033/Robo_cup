@@ -21,7 +21,6 @@ class activateRasa(AbstractAction):
         self.input = rospy.Publisher("/planner_intention", String, queue_size=1)
 
         if len(self.params) > 0:
-            rospy.sleep(0.5)
             self.input.publish(str("_".join(self.params)))#
         else:
             rospy.logwarn("Wrong use of activateIntent action, you should pass the intent name!")
