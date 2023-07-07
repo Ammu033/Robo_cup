@@ -39,7 +39,7 @@ def Receptionist(p):
 
     p.exec_action('moveHead', '0_0.3')
     wait_for_person(p)
-    p.exec_action('saveGuestData' , 'setloc_host')
+    #p.exec_action('saveGuestData' , 'setloc_host') #TODO Add this after going to couch
 
     p.exec_action('personIdentification' , 'learn' )
     start_time = rospy.get_time()
