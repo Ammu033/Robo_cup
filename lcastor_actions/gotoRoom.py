@@ -12,7 +12,6 @@ from AbstractAction import AbstractAction
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 import actionlib
 import math
-from std_msgs import String
 """
 Starts and stops the object detection node
 """
@@ -22,7 +21,6 @@ class gotoRoom(AbstractAction):
 
     def _start_action(self):
         rospy.set_param(ROS_PARAM, "")
-        rospy.Publisher("/gotoRoom/status", String)
         self.obj_dict = {"cup": "kitchen",
                          "bed": "bedroom",
                          "bagpack" : "livingroom"}
@@ -37,9 +35,10 @@ class gotoRoom(AbstractAction):
                           "kitchentable" : [5.9, 1.7, 0.0, 0.0, 0.38, 0.92],
                           "chairs" : [6.91, 1.73, 0.0, 0.0, 0.70, 0.70],
                           "pantry" : [5.39, 1.75, 0.0, 0.0, 0.71, 0.70],
+                          "cabinet" : [5.39, 1.75, 0.0, 0.0, 0.71, 0.70],
                           "refrigerator" : [4.82, -0.23, 0.0, 0.0, 0.99, -0.02],
                           "sink" : [4.32, 1.07, 0.0, 0.0, 0.93, -0.36],
-                          "cabinet" : [2.62, -3.42, 0.0, 0.0, 0.0, 1.0],
+                         # "cabinet" : [2.62, -3.42, 0.0, 0.0, 0.0, 1.0],
                           "coatrack" : [-0.254, 4.32, 0.0, 0.0, 0.95, -0.30],
                           "desk" : [2.62, -3.42, 0.0, 0.0, 1.0, 0.0],
                           "armchair" : [-0.0735, -3.42, 0.0, 0.0, 0.0, 1.0],
