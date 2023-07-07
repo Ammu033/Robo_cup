@@ -15,7 +15,7 @@ import rospy
 
 
 def introduce_people(p , person1 , person2):
-    x_y_of_people = [rospy.get_param(person1  + '/x') , rospy.get_param(person1 + '/y')]
+    x_y_of_people = [str(rospy.get_param(person1  + '/x')) , str(rospy.get_param(person1 + '/y'))]
     person1_found = look_for_person(p, person1)
     person2_found = look_for_person(p, person2)
     person1_w = rospy.get_param(person1 + '/w')
@@ -46,3 +46,14 @@ def introduce_people(p , person1 , person2):
     p.exec_action('goto' , "_".join(x_y_of_people) + '_' + str(person2_w) )
     p.exec_action('moveHead', str(person2_head_angle) + '_0.0')
     p.exec_action('speak' , 'Their_favourite_drink_is' + person1_drink)
+
+
+if __name__ == "__main__":
+
+    p = PNPCmd()
+
+    p.begin()
+
+    introduce_people(p, "guest1", "guest2")
+
+    p.end()

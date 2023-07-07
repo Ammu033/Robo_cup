@@ -43,7 +43,7 @@ def send_to_rasa(msg):
         #print(r)
         msg = String()
         msg.data = r["text"]
-        pub.publish(msg)
+        #pub.publish(msg)
 
 def subscribe_to_speech(msg):
     global send_speech

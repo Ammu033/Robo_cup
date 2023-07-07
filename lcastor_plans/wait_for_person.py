@@ -17,8 +17,12 @@ def wait_for_person(p):
     p.exec_action('moveHead', '0_0.3')
 
     # 
+    n = 0
     while not p.get_condition("IsPersonInRange_1.2"):
-        time.sleep(2)
+        if n >= 4:
+            break 
+        time.sleep(3)
+        n += 1
     
 
 

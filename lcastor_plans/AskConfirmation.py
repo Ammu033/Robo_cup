@@ -13,16 +13,10 @@ from pnp_cmd_ros import *
 from std_msgs.msg import Bool
 import rospy
 
-def confirm_information(p, person, info):
 
-    confirmed = False
+def AskConfirmation(p):
+    confirmed = False    
 
-    data = rospy.get_param("/{}/{}".format(person, info))
-    data = data.replace(" ", "_")
-
-    p.exec_action("speak", "I_understood_your_{}_is_{}".format(info, data))
-    p.exec_action("speak", "Please,_confirm_whether_that_is_correct.")
-    #p.exec_action('speak' , '.')
     p.exec_action('activateRasa', "affirm_deny")
     
     start_time = rospy.get_time()
@@ -30,7 +24,6 @@ def confirm_information(p, person, info):
     while not detected:
         if rospy.get_time() - start_time > 10.:
             p.exec_action('speak' , 'Please_repeat_louder,_I_did_not_understand_you.')
-            #p.exec_action('speak' , '.')
             p.exec_action('activateRasa', "affirm_deny")
             start_time = rospy.get_time()
 
@@ -38,20 +31,9 @@ def confirm_information(p, person, info):
         time.sleep(1)
 
     try:
-        confirmed = rospy.wait_for_message('/person_affirm_deny', Bool, timeout=10.).data
-    except Exception  as e:
+        confirmed = rospy.wait_for_message('/person_affirm_deny', Bool, timeout=5.)
+    except Exception as e:
         confirmed = False    
-
-    # if not affirm_deny_data:
-    #     p.exec_action("speak", "Please,_press_yes_or_.")
-    #     p.exec_action('getYesNoConfirmation', "Is_{}_your_{}".format(data, info))
-
-    #     while True:
-    #         if p.get_condition("IsYesConfirmed"):
-    #             confirmed = True
-    #         elif p.get_condition("IsNoConfirmed"):
-    #             confirmed = False
-    #         time.sleep(1)
 
     return confirmed
 
