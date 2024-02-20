@@ -1,3 +1,9 @@
 [submodule "lcastor_perception"]
 	path = lcastor_perception
 	url = https://github.com/Melanoneiro/lcastor_perception.git
+[submodule "lcastor_isaac_sim/tiago_robot"]
+	path = lcastor_isaac_sim/tiago_robot
+	url = https://github.com/pal-robotics/tiago_robot/
+[submodule "lcastor_isaac_sim/ycb-tools"]
+	path = lcastor_isaac_sim/ycb-tools
+	url = https://github.com/sea-bass/ycb-tools
