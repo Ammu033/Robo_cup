@@ -2,6 +2,7 @@ import os
 import dotenv
 import geocoder
 import requests 
+import gestures
 
 APIKEYS_PATH = "/home/eden/Documents/noetic-llama/noetic-llama/apikeys.env"
 # APIKEYS_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "..", "apikeys.env")
@@ -56,6 +57,7 @@ def get_weather_data(coordinates):
     j = req.json()
     o = "The current temperature is %f°C with an outlook of '%s'" % (j["current"]["temperature_2m"], WEATHER_CODES[j["current"]["weather_code"]])
     print(o)
+    gestures.speak(o)
     return o
 
 
