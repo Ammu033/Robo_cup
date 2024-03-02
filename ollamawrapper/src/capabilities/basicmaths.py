@@ -1,5 +1,5 @@
 import rospy
-
+import gestures
 
 def add(num1, num2):
     """Returns the output of two numbers added together
@@ -11,7 +11,9 @@ def add(num1, num2):
     Returns:
         int: The sum of the two numbers
     """
-    print("%f + %f = %f" % (num1, num2, num1 + num2))
+    o = "%f + %f = %f" % (num1, num2, num1 + num2)
+    print(o)
+    gestures.speak(o)
     return num1 + num2
 
 def sub(num1, num2):
@@ -21,7 +23,9 @@ def sub(num1, num2):
         num1 (int): The first number
         num2 (int): A number to subtract the first number from
     """
-    print("%f - %f = %f" % (num1, num2, num1 - num2))
+    o = "%f - %f = %f" % (num1, num2, num1 - num2)
+    print(o)
+    gestures.speak(o)
     return num1 - num2
 
 
@@ -32,7 +36,9 @@ def mult(num1, num2):
         num1 (int): The first number to multiply together
         num2 (int): The second number to multiply together
     """
-    print("%f × %f = %f" % (num1, num2, num1 * num2))
+    o = "%f × %f = %f" % (num1, num2, num1 * num2)
+    gestures.speak(o)
+    print(o)
     return  num1 * num2
 
 def div(num1, num2):
@@ -42,7 +48,9 @@ def div(num1, num2):
         num1 (int): The enumerator
         num2 (int): The denominator
     """
-    print("%f ÷ %f = %f" % (num1, num2, num1 / num2))
+    o = "%f ÷ %f = %f" % (num1, num2, num1 / num2)
+    gestures.speak(o)
+    print(o)
     return num1 / num2
 
 """class A:

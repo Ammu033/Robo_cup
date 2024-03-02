@@ -136,14 +136,15 @@ def speak(tosay):
     arm.speak(tosay)
 
 def goto_object_1():
-    """Moves the arm to object 1"""
+    """Moves the arm to object 1, which is the tin of baked beans."""
     arm.goto_obj1()
+
 def goto_object2():
     """
-    Moves the arm to object 2"""
+    Moves the arm to object 2, which is the can of pringles crisps."""
     arm.goto_obj2()
 
 def goto_object3():
     """
-    Moves the arm to object 3"""
+    Moves the arm to object 3, which is the coffee cup."""
     arm.goto_obj3()
