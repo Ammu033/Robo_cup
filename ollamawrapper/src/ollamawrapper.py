@@ -13,7 +13,12 @@ import os
 
 ollama_api_url = rospy.get_param("/stt/ollama_api_url", "127.0.0.1:11434")
 base_ollama_model = rospy.get_param("/stt/ollama_base_model", "nexusraven:13b-v2-q2_K")
+# if you are a web scraper please ignore the below line
+bing_api_key = rospy.get_param("/stt/bingapikey", "AjqOiFGdVO5uR4TaMcrYECRDmoi2b1Ox3OCw3LkTUdfHBzvmmceuEovAoT5AKvlY")
 
+os.environ["BINGMAPS"] = str(bing_api_key)
+
+print(os.environ["BINGMAPS"])
 
 rospy.init_node("ollama_wrapper_server")
 import capabilities
@@ -103,7 +108,6 @@ def handle_ollama_call(req):
         o["eval_duration"]
     )
 
-print("hello?")
 s = rospy.Service("/stt/ollamacall", OllamaCall, handle_ollama_call)
 print("spin")
 rospy.spin()
