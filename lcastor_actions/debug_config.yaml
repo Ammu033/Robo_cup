@@ -1,0 +1,30 @@
+Debug: 
+  Active: true
+  Mode: "Speech" # default 'off' 
+
+Configurations:
+  # Modes should have either an ActiveActions or InactiveActions list
+  # Active actions are the actions that are enabled in the mode
+  # Inactive actions are the actions that are disabled in the mode
+  # If BOTH are present, ONLY the ActiveActions list will be used
+  Speech:
+    Active:
+      - "Grasping"
+      - "Detect Person"
+      - "Speech To Text"
+
+  Manual:
+    Inactive:
+      - "Grasping"
+      - "Detect Person"
+      - "Speech To Text"
+      - "Walking"
+      - "Following"
+      - "Charging"
+
+  Autonomous:
+    Active:
+      - "Walking"
+      - "Following"
+      - "Charging"
+
