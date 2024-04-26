@@ -1,30 +1,66 @@
 Debug: 
-  Active: true
-  Mode: "Speech" # default 'off' 
+  Active: False 
+  Mode: "Test3" 
 
 Configurations:
-  # Modes should have either an ActiveActions or InactiveActions list
+  # Modes should have either an Active or Inactive list
   # Active actions are the actions that are enabled in the mode
   # Inactive actions are the actions that are disabled in the mode
-  # If BOTH are present, ONLY the ActiveActions list will be used
-  Speech:
+  # If BOTH are present, ONLY the Active list will be used
+  Test1: # name of the mode
     Active:
-      - "Grasping"
-      - "Detect Person"
-      - "Speech To Text"
-
-  Manual:
+      # armAction
+      # moveHead
+      speak
+      # moveTorso
+  Test2: # name of the mode
+    Active:
+      # armAction
+      # moveHead
+      # speak
+      moveTorso
+  Test3: # name of the mode
     Inactive:
-      - "Grasping"
-      - "Detect Person"
-      - "Speech To Text"
-      - "Walking"
-      - "Following"
-      - "Charging"
+      # armAction
+      # moveHead
+      # speak
+      moveTorso
 
-  Autonomous:
-    Active:
-      - "Walking"
-      - "Following"
-      - "Charging"
 
+
+
+
+
+
+    # Active:
+    #   # activateRasa
+    #   # armAction
+    #   # debug_config
+    #   # findClosestPersonToTrack
+    #   # followPerson
+    #   # followPerson_ats
+    #   # gestureDetection
+    #   # getContinueConfirmation
+    #   # getTextInput
+    #   # getYesNoConfirmation
+    #   # goto
+    #   # gotoRoom
+    #   # gotoRoom
+    #   # graspObject
+    #   # gripperAction
+    #   # listen
+    #   # lookAtClosestPerson
+    #   # moveGripperTo
+    #   # moveHead
+    #   # speak
+    #   # moveTorso
+    #   # navigateForward
+    #   # objectDetection
+    #   # peopleDetection
+    #   # personIdentification
+    #   # recog_action
+    #   # saveGuestData
+    #   # setNavigationMode
+    #   # speak
+    #   # test
+    #   # waitOpenDoor
