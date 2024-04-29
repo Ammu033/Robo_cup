@@ -1,3 +1,4 @@
-from .weather import *
+# from .weather import *
 from .basicmaths import *
-from .gestures import *
+# from .gestures import *
+from .receptionist import *
