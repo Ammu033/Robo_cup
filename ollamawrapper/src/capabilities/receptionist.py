@@ -34,3 +34,6 @@ def get_favorite_drink(favourite_drink):
     """
     ReceptionistPublisher().publish_drink(favourite_drink)
     print("I think the person's favourite drink is %s" % favourite_drink)
+
+def t_person_name(person_name):
+    get_person_name(person_name)

@@ -1,7 +1,7 @@
 import os
 import sys
 import rospy
-
+from std_msgs.msg import String
 try:
     sys.path.insert(0, os.environ["PNP_HOME"] + "/scripts")
 except:
@@ -24,14 +24,22 @@ def obtain_person_name(p, person, info):
 
     if info == "name":
         p.exec_action("speak", "Can_you_please_tell_me_your_name?")
+        rospy.loginfo("activating ollama...")
         p.exec_action("activateOllama", "guest_name")
+        reponse_topic = "ollama_name"
     if info == "drink":
         p.exec_action("speak", "Can_you_please_tell_me_your_favourite_drink?")
         p.exec_action("activateOllama", "guest_drink")
+        reponse_topic = "ollama_drink"
+
     start_time = rospy.get_time()
 
     # waiting on a response confirmation from the user
-    while not p.get_condition("IsOllamaIntentDetected"):
+    rospy.loginfo("obtain_person_name: waiting for ollama intent detection...")
+
+    condition = p.get_condition("IsOllamaIntentDetected")
+
+    while not ( response := rospy.wait_for_message(reponse_topic, String, timeout=60).data ):
         # TODO: may need ollama wrapper to publish intent as soon as whisper starts
 
         # only attempt to ask again if 10 seconds have passed
@@ -44,10 +52,15 @@ def obtain_person_name(p, person, info):
 
     time.sleep(2)
     if info == "name":
-        p.exec_action("saveGuestDataOllama", "setname_" + person)
+        rospy.loginfo(f"obtain_person_name: saving guest data for {person}...")
+        p.exec_action("saveGuestDataOllama", "setname_" + person + '_' + response)
 
     if info == "drink":
-        p.exec_action("saveGuestDataOllama", "setname_" + person)
+        p.exec_action("saveGuestDataOllama", "setname_" + person + '_' + response)
+
+    
+    # p.exec_action
+    # p.action_cmd('speak', f'Thank you_{rospy.get}', 'start')
 
         # TODO: (from above) confirmed starts up the second loop
         # confirmed = confirm_information_simple(p, person, info)

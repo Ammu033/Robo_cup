@@ -23,16 +23,18 @@ class activateOllama(AbstractAction):
         )
         # self.starting_time = rospy.Time.now()
 
-        self.input = rospy.Publisher("/planner_intention", String, queue_size=1)
+        # self.input = rospy.Publisher("/planner_intention", String, queue_size=1)
 
-        if len(self.params) > 0:
-            self.input.publish(str("_".join(self.params)))  #
-        else:
-            rospy.logwarn(
-                "Wrong use of activateOllama action, you should pass the intent name!"
-            )
+        # if len(self.params) > 0:
+        #     self.input.publish(str("_".join(self.params)))  #
+        # else:
+        #     rospy.logwarn(
+        #         "Wrong use of activateOllama action, you should pass the intent name!"
+        #     )
 
-        rospy.sleep(1)
+        # rospy.sleep(1)
+        rospy.loginfo("exiting activateOllama action...")
+
         self.params.append("done")
 
     def _stop_action(self):
