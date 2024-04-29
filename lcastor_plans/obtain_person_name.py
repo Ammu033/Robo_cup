@@ -30,6 +30,8 @@ def obtain_person_name(p, person, info):
 
     # waiting on a response confirmation from the user
     while not p.get_condition("IsOllamaIntentDetected"):
+        # TODO: may need ollama wrapper to publish intent as soon as whisper starts
+
         # only attempt to ask again if 10 seconds have passed
         # maybe this should be some kind of timeout parameter
         if rospy.get_time() - start_time > 10.0:
