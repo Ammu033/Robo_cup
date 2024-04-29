@@ -18,12 +18,12 @@ class saveGuestDataOllama(AbstractAction):
             rospy.set_param(set_param + "/head_angle", 0.0)
             rospy.set_param(
                 set_param + "/name",
-                rospy.wait_for_message("guest_name", String).data,
+                rospy.wait_for_message("ollama_name", String, timeout=60).data,
             )
         elif check_param == "setdrink":
             rospy.set_param(
                 set_param + "/drink",
-                rospy.wait_for_message("guest_drink", String).data,
+                rospy.wait_for_message("ollama_drink", String).data,
             )
 
         self.params.append("done")
