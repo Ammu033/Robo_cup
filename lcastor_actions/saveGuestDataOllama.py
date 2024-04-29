@@ -20,6 +20,12 @@ class saveGuestDataOllama(AbstractAction):
                 set_param + "/name",
                 rospy.wait_for_message("guest_name", String).data,
             )
+        elif check_param == "setdrink":
+            rospy.set_param(
+                set_param + "/drink",
+                rospy.wait_for_message("guest_drink", String).data,
+            )
+
         self.params.append("done")
 
     def get_position(self):
