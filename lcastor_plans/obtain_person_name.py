@@ -25,7 +25,9 @@ def obtain_person_name(p, person, info):
     if info == "name":
         p.exec_action("speak", "Can_you_please_tell_me_your_name?")
         p.exec_action("activateOllama", "guest_name")
-
+    if info == "drink":
+        p.exec_action("speak", "Can_you_please_tell_me_your_favourite_drink?")
+        p.exec_action("activateOllama", "guest_drink")
     start_time = rospy.get_time()
 
     # waiting on a response confirmation from the user
@@ -42,6 +44,9 @@ def obtain_person_name(p, person, info):
 
     time.sleep(2)
     if info == "name":
+        p.exec_action("saveGuestDataOllama", "setname_" + person)
+
+    if info == "drink":
         p.exec_action("saveGuestDataOllama", "setname_" + person)
 
         # TODO: (from above) confirmed starts up the second loop
