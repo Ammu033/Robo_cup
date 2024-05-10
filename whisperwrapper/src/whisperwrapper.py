@@ -83,18 +83,15 @@ class WhisperWrapper:
                         rospy.loginfo("Skipped due to low confidence it's actually speech.")
 
     def run_ollama(self, text):
-        rospy.loginfo("Since we're about to send something to ollama, let's turn off whisper.")
-        self.listening_pub.publish(listening = False)
-
         try:
             service_call = rospy.ServiceProxy("/stt/ollamacall", OllamaCall)
             response = service_call(input = text)
             print(response)
         except Exception as e:
-            print("Ollama failed: " % str(e))
-
-
-                    
+            print("Ollama failed: ", str(e))
+        else:        
+            rospy.loginfo("We've successfully sent something to ollama, so let's stop listening.")
+            self.listening_pub.publish(listening = False)      
 
 if __name__ == "__main__":
     rospy.init_node("whisper_wrapper")
