@@ -2,6 +2,7 @@
 
 from ollamamessages.msg import WhisperTranscription, WhisperListening
 from ollamamessages.srv import OllamaCall, OllamaCallResponse
+from std_msgs.msg import String
 
 import speech_recognition as sr
 import threading
@@ -26,12 +27,18 @@ class WhisperWrapper:
     def __init__(self) -> None:
         self.transcription_pub = rospy.Publisher("/stt/transcription", WhisperTranscription, queue_size = 1)
         self.listening_sub = rospy.Subscriber("/stt/listening", WhisperListening, self.listening_sub_cb)
+        self.listening_pub = rospy.Publisher("/stt/listening", WhisperListening, queue_size = 1)
+        self.planner_intention_sub = rospy.Subscriber("/planner_intention", String, self.planner_intention_sub_cb)
 
         self.record_audio(pause, energy, dynamic_energy, microphone_device)
 
     def listening_sub_cb(self, set_listening):
         rospy.loginfo("Set listening = %s" % str(set_listening.listening))
         self.listening = set_listening.listening
+
+    def planner_intention_sub_cb(self, intention):
+        rospy.loginfo("Because /planner_intention has been set to '%s', I am turning on whisper." % intention)
+        self.listening_pub.publish(listening = True)
 
     def record_audio(self, pause, energy, dynamic_energy, microphone_device):
         recogniser = sr.Recognizer()
@@ -76,12 +83,15 @@ class WhisperWrapper:
                         rospy.loginfo("Skipped due to low confidence it's actually speech.")
 
     def run_ollama(self, text):
-        service_call = rospy.ServiceProxy("/stt/ollamacall", OllamaCall)
-        response = service_call(input = text)
-        print(response)
-
-
-                    
+        try:
+            service_call = rospy.ServiceProxy("/stt/ollamacall", OllamaCall)
+            response = service_call(input = text)
+            print(response)
+        except Exception as e:
+            print("Ollama failed: ", str(e))
+        else:        
+            rospy.loginfo("We've successfully sent something to ollama, so let's stop listening.")
+            self.listening_pub.publish(listening = False)      
 
 if __name__ == "__main__":
     rospy.init_node("whisper_wrapper")

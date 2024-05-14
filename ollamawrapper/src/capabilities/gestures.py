@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-print("FLoofle")
 
 import sys
 import rospy
@@ -9,8 +8,6 @@ import actionlib
 from pal_interaction_msgs.msg import TtsActionGoal, TtsAction, TtsGoal
 from geometry_msgs.msg import PoseStamped
 from play_motion_msgs.msg import PlayMotionActionGoal
-
-print("after imports")
 
 class arm_move:
     def __init__(self):
@@ -43,6 +40,10 @@ class arm_move:
         self.object3_move_2 = [2.1 , 1.02 , 0.62 , 1.63 , -1.24 , 0.47 , -0.49]
         self.object3_move_3 = [2.1 , 0.75 , 0.4 , 1.54 , -0.90 , 0.48 , -0.39]
 
+        self.bottle_move_2 = [1.05, 0.89, -0.47, 2.03, -0.12, 1.24, 0.4]
+        self.bottle_move_3 = [1.32, 0.9, -0.49, 2.06, 0.28, 0.98, 0.47]
+        self.bottle_final = [1.02, 0.97, -0.26, 1.49, 1.08, 0.54, 0.53]
+
         self.object_final = [0.53, 0.56, -1.19, 1.10, 0.58, -0.03, 0.04]
         self.object_home = [0.2, -1.34, -0.2, 1.94, -1.57, 1.37, 0.0]
 
@@ -52,37 +53,14 @@ class arm_move:
         """
         self.arm.go(self.object1_move_1 , wait=True)
         rospy.sleep(2)
-        self.arm.go(self.object1_move_2 , wait=True)
+        self.arm.go(self.bottle_move_2 , wait=True)
         rospy.sleep(2)
         self.pub.publish(self.open_msg)
         rospy.sleep(2)
-        self.arm.go(self.object1_move_3 , wait=True)
+        self.arm.go(self.bottle_move_3 , wait=True)
         self.pub.publish(self.close_msg)
         rospy.sleep(2)
-        self.arm.go(self.object_final)
-        rospy.sleep(2)
-        self.pub.publish(self.open_msg)
-        rospy.sleep(2)
-        self.arm.go(self.object1_move_1)
-        rospy.sleep(2)
-        self.arm.go(self.object_home)
-        self.pub.publish(self.close_msg)
-
-
-    def goto_obj2(self):
-        """
-        A Function for reaching to object 1 # change the name of the object here
-        """
-        self.arm.go(self.object2_move_1 , wait=True)
-        rospy.sleep(2)
-        self.arm.go(self.object2_move_2 , wait=True)
-        rospy.sleep(2)
-        self.pub.publish(self.open_msg)
-        rospy.sleep(2)
-        self.arm.go(self.object2_move_3 , wait=True)
-        self.pub.publish(self.close_msg)
-        rospy.sleep(2)
-        self.arm.go(self.object_final)
+        self.arm.go(self.bottle_final)
         rospy.sleep(2)
         self.pub.publish(self.open_msg)
         rospy.sleep(2)
@@ -92,27 +70,50 @@ class arm_move:
         self.pub.publish(self.close_msg)
 
 
-    def goto_obj3(self):
-        """
-        A Function for reaching to object 1 # change the name of the object here
-        """
-        self.arm.go(self.object3_move_1 , wait=True)
-        rospy.sleep(2)
-        self.arm.go(self.object3_move_2 , wait=True)
-        rospy.sleep(2)
-        self.pub.publish(self.open_msg)
-        rospy.sleep(2)
-        self.arm.go(self.object3_move_3 , wait=True)
-        self.pub.publish(self.close_msg)
-        rospy.sleep(2)
-        self.arm.go(self.object_final)
-        rospy.sleep(2)
-        self.pub.publish(self.open_msg)
-        rospy.sleep(2)
-        self.arm.go(self.object1_move_1)
-        rospy.sleep(2)
-        self.arm.go(self.object_home)
-        self.pub.publish(self.close_msg)
+    # def goto_obj2(self):
+    #     """
+    #     A Function for reaching to object 1 # change the name of the object here
+    #     """
+    #     self.arm.go(self.object2_move_1 , wait=True)
+    #     rospy.sleep(2)
+    #     self.arm.go(self.object2_move_2 , wait=True)
+    #     rospy.sleep(2)
+    #     self.pub.publish(self.open_msg)
+    #     rospy.sleep(2)
+    #     self.arm.go(self.object2_move_3 , wait=True)
+    #     self.pub.publish(self.close_msg)
+    #     rospy.sleep(2)
+    #     self.arm.go(self.object_final)
+    #     rospy.sleep(2)
+    #     self.pub.publish(self.open_msg)
+    #     rospy.sleep(2)
+    #     self.arm.go(self.object1_move_1)
+    #     rospy.sleep(2)
+    #     self.arm.go(self.object_home)
+    #     self.pub.publish(self.close_msg)
+
+
+    # def goto_obj3(self):
+    #     """
+    #     A Function for reaching to object 1 # change the name of the object here
+    #     """
+    #     self.arm.go(self.object3_move_1 , wait=True)
+    #     rospy.sleep(2)
+    #     self.arm.go(self.object3_move_2 , wait=True)
+    #     rospy.sleep(2)
+    #     self.pub.publish(self.open_msg)
+    #     rospy.sleep(2)
+    #     self.arm.go(self.object3_move_3 , wait=True)
+    #     self.pub.publish(self.close_msg)
+    #     rospy.sleep(2)
+    #     self.arm.go(self.object_final)
+    #     rospy.sleep(2)
+    #     self.pub.publish(self.open_msg)
+    #     rospy.sleep(2)
+    #     self.arm.go(self.object1_move_1)
+    #     rospy.sleep(2)
+    #     self.arm.go(self.object_home)
+    #     self.pub.publish(self.close_msg)
 
 
     def speak(self, params):
@@ -123,9 +124,10 @@ class arm_move:
         self.tts_goal.goal.rawtext.text = params # 'Please_take_the_bottle_from_my_hand'
         self.ac.send_goal(self.tts_goal.goal  )
 
+print("After declaration")
+
 arm = arm_move()
 
-print("After declaration")
 
 def speak(tosay):
     """Function to make the tiago speak arbitrary words
@@ -135,16 +137,16 @@ def speak(tosay):
     """
     arm.speak(tosay)
 
-def goto_object_1():
-    """Moves the arm to object 1, which is the tin of baked beans."""
+def goto_water_bottle(**kwargs):
+    """Moves the arm to object 1, which is the bottle of water."""
     arm.goto_obj1()
 
-def goto_object2():
-    """
-    Moves the arm to object 2, which is the can of pringles crisps."""
-    arm.goto_obj2()
+# def goto_coffee_cup(**kwargs):
+#     """
+#     Moves the arm to object 2, which is the coffee cup."""
+#     arm.goto_obj2()
 
-def goto_object3():
-    """
-    Moves the arm to object 3, which is the coffee cup."""
-    arm.goto_obj3()
+# def goto_pringles_can(**kwargs):
+#     """
+#     Moves the arm to object 2, which is the can of pringles crisps."""
+#     arm.goto_obj2()

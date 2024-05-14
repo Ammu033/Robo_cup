@@ -2,7 +2,7 @@ import os
 import dotenv
 import geocoder
 import requests 
-import gestures
+import capabilities.gestures as gestures
 
 APIKEYS_PATH = "/home/eden/Documents/noetic-llama/noetic-llama/apikeys.env"
 # APIKEYS_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "..", "apikeys.env")
@@ -55,7 +55,7 @@ def get_weather_data(coordinates):
     '''
     req = requests.get("https://api.open-meteo.com/v1/forecast?latitude=%f&longitude=%f&current=temperature_2m&current=weather_code" % coordinates)
     j = req.json()
-    o = "The current temperature is %f°C with an outlook of '%s'" % (j["current"]["temperature_2m"], WEATHER_CODES[j["current"]["weather_code"]])
+    o = "The current temperature is %.1f°C with an outlook of '%s'" % (j["current"]["temperature_2m"], WEATHER_CODES[j["current"]["weather_code"]])
     print(o)
     gestures.speak(o)
     return o
@@ -73,6 +73,7 @@ def get_coordinates_from_city(city_name):
     '''
 
     g = geocoder.bing(city_name, key = os.environ["BINGMAPS"]).json
+    gestures.speak("By '%s' I am assuming you mean '%s'" % (city_name, g["address"]))
     print("By '%s' I am assuming you mean '%s'" % (city_name, g["address"]))
 
     # print(g["lat"], g["lng"])
