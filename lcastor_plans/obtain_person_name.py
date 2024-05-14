@@ -42,8 +42,6 @@ def obtain_person_name(p, person, info):
     while not detected:
         response = rospy.wait_for_message(response_topic, String, timeout=60).data
 
-        # TODO: may need ollama wrapper to publish intent as soon as whisper starts
-
         # only attempt to ask again if 10 seconds have passed
         # maybe this should be some kind of timeout parameter
         if rospy.get_time() - start_time > 10.0:
@@ -55,11 +53,12 @@ def obtain_person_name(p, person, info):
 
     time.sleep(2)
     if info == "name":
-        rospy.loginfo(f"obtain_person_name: saving guest data for {person}...")
+        rospy.loginfo(f"obtain_person_name: saving guest data (name) for {person}...")
         p.exec_action("saveGuestDataOllama", "setname_" + person + "_" + response)
 
     if info == "drink":
-        p.exec_action("saveGuestDataOllama", "setname_" + person + "_" + response)
+        rospy.loginfo(f"obtain_person_drink: saving guest data (drink) for {person}...")
+        p.exec_action("saveGuestDataOllama", "setdrink_" + person + "_" + response)
 
     # p.exec_action
     # p.action_cmd('speak', f'Thank you_{rospy.get}', 'start')
