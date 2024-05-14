@@ -65,6 +65,8 @@ def getfunctioncapabilities():
                 if inspect.isfunction(function):
                     # print(functionname, function)
                     docstring = inspect.getdoc(function)
+                    if docstring is None:
+                        docstring = ""
                     # only very simple arguments are fetched, i.e. no **kwargs, or default arguments
                     # will be dealt with
                     argnames = inspect.getfullargspec(function).args
@@ -78,7 +80,7 @@ print(modelfile)
 client.create(model = MODEL_NAME, modelfile = modelfile)
 
 def get_functions(ollama_output):
-    return [f.strip() for f in ollama_output[8:].strip().split(";") if f != ""]
+    return [f.strip().replace("<bot_end>", "") for f in ollama_output[8:].strip().split(";") if f != ""]
 
 def main(prompt):
     # with open("Modelfile", "r") as f:
@@ -98,6 +100,7 @@ def main(prompt):
         try:
             exec(func_str)
         except Exception as e:
+            rospy.loginfo("Function call failed: %s" % str(e))
             ollama_confirm_pub.publish(False)
         else:
             ollama_confirm_pub.publish(True)

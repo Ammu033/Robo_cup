@@ -29,7 +29,7 @@ def do_guest_name(p, guest):
 
     p.exec_action(
         "speak",
-        "Thank_you_" + rospy.get_param(f"/{guest}/name".replace(" ", "_"),
+        "Thank_you_" + rospy.get_param(f"/{guest}/name".replace(" ", "_")),
     )
     p.exec_action("speak", "Enjoy_the_rest_of_the_day!")
 

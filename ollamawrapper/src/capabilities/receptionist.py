@@ -8,13 +8,13 @@ class ReceptionistPublisher:
             "/ollama_name",
             String,
             queue_size=1,
-            latch=True,
+            # latch=True,
         )
         self.ollama_drink_pub = rospy.Publisher(
             "/ollama_drink",
             String,
             queue_size=1,
-            latch=True,
+            # latch=True,
         )
         # self.ollama_confirm_pub = rospy.Publisher("/ollama_confirm", Bool, queue_size = 1)
 
@@ -28,8 +28,9 @@ class ReceptionistPublisher:
 
 
 def get_person_name(person_name):
-    """Fetches the person's name from a statement such as 'My name is Eden', which would return "Eden",
-    or 'Hello my name is Omar and my favourite drink is Coke' would return "Omar".
+    """Fetches the person's name from a statement such as 'My name is Bob', which would return "Bob",
+    or 'Hello my name is Alice.' would return "Alice".
+    The possible names are 'Alice', 'Bob', 'Charlie', and 'Dave'.
 
     Args:
         person_name (str): The person's name, parsed from the string
@@ -40,7 +41,7 @@ def get_person_name(person_name):
 
 def get_favorite_drink(favourite_drink):
     """Parses the person's favorite drink from a statement. For example, 'My favourite drink is Pepsi' would return "Pepsi",
-    and 'Hello my name is Eden and my favourite drink is Coke' would return "Coke".
+    and 'My favourite drink is Coke' would return "Coke".
 
     Args:
         favorite_drink (str): The person's favorite drink, parsed from the string
@@ -51,4 +52,10 @@ def get_favorite_drink(favourite_drink):
 
 def t_person_name(person_name):
     get_person_name(person_name)
+
+def person_name(person_name):
+    get_person_name(person_name)
+
+def t_favorite_drink(favourite_drink):
+    get_favorite_drink(favourite_drink)
 
