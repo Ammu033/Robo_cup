@@ -2,7 +2,6 @@ import rospy
 from tf import TransformListener
 from AbstractAction import AbstractAction
 from std_msgs.msg import String
-import json
 
 
 class saveGuestDataOllama(AbstractAction):
@@ -16,20 +15,15 @@ class saveGuestDataOllama(AbstractAction):
         rospy.loginfo("saveGuestDataOllama: saving the param...")
         rospy.loginfo(f"param = {self.params}")
 
+        if self.params[0].lower() == "setname":
 
-
-        if (self.params[0].lower() == "setname"):
-        
             rospy.set_param(self.params[1].lower() + "/head_angle", 0.0)
             rospy.set_param(
                 self.params[1].lower() + "/name",
                 self.params[2].lower(),
             )
         elif self.params[0].lower() == "setdrink":
-            rospy.set_param(
-                self.params[1].lower() + "/drink",
-                self.params[2].lower()
-            )
+            rospy.set_param(self.params[1].lower() + "/drink", self.params[2].lower())
 
         self.params.append("done")
 

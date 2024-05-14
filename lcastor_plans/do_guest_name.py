@@ -25,11 +25,11 @@ def do_guest_name(p, guest):
     p.exec_action("speak", "Can_you_stand_there_and_look_at_my_eyes,_please?")
 
     obtain_person_name(p, guest, "name")
-    # obtain_person_name(p, guest, "drink")
+    obtain_person_name(p, guest, "drink")
 
     p.exec_action(
         "speak",
-        "Thank_you_" + rospy.get_param("/{}/name".format(guest)).replace(" ", "_"),
+        "Thank_you_" + rospy.get_param(f"/{guest}/name".replace(" ", "_"),
     )
     p.exec_action("speak", "Enjoy_the_rest_of_the_day!")
 

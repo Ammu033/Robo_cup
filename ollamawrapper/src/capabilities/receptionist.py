@@ -1,10 +1,21 @@
 from std_msgs.msg import String, Bool
 import rospy
 
+
 class ReceptionistPublisher:
     def __init__(self):
-        self.ollama_name_pub = rospy.Publisher("/ollama_name", String, queue_size = 1)
-        self.ollama_drink_pub = rospy.Publisher("/ollama_drink", String, queue_size = 1)
+        self.ollama_name_pub = rospy.Publisher(
+            "/ollama_name",
+            String,
+            queue_size=1,
+            latch=True,
+        )
+        self.ollama_drink_pub = rospy.Publisher(
+            "/ollama_drink",
+            String,
+            queue_size=1,
+            latch=True,
+        )
         # self.ollama_confirm_pub = rospy.Publisher("/ollama_confirm", Bool, queue_size = 1)
 
         # self.ollama_confirm_pub.publish(True)
@@ -14,6 +25,7 @@ class ReceptionistPublisher:
 
     def publish_drink(self, favourite_drink):
         self.ollama_drink_pub.publish(favourite_drink)
+
 
 def get_person_name(person_name):
     """Fetches the person's name from a statement such as 'My name is Eden', which would return "Eden",
@@ -25,15 +37,18 @@ def get_person_name(person_name):
     ReceptionistPublisher().publish_name(person_name)
     print("I think the person's name is %s" % person_name)
 
+
 def get_favorite_drink(favourite_drink):
     """Parses the person's favorite drink from a statement. For example, 'My favourite drink is Pepsi' would return "Pepsi",
     and 'Hello my name is Eden and my favourite drink is Coke' would return "Coke".
-    
+
     Args:
         favorite_drink (str): The person's favorite drink, parsed from the string
     """
     ReceptionistPublisher().publish_drink(favourite_drink)
     print("I think the person's favourite drink is %s" % favourite_drink)
 
+
 def t_person_name(person_name):
     get_person_name(person_name)
+
