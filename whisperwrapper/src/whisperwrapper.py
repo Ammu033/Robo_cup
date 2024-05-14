@@ -17,7 +17,6 @@ whisper_api_url = rospy.get_param("/stt/whisper_api_url", "127.0.0.1:9000")
 pause = rospy.get_param("/stt/speech_recogn_pause_time", 0.8)
 energy = rospy.get_param("/stt/speech_recogn_energy", 400) 
 dynamic_energy = rospy.get_param("/stt/speech_recogn_dyn_energy_flag", False)
-microphone_device = rospy.get_param("/stt/microphone_device", 1)
 no_speech_thresh = rospy.get_param("/stt/speech_confidence_thresh", 0.1)
 
 class WhisperWrapper:
@@ -30,7 +29,7 @@ class WhisperWrapper:
         self.listening_pub = rospy.Publisher("/stt/listening", WhisperListening, queue_size = 1)
         self.planner_intention_sub = rospy.Subscriber("/planner_intention", String, self.planner_intention_sub_cb)
 
-        self.record_audio(pause, energy, dynamic_energy, microphone_device)
+        self.record_audio(pause, energy, dynamic_energy)
 
     def listening_sub_cb(self, set_listening):
         rospy.loginfo("Set listening = %s" % str(set_listening.listening))
@@ -40,13 +39,13 @@ class WhisperWrapper:
         rospy.loginfo("Because /planner_intention has been set to '%s', I am turning on whisper." % intention)
         self.listening_pub.publish(listening = True)
 
-    def record_audio(self, pause, energy, dynamic_energy, microphone_device):
+    def record_audio(self, pause, energy, dynamic_energy):
         recogniser = sr.Recognizer()
         recogniser.energy_threshold = energy
         recogniser.pause_threshold = pause
         recogniser.dynamic_energy_threshold = dynamic_energy
 
-        with sr.Microphone(sample_rate = 10000, device_index = microphone_device) as microphone:
+        with sr.Microphone(sample_rate = 10000) as microphone:
             rospy.loginfo("Listening...")
             while True and not rospy.is_shutdown():
                 audio = recogniser.listen(microphone)
