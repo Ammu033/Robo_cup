@@ -39,7 +39,7 @@ class WhisperWrapper:
         recogniser.pause_threshold = pause
         recogniser.dynamic_energy_threshold = dynamic_energy
 
-        with sr.Microphone(sample_rate = 10000) as microphone:
+        with sr.Microphone(sample_rate = 10000, device_index = microphone_device) as microphone:
             rospy.loginfo("Listening...")
             while True and not rospy.is_shutdown():
                 audio = recogniser.listen(microphone)
