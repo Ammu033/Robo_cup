@@ -24,6 +24,9 @@ def obtain_person_name(p, person, info):
     # while not confirmed:
 
     if info == "name":
+        # TODO: the intention message needs to be sent *before* whisper is activated, otherwise, it might cause issues
+        # currently, the sending of the intention message causes whisper to start at the same time, but I think this
+        # should be separated into two actions, it sets the intention, then pauses, and then activates whisper
         p.exec_action("speak", "Can_you_please_tell_me_your_name?")
         time.sleep(1)
         rospy.loginfo("activating ollama...")
