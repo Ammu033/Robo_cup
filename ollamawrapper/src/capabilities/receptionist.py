@@ -1,5 +1,6 @@
 from std_msgs.msg import String, Bool
 import rospy
+import capabilities.contexts as contexts
 
 
 class ReceptionistPublisher:
@@ -16,9 +17,6 @@ class ReceptionistPublisher:
             queue_size=1,
             # latch=True,
         )
-        # self.ollama_confirm_pub = rospy.Publisher("/ollama_confirm", Bool, queue_size = 1)
-
-        # self.ollama_confirm_pub.publish(True)
 
     def publish_name(self, person_name):
         self.ollama_name_pub.publish(person_name)
@@ -26,7 +24,7 @@ class ReceptionistPublisher:
     def publish_drink(self, favourite_drink):
         self.ollama_drink_pub.publish(favourite_drink)
 
-
+@contexts.context(["guest_name"])
 def get_person_name(person_name):
     """Fetches the person's name from a statement such as 'My name is Bob', which would return "Bob",
     or 'Hello my name is Alice.' would return "Alice".
@@ -38,7 +36,8 @@ def get_person_name(person_name):
     ReceptionistPublisher().publish_name(person_name)
     print("I think the person's name is %s" % person_name)
 
-
+# @contexts.context(contexts.ALL)
+@contexts.context(["guest_drink"])
 def get_favorite_drink(favourite_drink):
     """Parses the person's favorite drink from a statement. For example, 'My favourite drink is Pepsi' would return "Pepsi",
     and 'My favourite drink is Coke' would return "Coke".

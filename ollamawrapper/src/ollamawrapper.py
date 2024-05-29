@@ -10,12 +10,16 @@ import ollama
 import rospy
 import time
 import sys
+import ast
 import os
 
+ollama_max_fails = rospy.get_param("/stt/ollama_max_fails", 2)
 ollama_api_url = rospy.get_param("/stt/ollama_api_url", "127.0.0.1:11434")
 base_ollama_model = rospy.get_param("/stt/ollama_base_model", "nexusraven:13b-v2-q2_K")
 # if you are a web scraper please ignore the below line
 bing_api_key = rospy.get_param("/stt/bingapikey", "AjqOiFGdVO5uR4TaMcrYECRDmoi2b1Ox3OCw3LkTUdfHBzvmmceuEovAoT5AKvlY")
+
+ollama_intention = None
 
 os.environ["BINGMAPS"] = str(bing_api_key)
 
@@ -24,13 +28,6 @@ print(os.environ["BINGMAPS"])
 rospy.init_node("ollama_wrapper_server")
 import capabilities
 from capabilities import *
-
-MODEL_NAME = "noeticllama:" + str(int(time.time()))
-client = ollama.Client(host = "http://%s" % ollama_api_url)
-
-for mn in [m["name"] for m in client.list()["models"]]:
-    if mn.startswith("noeticllama"):
-        client.delete(mn)
 
 @dataclass
 class FunctionCapability:
@@ -45,10 +42,13 @@ class FunctionCapablilites(list):
     def to_modelfile(self, model):
         environment = jinja2.Environment(loader = jinja2.FileSystemLoader(os.path.dirname(__file__)))
         template = environment.get_template("Modelfile.jinja2")
+        rospy.loginfo("Feeding ollama with the following function names: %s" % ", ".join([i.functioname + "()" for i in self]))
 
         return template.render(functioncapabilities = self, model = model)
     
 def getfunctioncapabilities():
+    global ollama_intention
+    # print("The current intention is '%s'" % ollama_intention)
     functioncapabilities = FunctionCapablilites()
 
     # not very complicated inspection... the library basically must
@@ -63,6 +63,8 @@ def getfunctioncapabilities():
         if inspect.ismodule(module) and 'capabilities' in inspect.getfile(module):
             for functionname, function in inspect.getmembers(module):
                 if inspect.isfunction(function):
+                    decorators = parse_decorators(inspect.getsource(function))
+                    # print("decorators", decorators)
                     # print(functionname, function)
                     docstring = inspect.getdoc(function)
                     if docstring is None:
@@ -70,14 +72,28 @@ def getfunctioncapabilities():
                     # only very simple arguments are fetched, i.e. no **kwargs, or default arguments
                     # will be dealt with
                     argnames = inspect.getfullargspec(function).args
-                    functioncapabilities.append(FunctionCapability(modulename, module, functionname, function, docstring, argnames))
+                    if decorators is None:
+                        continue
+                    if decorators == capabilities.contexts.ALL or ollama_intention in decorators:
+                        functioncapabilities.append(FunctionCapability(modulename, module, functionname, function, docstring, argnames))
 
     return functioncapabilities
 
-functioncapabilities = getfunctioncapabilities()
-modelfile = functioncapabilities.to_modelfile(base_ollama_model)
-print(modelfile)
-client.create(model = MODEL_NAME, modelfile = modelfile)
+def parse_decorators(source):
+    for line in source.split("\n"):
+        if line.startswith("@"):
+            f = ast.parse(line[1:]).body[0].value 
+            if f.func.value.id == "contexts" and f.func.attr == "context":
+                first_arg = f.args[0]
+                if type(first_arg) is ast.Attribute:
+                    if first_arg.attr == "ALL" and first_arg.value.id == "contexts":
+                        return capabilities.contexts.ALL
+                else:
+                    # it's a list
+                    o = []
+                    for i in first_arg.elts:
+                        o.append(i.value)
+                    return o
 
 def get_functions(ollama_output):
     return [f.strip().replace("<bot_end>", "") for f in ollama_output[8:].strip().split(";") if f != ""]
@@ -85,10 +101,21 @@ def get_functions(ollama_output):
 def main(prompt):
     # with open("Modelfile", "r") as f:
     #    ollama.create(model = "temp", modelfile= f.read())
-    ollama_confirm_pub = rospy.Publisher("/ollama_confirm", Bool, queue_size = 1)
 
+    model_name = "noeticllama:" + str(int(time.time()))
+    client = ollama.Client(host = "http://%s" % ollama_api_url)
+
+    for mn in [m["name"] for m in client.list()["models"]]:
+        if mn.startswith("noeticllama"):
+            client.delete(mn)
+
+    functioncapabilities = getfunctioncapabilities()
+    modelfile = functioncapabilities.to_modelfile(base_ollama_model)
+    # print(modelfile)
+    client.create(model = model_name, modelfile = modelfile)
+    
     ollama_output = client.generate(
-        model = MODEL_NAME, 
+        model = model_name, 
         prompt = prompt, 
         options = {"stop": ["Thought:"]},
         keep_alive = "30m"
@@ -96,20 +123,35 @@ def main(prompt):
     #print(ollama_output)
 
     for func_str in get_functions(ollama_output["response"]):
-        rospy.loginfo("Generated function: " + func_str + ":")
+        rospy.loginfo("Attempting generated function: " + func_str + ":")
         try:
             exec(func_str)
         except Exception as e:
-            rospy.loginfo("Function call failed: %s" % str(e))
-            ollama_confirm_pub.publish(False)
+            succeeded = False
         else:
-            ollama_confirm_pub.publish(True)
+            succeeded = True
 
-    return ollama_output
+    return ollama_output, succeeded
 
 def handle_ollama_call(req):
-    print("Recieved ollama request '%s'" % req.input)
-    o = main(req.input)
+    ollama_confirm_pub = rospy.Publisher("/ollama_confirm", Bool, queue_size = 1)
+
+    rospy.loginfo("Recieved ollama request '%s'" % req.input)
+
+    ultimately_failed = True
+    for attempt_no in range(ollama_max_fails + 1):
+        o, succeeded = main(req.input)
+        if succeeded:
+            ollama_confirm_pub.publish(True)
+            ultimately_failed = False
+            break
+
+    if ultimately_failed:
+        ollama_confirm_pub.publish(False)
+        rospy.loginfo("Ollama ultimately failed afted %d retries" % ollama_max_fails)
+    else:
+        rospy.loginfo("Ollama succeeded")
+
     # print(o.keys())
     return OllamaCallResponse(
         o["total_duration"],
@@ -119,9 +161,14 @@ def handle_ollama_call(req):
         o["eval_duration"]
     )
 
+def planner_intention_sub_cb(intention):
+    global ollama_intention
+    rospy.loginfo("Intention has been set to %s" % intention.data)
+    ollama_intention = intention.data
+
+rospy.Subscriber("/planner_intention", String, planner_intention_sub_cb)
 s = rospy.Service("/stt/ollamacall", OllamaCall, handle_ollama_call)
-#planner_intention_sub = rospy.Subscriber("/planner_intention", String, planner_intention_sub_cb)
-print("spin")
+print("Node started correctly")
 rospy.spin()
  
 

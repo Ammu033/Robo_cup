@@ -1,6 +1,8 @@
 import rospy
 #import capabilities.gestures as gestures
+import capabilities.contexts as contexts
 
+@contexts.context(contexts.ALL)
 def add(num1, num2):
     """Returns the output of two numbers added together
 
