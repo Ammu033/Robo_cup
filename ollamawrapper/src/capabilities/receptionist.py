@@ -38,7 +38,7 @@ def get_person_name(person_name):
 
 # @contexts.context(contexts.ALL)
 @contexts.context(["guest_drink"])
-def get_favorite_drink(favourite_drink):
+def get_favourite_drink(favourite_drink):
     """Parses the person's favorite drink from a statement. For example, 'My favourite drink is Pepsi' would return "Pepsi",
     and 'My favourite drink is Coke' would return "Coke".
 
@@ -47,6 +47,10 @@ def get_favorite_drink(favourite_drink):
     """
     ReceptionistPublisher().publish_drink(favourite_drink)
     print("I think the person's favourite drink is %s" % favourite_drink)
+
+@contexts.context(["guest_drink"])
+def get_favorite_drink(favorite_drink):
+    get_favourite_drink(favorite_drink)
 
 
 def t_person_name(person_name):
