@@ -27,17 +27,12 @@ class WhisperWrapper:
         self.transcription_pub = rospy.Publisher("/stt/transcription", WhisperTranscription, queue_size = 1)
         self.listening_sub = rospy.Subscriber("/stt/listening", WhisperListening, self.listening_sub_cb)
         self.listening_pub = rospy.Publisher("/stt/listening", WhisperListening, queue_size = 1)
-        self.planner_intention_sub = rospy.Subscriber("/planner_intention", String, self.planner_intention_sub_cb)
 
         self.record_audio(pause, energy, dynamic_energy)
 
     def listening_sub_cb(self, set_listening):
         rospy.loginfo("Set listening = %s" % str(set_listening.listening))
         self.listening = set_listening.listening
-
-    def planner_intention_sub_cb(self, intention):
-        rospy.loginfo("Because /planner_intention has been set to '%s', I am turning on whisper." % intention)
-        self.listening_pub.publish(listening = True)
 
     def record_audio(self, pause, energy, dynamic_energy):
         recogniser = sr.Recognizer()
