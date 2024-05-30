@@ -3,6 +3,7 @@ import sys
 import rospy
 import time
 from std_msgs.msg import String
+from ollamamessages.msg import WhisperListening
 try:
     sys.path.insert(0, os.environ["PNP_HOME"] + "/scripts")
 except:
@@ -23,20 +24,24 @@ def obtain_person_name(p, person, info):
     # TODO: while not confirmed starts up the second loop
     # while not confirmed:
 
+    listening_pub = rospy.Publisher("/stt/listening", WhisperListening, queue_size = 1)
+
     if info == "name":
         # TODO: the intention message needs to be sent *before* whisper is activated, otherwise, it might cause issues
         # currently, the sending of the intention message causes whisper to start at the same time, but I think this
         # should be separated into two actions, it sets the intention, then pauses, and then activates whisper
         p.exec_action("speak", "Can_you_please_tell_me_your_name?")
-        time.sleep(1)
         rospy.loginfo("activating ollama...")
         p.exec_action("activateOllama", "guest_name")
         reponse_topic = "ollama_name"
+        time.sleep(1)
+        listening_pub.publish(listening = True)
     if info == "drink":
         p.exec_action("speak", "Can_you_please_tell_me_your_favourite_drink?")
-        time.sleep(1)
         p.exec_action("activateOllama", "guest_drink")
         reponse_topic = "ollama_drink"
+        time.sleep(1)
+        listening_pub.publish(listening = True)
 
     start_time = rospy.get_time()
 
