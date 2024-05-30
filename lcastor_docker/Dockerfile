@@ -90,7 +90,7 @@ USER root
 # Fix pip not working properly
 RUN wget https://files.pythonhosted.org/packages/00/3f/ea5cfb789dddb327e6d2cf9377c36d9d8607af85530af0e7001165587ae7/pyOpenSSL-22.1.0-py3-none-any.whl
 RUN python3 -m easy_install pyOpenSSL-22.1.0-py3-none-any.whl
-
+#
 # Create entrypoint for image
 # COPY entrypoint.sh .
 ENTRYPOINT ["/bin/bash", "/home/lcastor/ros_ws/src/LCASTOR/lcastor_docker/entrypoint.sh"]
