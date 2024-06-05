@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 from ollamamessages.srv import OllamaCall, OllamaCallResponse
+from ollamamessages.msg import OllamaResponse
 from std_msgs.msg import String
 import inspect
 import typing
@@ -134,7 +135,8 @@ def main(prompt):
     return ollama_output, succeeded
 
 def handle_ollama_call(req):
-    ollama_confirm_pub = rospy.Publisher("/ollama_confirm", Bool, queue_size = 1)
+    global ollama_intention
+    ollama_confirm_pub = rospy.Publisher("/ollama_response", OllamaResponse, queue_size = 1)
 
     rospy.loginfo("Recieved ollama request '%s'" % req.input)
 
@@ -142,7 +144,7 @@ def handle_ollama_call(req):
     for attempt_no in range(ollama_max_fails + 1):
         o, succeeded = main(req.input)
         if succeeded:
-            ollama_confirm_pub.publish(True)
+            ollama_confirm_pub.publish(success = True, intent = ollama_intention)
             ultimately_failed = False
             break
 

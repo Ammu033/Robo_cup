@@ -52,6 +52,7 @@ add_message_files(
   FILES
   WhisperTranscription.msg
   WhisperListening.msg
+  OllamaResponse.msg
 )
 
 ## Generate services in the 'srv' folder
