@@ -58,7 +58,7 @@ def request_info_from_ollama(p, info, publish_info, speech_text, default_info, t
                 response = rospy.wait_for_message(
                     "ollama_response", OllamaResponse, timeout=response_timeout
                 )
-            except ValueError as e:
+            except Exception as e:
                 rospy.logerr(e)
                 continue
                 
