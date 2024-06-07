@@ -66,7 +66,7 @@ def request_info_from_ollama(p, info, publish_info, speech_text, default_info, t
                 if response_intent == publish_info:
                     info_output = rospy.wait_for_message(
                         "ollama_output", String, timeout=response_timeout
-                    )
+                    ).data
                     check = False if info_output else True
                     continue
 

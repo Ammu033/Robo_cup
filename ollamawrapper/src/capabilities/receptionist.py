@@ -9,7 +9,7 @@ class ReceptionistPublisher:
             "/ollama_output",
             String,
             queue_size=1,
-            # latch=True,
+            latch=True,
         )
 
     def publish_output(self, output):
