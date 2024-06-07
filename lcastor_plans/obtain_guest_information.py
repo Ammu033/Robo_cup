@@ -24,7 +24,7 @@ OVERALL_TIMEOUT = 120.0
 RESPONSE_TIMEOUT = 5.0
 RETRY_TIMEOUT=10.0
 MAX_TRIES = 2
-def request_info_from_ollama(info, publish_info, speech_text, default_info, tries=MAX_TRIES, timeout=OVERALL_TIMEOUT, response_timeout=RESPONSE_TIMEOUT, retry_after=RETRY_TIMEOUT) -> tuple[bool, str]:
+def request_info_from_ollama(p, info, publish_info, speech_text, default_info, tries=MAX_TRIES, timeout=OVERALL_TIMEOUT, response_timeout=RESPONSE_TIMEOUT, retry_after=RETRY_TIMEOUT):
     p.exec_action("speak", speech_text)
 
     listening_pub = rospy.Publisher("/stt/listening", WhisperListening, queue_size=1)
@@ -110,11 +110,6 @@ def obtain_guest_information(p, person, info):
     person = person.lower()
     info = info.lower()
 
-    listening_pub = rospy.Publisher("/stt/listening", WhisperListening, queue_size=1)
-    planner_intent_pub = rospy.Publisher(
-        "/planner_intention", String, queue_size=1, latch=True
-    )
-
     if info == "name":
         speech_text = "Please_tell_me_your_name?"
         default_info = "Max"
@@ -128,14 +123,14 @@ def obtain_guest_information(p, person, info):
     topic = f"ollama_{info}"
 
 
-    success, info_response = request_info_from_ollama(info, topic, speech_text, default_info)
+    success, info_response = request_info_from_ollama(p, info, topic, speech_text, default_info)
 
     if success:        
         affirm_topic = "affirm_deny"
         affirm_info = "affirm_deny"
         speech_text = f"Did_you_say_{info_response}?"
         default_info = "Yes"
-        affirm_success, affirm_response = request_info_from_ollama(affirm_topic, affirm_info, speech_text, default_info)
+        affirm_success, affirm_response = request_info_from_ollama(p, affirm_info, affirm_topic, speech_text, default_info)
     
         if affirm_success and affirm_response == "Yes":
         # TODO: Storing the variable of interest
