@@ -13,6 +13,7 @@ import pnp_cmd_ros
 from pnp_cmd_ros import *
 
 from obtain_person_name import obtain_person_name
+from obtain_person_information import obtain_person_information
 from introduce_people import introduce_people
 from wait_for_person import wait_for_person
 
