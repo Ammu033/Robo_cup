@@ -24,8 +24,8 @@ def do_guest_name(p, guest):
     p.exec_action("speak", "Hi,_my_name_is_tiago!")
     p.exec_action("speak", "Can_you_stand_there_and_look_at_my_eyes,_please?")
 
-    obtain_person_name(p, guest, "name")
-    obtain_person_name(p, guest, "drink")
+    obtain_guest_information(p, guest, "name")
+    # obtain_guest_information(p, guest, "drink")
 
     p.exec_action(
         "speak",
