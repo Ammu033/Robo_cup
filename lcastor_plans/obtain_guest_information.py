@@ -142,13 +142,15 @@ def obtain_guest_information(p, person, info):
         if affirm_success and affirm_response == "Yes":
         # TODO: Storing the variable of interest
             time.sleep(2)
-            rospy.loginfo(f"obtain_person: saving guest data for {person}...")
+            rospy.loginfo(f"obtain_guest_info: saving guest data for {person}...")
             p.exec_action(
                 "saveGuestDataOllama", f"set{info}_" + person + "_" + info_response 
             )
 
             get_info = rospy.get_param(f"/{person}/{info}")
             p.action_cmd("speak", final_text+get_info, "start")
+        else:
+            rospy.loginfo("Couldn't obtain guest info stuff, ie in the else space DEBUG")
         return 
 
     time.sleep(2)
