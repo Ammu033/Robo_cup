@@ -21,8 +21,8 @@ from confirm_information_simple import confirm_information_simple
 
 
 OVERALL_TIMEOUT = 120.0
-RESPONSE_TIMEOUT = 5.0
-RETRY_TIMEOUT=10.0
+RESPONSE_TIMEOUT = 60.0
+RETRY_TIMEOUT=60.0
 MAX_TRIES = 2
 def request_info_from_ollama(p, info, publish_info, speech_text, default_info, tries=MAX_TRIES, timeout=OVERALL_TIMEOUT, response_timeout=RESPONSE_TIMEOUT, retry_after=RETRY_TIMEOUT):
     p.exec_action("speak", speech_text)
@@ -58,7 +58,7 @@ def request_info_from_ollama(p, info, publish_info, speech_text, default_info, t
         if (rospy.get_time() - start_time) < retry_after:
             response = rospy.wait_for_message(
                 "ollama_response", OllamaResponse, timeout=response_timeout
-            ).data
+            )
 
             # success case
             if response and response.success:
@@ -66,7 +66,7 @@ def request_info_from_ollama(p, info, publish_info, speech_text, default_info, t
                 if response_intent == publish_info:
                     info_output = rospy.wait_for_message(
                         "ollama_output", String, timeout=response_timeout
-                    ).data
+                    )
                     check = False if info_output else True
                     continue
 
