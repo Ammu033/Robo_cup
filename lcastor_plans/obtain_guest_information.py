@@ -120,7 +120,7 @@ def obtain_guest_information(p, person, info):
         rospy.logerr("obtain_person_info: invalid info type.")
         return
 
-    topic = f"ollama_{info}"
+    topic = f"guest_{info}"
 
 
     success, info_response = request_info_from_ollama(p, info, topic, speech_text, default_info)
