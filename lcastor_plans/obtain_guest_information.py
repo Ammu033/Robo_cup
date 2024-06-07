@@ -97,8 +97,11 @@ def request_info_from_ollama(p, info, publish_info, speech_text, default_info, t
 
     if not info_output or message_failed:
         info_output = default_info
-    
+
     success = not message_failed
+    rospy.loginfo(f'info captured: {info_output}')
+    rospy.loginfo(f'success status: {success}')
+    
     return (success, info_output)
 
 def obtain_guest_information(p, person, info):
@@ -113,9 +116,11 @@ def obtain_guest_information(p, person, info):
     if info == "name":
         speech_text = "Please_tell_me_your_name?"
         default_info = "Max"
+        final_text = "Thank_you_"
     elif info == "drink":
         speech_text = "Please_tell_me_your_favourite_drink?"
         default_info = "Milk"
+        final_text = "Hopefully_we_can_serve_you_some_"
     else:
         rospy.logerr("obtain_person_info: invalid info type.")
         return
@@ -131,7 +136,7 @@ def obtain_guest_information(p, person, info):
         speech_text = f"Did_you_say_{info_response}?"
         default_info = "Yes"
         affirm_success, affirm_response = request_info_from_ollama(p, affirm_info, affirm_topic, speech_text, default_info)
-    
+   
         if affirm_success and affirm_response == "Yes":
         # TODO: Storing the variable of interest
             time.sleep(2)
@@ -139,8 +144,9 @@ def obtain_guest_information(p, person, info):
             p.exec_action(
                 "saveGuestDataOllama", f"set{info}_" + person + "_" + info_response 
             )
-        if get_name := rospy.get_param(f"/{person}/name"):
-            p.action_cmd("speak", f"Thank_you_{get_name}", "start")
+
+            get_info = rospy.get_param(f"/{person}/{info}")
+            p.action_cmd("speak", final_text+get_info, "start")
         return 
 
     time.sleep(2)

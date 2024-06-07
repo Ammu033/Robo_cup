@@ -8,10 +8,8 @@ class saveGuestDataOllama(AbstractAction):
 
     def _start_action(self):
         self.tf = TransformListener()
-        # rospy.loginfo("Starting Reception Action ")
+        rospy.loginfo("saving guest data")
         # person = rospy.get_param('/person_to_deal')
-        # print('check_param:', check_param)
-        # print('set_param:', set_param)
         rospy.loginfo("saveGuestDataOllama: saving the param...")
         rospy.loginfo(f"param = {self.params}")
 
@@ -21,7 +19,7 @@ class saveGuestDataOllama(AbstractAction):
             rospy.set_param(
                 self.params[1].lower() + "/name",
                 self.params[2].lower(),
-            )
+            ) 
         elif self.params[0].lower() == "setdrink":
             rospy.set_param(self.params[1].lower() + "/drink", self.params[2].lower())
 
