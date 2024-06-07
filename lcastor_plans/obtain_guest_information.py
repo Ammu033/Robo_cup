@@ -69,6 +69,15 @@ def request_info_from_ollama(p, info, publish_info, speech_text, default_info, t
                     info_output = rospy.wait_for_message(
                         "ollama_output", String, timeout=response_timeout
                     ).data
+
+                    #FIXME: sometimes it seems like reponse isn't captured if overlapping with speech?
+                    # the overlapping might not be the issue, need to investigate some more
+
+                    #TODO: manage spaced words? eg. 'iced tea'
+                    # if spced words replace with '+'
+
+                    info_output = info_output.replace(' ', '+')
+
                     check = False if info_output else True
                     continue
 
@@ -130,8 +139,6 @@ def obtain_guest_information(p, person, info):
         return
 
     topic = f"guest_{info}"
-
-
     success, info_response = request_info_from_ollama(p, info, topic, speech_text, default_info)
 
     if success:        
@@ -144,7 +151,6 @@ def obtain_guest_information(p, person, info):
         if affirm_success and affirm_response == "yes":
             time.sleep(2)
             rospy.loginfo(f"obtain_guest_info: saving guest data for {person}...")
-            # TODO: fix the param saving 
             p.exec_action(
                 "saveGuestDataOllama", f"set{info}_" + person + "_" + info_response 
             )
