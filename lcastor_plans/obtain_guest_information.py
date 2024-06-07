@@ -18,9 +18,9 @@ from pnp_cmd_ros import *
 from confirm_information_simple import confirm_information_simple
 
 
-OVERALL_TIMEOUT = 120.0
-RESPONSE_TIMEOUT = 10.0
-RETRY_TIMEOUT=30.0
+OVERALL_TIMEOUT = 59.0
+RESPONSE_TIMEOUT = 15.0
+RETRY_TIMEOUT=15.0
 MAX_TRIES = 2 
 def request_info_from_ollama(p, info, publish_info, speech_text, default_info, tries=MAX_TRIES, timeout=OVERALL_TIMEOUT, response_timeout=RESPONSE_TIMEOUT, retry_after=RETRY_TIMEOUT):
     p.exec_action("speak", speech_text)
