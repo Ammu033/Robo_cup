@@ -19,9 +19,9 @@ from confirm_information_simple import confirm_information_simple
 
 
 OVERALL_TIMEOUT = 120.0
-RESPONSE_TIMEOUT = 60.0
-RETRY_TIMEOUT=60.0
-MAX_TRIES = 1 
+RESPONSE_TIMEOUT = 10.0
+RETRY_TIMEOUT=30.0
+MAX_TRIES = 2 
 def request_info_from_ollama(p, info, publish_info, speech_text, default_info, tries=MAX_TRIES, timeout=OVERALL_TIMEOUT, response_timeout=RESPONSE_TIMEOUT, retry_after=RETRY_TIMEOUT):
     p.exec_action("speak", speech_text)
 
@@ -91,10 +91,12 @@ def request_info_from_ollama(p, info, publish_info, speech_text, default_info, t
                     tries += 1
                     continue
         else:
+            listening_pub.publish(listening=False)
             p.exec_action("speak", "Please_repeat_louder.")
             start_time = rospy.get_time()
             planner_intent_pub.publish(publish_info)
             time.sleep(1)
+            listening_pub.publish(listening=True)
             continue
 
     if not info_output or message_failed:
