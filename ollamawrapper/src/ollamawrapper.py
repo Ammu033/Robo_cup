@@ -119,7 +119,7 @@ def main(prompt):
         model = model_name, 
         prompt = prompt, 
         options = {"stop": ["Thought:"]},
-        keep_alive = "30m"
+        keep_alive = "0m"
     )
     #print(ollama_output)
 
