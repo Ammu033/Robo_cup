@@ -30,19 +30,19 @@ def get_person_name(person_name):
 
 # @contexts.context(contexts.ALL)
 @contexts.context(["guest_drink"])
-def get_favourite_drink(favourite_drink):
+def get_favourite_drink(drink):
     """Parses the person's favorite drink from a statement. For example, 'My favourite drink is Pepsi' would return "Pepsi",
     and 'My favourite drink is Coke' would return "Coke".
 
     Args:
-        favorite_drink (str): The person's favorite drink, parsed from the string
+        drink (str): The person's favorite drink, parsed from the string
     """
-    ReceptionistPublisher().publish_output(favourite_drink)
-    print("I think the person's favourite drink is %s" % favourite_drink)
+    ReceptionistPublisher().publish_output(drink)
+    print("I think the person's favourite drink is %s" % drink)
 
 @contexts.context(["guest_drink"])
-def get_favorite_drink(favorite_drink):
-    get_favourite_drink(favorite_drink)
+def get_favorite_drink(drink):
+    get_favourite_drink(drink)
 
 @contexts.context(["affirm_deny"])
 def parse_yes_no(affirm):

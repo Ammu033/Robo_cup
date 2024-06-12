@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from ollamamessages.srv import OllamaCall, OllamaCallResponse
 from ollamamessages.msg import OllamaResponse
 from std_msgs.msg import String
+import platform
 import inspect
 import typing
 import jinja2
@@ -119,7 +120,7 @@ def main(prompt):
         model = model_name, 
         prompt = prompt, 
         options = {"stop": ["Thought:"]},
-        keep_alive = "0m"
+        keep_alive = "1m"
     )
     #print(ollama_output)
 
@@ -136,6 +137,7 @@ def main(prompt):
 
 def handle_ollama_call(req):
     global ollama_intention
+    start_time = time.time()
     ollama_confirm_pub = rospy.Publisher("/ollama_response", OllamaResponse, queue_size = 1)
 
     rospy.loginfo("Recieved ollama request '%s'" % req.input)
@@ -149,10 +151,15 @@ def handle_ollama_call(req):
             break
 
     if ultimately_failed:
-        ollama_confirm_pub.publish(False)
+        ollama_confirm_pub.publish(success = False, intent = ollama_intention)
         rospy.loginfo("Ollama ultimately failed afted %d retries" % ollama_max_fails)
     else:
         rospy.loginfo("Ollama succeeded")
+
+    time_taken = time.time() - start_time
+    rospy.loginfo("Had %d attempts and took %.1f seconds" % (attempt_no + 1, time_taken))
+    with open(os.path.join(os.path.dirname(__file__), "..", "ollama_benchmarks.csv"), "a") as f:
+        f.write("%s,%.1f,%d,%s,%s,%d\n" % (platform.node(), time_taken, attempt_no + 1, ollama_intention, str(not ultimately_failed), len(req.input)))
 
     # print(o.keys())
     return OllamaCallResponse(
