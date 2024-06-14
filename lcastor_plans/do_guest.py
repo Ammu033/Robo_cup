@@ -23,32 +23,32 @@ def do_guest(p, guest):
     p.exec_action('speak' , 'Hi,_my_name_is_tiago!')
     p.exec_action('speak' , 'Can_you_stand_there_and_look_at_my_eyes,_please?')
     ##
-    #detected = False
-    #start_time = rospy.get_time()
-    #detected = p.get_condition("isPersonDetected")
-    #while not detected:
-    #    if rospy.get_time() - start_time > 10.:
-    #        p.exec_action('speak' , 'Please_move_a_bit,_so_I_can_see_you_better.')
-    #        start_time = rospy.get_time()#
+    detected = False
+    start_time = rospy.get_time()
+    detected = p.get_condition("isPersonDetected")
+    while not detected:
+       if rospy.get_time() - start_time > 10.:
+           p.exec_action('speak' , 'Please_move_a_bit,_so_I_can_see_you_better.')
+           start_time = rospy.get_time()#
 
-   #     detected = p.get_condition("isPersonDetected")
-    #    time.sleep(1)
+       detected = p.get_condition("isPersonDetected")
+       time.sleep(1)
 
 
-    #p.exec_action('personIdentification' , 'learn' )
+    p.exec_action('personIdentification' , 'learn' )
 
-    #start_time = rospy.get_time()
-    #saved = rospy.get_param('personSaved')
-    #while not saved: 
-    #    if rospy.get_time() - start_time > 30.:
-    #        break
-    #    time.sleep(1)
-    #    saved = rospy.get_param('personSaved')
+    start_time = rospy.get_time()
+    saved = rospy.get_param('personSaved')
+    while not saved: 
+       if rospy.get_time() - start_time > 30.:
+           break
+       time.sleep(1)
+       saved = rospy.get_param('personSaved')
     
-    #if not saved:
-    #    rospy.set_param('LastSavedid' , 15384)
+    if not saved:
+       rospy.set_param('LastSavedid' , 15384)
 
-    #p.exec_action('saveGuestData' , 'setid_{}'.format(guest))
+    p.exec_action('saveGuestData' , 'setid_{}'.format(guest))
 
     ##
     obtain_guest_information(p , guest , 'name')
@@ -62,7 +62,7 @@ def do_guest(p, guest):
     p.exec_action('saveGuestData' , 'setloc_host')
     p.exec_action('saveGuestData' , 'setloc_' + guest)
     p.exec_action('saveGuestData' , 'setheadangle_' +guest+'_'  + str(0.0))
-    introduce_people(p, 'host' , guest)
+    # introduce_people(p, 'host' , guest)
 
     #if guest == "guest2":
     #    introduce_people(p, 'guest1' , 'guest2')
