@@ -53,12 +53,10 @@ def Receptionist(p):
         rospy.set_param('LastSavedid' , 15384)
 
     p.exec_action('saveGuestData' , 'setid_host')
-    
 
     rospy.set_param('personSaved' , 0)
 
     p.exec_action('speak' , 'Thank_you,_I_will_wait_at_the_entrance_for_guests!')
-
 
     # p.exec_action('gotoRoom' , 'r_receptionentrance')
     
@@ -66,9 +64,9 @@ def Receptionist(p):
     
     p.exec_action('speak' , 'I_will_now_go_to_the_entrance_and_wait_for_other_guests,_feel_at_home!!!')
 
-    p.exec_action('gotoRoom' , 'r_receptionentrance')
+    # p.exec_action('gotoRoom' , 'r_receptionentrance')
 
-    do_guest(p, "guest2")
+    # do_guest(p, "guest2")
 
     time.sleep(10)
     p.exec_action('speak' , 'Lets_have_some_fun!!!!')

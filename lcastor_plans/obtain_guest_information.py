@@ -17,12 +17,10 @@ import pnp_cmd_ros
 from pnp_cmd_ros import *
 from confirm_information_simple import confirm_information_simple
 
-
 OVERALL_TIMEOUT = 59.0
-RESPONSE_TIMEOUT = 15.0
-RETRY_TIMEOUT=15.0
+RESPONSE_TIMEOUT = 20.0
 MAX_TRIES = 2 
-def request_info_from_ollama(p, info, publish_info, speech_text, default_info, tries=MAX_TRIES, timeout=OVERALL_TIMEOUT, response_timeout=RESPONSE_TIMEOUT, retry_after=RETRY_TIMEOUT):
+def request_info_from_ollama(p, info, publish_info, speech_text, default_info, tries=MAX_TRIES, timeout=OVERALL_TIMEOUT, response_timeout=RESPONSE_TIMEOUT, retry_after=RESPONSE_TIMEOUT):
     p.exec_action("speak", speech_text)
 
     listening_pub = rospy.Publisher("/stt/listening", WhisperListening, queue_size=1)
@@ -156,7 +154,7 @@ def obtain_guest_information(p, person, info):
             )
 
             get_info = rospy.get_param(f"/{person}/{info}")
-            p.action_cmd("speak", final_text+get_info, "start")
+            p.exec_action("speak", final_text+get_info)
         else:
             rospy.loginfo("Couldn't obtain guest info stuff, ie in the else space DEBUG")
         return 
@@ -166,8 +164,8 @@ def obtain_guest_information(p, person, info):
     p.exec_action(
         "saveGuestDataOllama", f"set{info}_" + person + "_" + default_info 
     )
-    p.action_cmd(
-        "speak", f"Thank_you._{default_info}_was_stored_as_your_{info}", "start"
+    p.exec_action(
+        "speak", f"Thank_you._{default_info}_was_stored_as_your_{info}"
     )
    
 if __name__ == "__main__":
@@ -176,6 +174,6 @@ if __name__ == "__main__":
 
     p.begin()
 
-    obtain_person_name(p, "guest1", "name")
+    obtain_guest_information(p, "guest1", "name")
 
     p.end()

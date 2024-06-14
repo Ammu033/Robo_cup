@@ -12,7 +12,7 @@ import time
 import pnp_cmd_ros
 from pnp_cmd_ros import *
 
-from obtain_person_information import obtain_person_information
+from obtain_guest_information import obtain_guest_information
 from introduce_people import introduce_people
 from wait_for_person import wait_for_person
 
@@ -51,11 +51,10 @@ def do_guest(p, guest):
     #p.exec_action('saveGuestData' , 'setid_{}'.format(guest))
 
     ##
-    obtain_person_information(p , guest , 'name')
-    obtain_person_information(p , guest , 'drink')
+    obtain_guest_information(p , guest , 'name')
+    obtain_guest_information(p , guest , 'drink')
     p.exec_action('speak', 'Thank_you_' + rospy.get_param('/{}/name'.format(guest)).replace(" ", "_"))
-    p.exec_action('speak', 'Enjoy_the_rest_of_the_day!') 
-    
+        
     #if guest == "guest2":
     #    p.exec_action('gotoRoom' , 'r_couch2') #TODO PUT BACK 
     #elif guest == "guest1":
