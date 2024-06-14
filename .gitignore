@@ -415,3 +415,6 @@ coverage.xml
 docs/_build/
 
 *.code-workspace
+
+# don't ignore eden's benchmark file (okay we can delete this later)
+!ollamawrapper/ollama_benchmarks.csv
