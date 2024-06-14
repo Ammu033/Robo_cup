@@ -27,7 +27,7 @@ def Receptionist(p):
     rospy.set_param('/host/name' , 'john')
     rospy.set_param('/host/drink' , 'milk')
 
-    while not rospy.get_param('modelLoaded'): time.sleep(0.01)
+    # while not rospy.get_param('modelLoaded'): time.sleep(0.01)
 
     
     # p.exec_action('gotoRoom' , 'r_couch1') #TODO PUT BACK
@@ -66,7 +66,7 @@ def Receptionist(p):
 
     # p.exec_action('gotoRoom' , 'r_receptionentrance')
 
-    # do_guest(p, "guest2")
+    do_guest(p, "guest2")
 
     time.sleep(10)
     p.exec_action('speak' , 'Lets_have_some_fun!!!!')
