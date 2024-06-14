@@ -59,10 +59,10 @@ def do_guest(p, guest):
     #    p.exec_action('gotoRoom' , 'r_couch2') #TODO PUT BACK 
     #elif guest == "guest1":
     #    p.exec_action('gotoRoom' , 'r_couch1') #TODO PUT BACK 
-    #p.exec_action('saveGuestData' , 'setloc_host')
-    #p.exec_action('saveGuestData' , 'setloc_' + guest)
-    #p.exec_action('saveGuestData' , 'setheadangle_' +guest+'_'  + str(0.0))
-    #introduce_people(p, 'host' , guest)
+    p.exec_action('saveGuestData' , 'setloc_host')
+    p.exec_action('saveGuestData' , 'setloc_' + guest)
+    p.exec_action('saveGuestData' , 'setheadangle_' +guest+'_'  + str(0.0))
+    introduce_people(p, 'host' , guest)
 
     #if guest == "guest2":
     #    introduce_people(p, 'guest1' , 'guest2')
