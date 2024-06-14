@@ -20,6 +20,16 @@ from confirm_information_simple import confirm_information_simple
 OVERALL_TIMEOUT = 59.0
 RESPONSE_TIMEOUT = 20.0
 MAX_TRIES = 2 
+
+def speech_for_whisper(p, listening_pub, planner_intent_pub, publish_info, speech_texts):
+    listening_pub.publish(listening=False)
+    for speech in [speech_texts]:
+        p.exec_action("speak", speech)
+    planner_intent_pub.publish(publish_info)
+    listening_pub.publish(listening=True)
+    start_time = rospy.get_time()
+    return start_time
+
 def request_info_from_ollama(p, info, publish_info, speech_text, default_info, tries=MAX_TRIES, timeout=OVERALL_TIMEOUT, response_timeout=RESPONSE_TIMEOUT, retry_after=RESPONSE_TIMEOUT):
     p.exec_action("speak", speech_text)
 
@@ -43,10 +53,7 @@ def request_info_from_ollama(p, info, publish_info, speech_text, default_info, t
 
     while check:
         if rospy.get_time() - initial_start_time > timeout:
-            p.exec_action(
-                "speak",
-                f"I_did_not_understand_you.I_will_set_your_{info}_to_{default_info}.",
-            )
+            speech_for_whisper(p, listening_pub, f"I_did_not_understand_you.I_will_set_your_{info}_to_{default_info}.")
             check = False
             message_failed = True
             continue
@@ -75,7 +82,6 @@ def request_info_from_ollama(p, info, publish_info, speech_text, default_info, t
                     # if spced words replace with '+'
 
                     info_output = info_output.replace(' ', '+')
-
                     check = False if info_output else True
                     continue
 
@@ -90,21 +96,15 @@ def request_info_from_ollama(p, info, publish_info, speech_text, default_info, t
                     continue
 
                 else:
-                    p.exec_action("speak", "I_did_not_understand_you.")
-                    p.exec_action("speak", speech_text)
-
-                    start_time = rospy.get_time()
-                    planner_intent_pub.publish(publish_info)
+                    speech_for_whisper(p, listening_pub, planner_intent_pub, publish_info, ["I_did_not_understand_you.", speech_text])
                     tries += 1
                     continue
         else:
-            listening_pub.publish(listening=False)
-            p.exec_action("speak", "Please_repeat_louder.")
-            start_time = rospy.get_time()
-            planner_intent_pub.publish(publish_info)
-            time.sleep(1)
-            listening_pub.publish(listening=True)
+            start_time = speech_for_whisper(p, listening_pub, planner_intent_pub, publish_info, ["Please_repeat_louder."])
             continue
+
+    # turning off listening after the response are complete
+    listening_pub.publish(listening=False)
 
     if not info_output or message_failed:
         info_output = default_info
