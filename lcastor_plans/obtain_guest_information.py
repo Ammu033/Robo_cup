@@ -78,10 +78,7 @@ def request_info_from_ollama(p, info, publish_info, speech_text, default_info, t
                     #FIXME: sometimes it seems like reponse isn't captured if overlapping with speech?
                     # the overlapping might not be the issue, need to investigate some more
 
-                    #TODO: manage spaced words? eg. 'iced tea'
-                    # if spced words replace with '+'
-
-                    info_output = info_output.replace(' ', '+')
+                    info_output = info_output.replace(' ', '_')
                     check = False if info_output else True
                     continue
 
