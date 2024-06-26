@@ -23,7 +23,7 @@ MAX_TRIES = 2
 
 def speech_for_whisper(p, listening_pub, planner_intent_pub, publish_info, speech_texts):
     listening_pub.publish(listening=False)
-    for speech in [speech_texts]:
+    for speech in speech_texts:
         p.exec_action("speak", speech)
     planner_intent_pub.publish(publish_info)
     listening_pub.publish(listening=True)
@@ -147,7 +147,7 @@ def obtain_guest_information(p, person, info):
             time.sleep(2)
             rospy.loginfo(f"obtain_guest_info: saving guest data for {person}...")
             p.exec_action(
-                "saveGuestDataOllama", f"set{info}_" + person + "_" + info_response 
+                "saveGuestData", f"set{info}_" + person + "_" + info_response 
             )
 
             get_info = rospy.get_param(f"/{person}/{info}")
@@ -159,7 +159,7 @@ def obtain_guest_information(p, person, info):
     time.sleep(2)
     rospy.loginfo(f"obtain_person: using an incase value for {person} {info}...")
     p.exec_action(
-        "saveGuestDataOllama", f"set{info}_" + person + "_" + default_info 
+        "saveGuestData", f"set{info}_" + person + "_" + default_info 
     )
     p.exec_action(
         "speak", f"Thank_you._{default_info}_was_stored_as_your_{info}"

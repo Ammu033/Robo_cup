@@ -10,7 +10,7 @@ class saveGuestData(AbstractAction):
         self.tf = TransformListener()
 
         rospy.loginfo("saving guest data")
-        rospy.loginfo("saveGuestDataOllama: saving the param...")
+        rospy.loginfo("saveGuestData: saving the param...")
         rospy.loginfo(f"param = {self.params}")
 
         setparam = self.params[0].lower()

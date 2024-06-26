@@ -61,10 +61,10 @@ def obtain_person_name(p, person, info):
     time.sleep(2)
     if info == "name":
         rospy.loginfo(f"obtain_person_name: saving guest data for {person}...")
-        p.exec_action("saveGuestDataOllama", "setname_" + person + '_' + response)
+        p.exec_action("saveGuestData", "setname_" + person + '_' + response)
 
     if info == "drink":
-        p.exec_action("saveGuestDataOllama", "setname_" + person + '_' + response)
+        p.exec_action("saveGuestData", "setname_" + person + '_' + response)
 
     
     # p.exec_action
