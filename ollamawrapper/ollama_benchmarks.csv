@@ -66,3 +66,5 @@ robocup-dell,3.4,1,affirm_deny,True,2
 robocup-dell,10.1,3,guest_name,True,5
 robocup-dell,3.9,1,guest_name,True,8
 robocup-dell,3.7,1,guest_name,True,5
+thinkpad-p14s-ros2,46.5,1,guest_name,True,16
+thinkpad-p14s-ros2,27.0,2,guest_name,True,16
