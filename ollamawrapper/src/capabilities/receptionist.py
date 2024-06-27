@@ -59,12 +59,18 @@ def parse_yes_no(affirm):
         print("I think this was a negative response (NO)")
         ReceptionistPublisher().publish_output("no")
 
+def rse_yes_no(affirm):
+    parse_yes_no(affirm)
+
 def t_person_name(person_name):
     get_person_name(person_name)
 
 def person_name(person_name):
     get_person_name(person_name)
 
-def t_favorite_drink(favourite_drink):
-    get_favorite_drink(favourite_drink)
+def t_favorite_drink(drink):
+    get_favorite_drink(drink)
+
+def t_favourite_drink(drink):
+    get_favourite_drink(drink)
 

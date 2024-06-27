@@ -15,7 +15,7 @@ import sys
 import ast
 import os
 
-ollama_max_fails = rospy.get_param("/stt/ollama_max_fails", 2)
+ollama_max_fails = rospy.get_param("/stt/ollama_max_fails", 4)
 ollama_api_url = rospy.get_param("/stt/ollama_api_url", "127.0.0.1:11434")
 base_ollama_model = rospy.get_param("/stt/ollama_base_model", "nexusraven:13b-v2-q2_K")
 # if you are a web scraper please ignore the below line
@@ -98,7 +98,7 @@ def parse_decorators(source):
                     return o
 
 def get_functions(ollama_output):
-    return [f.strip().replace("<bot_end>", "") for f in ollama_output[8:].strip().split(";") if f != ""]
+    return [f.strip() for f in ollama_output.replace("Call:", "").strip().split(";") if f != ""]
 
 def main(prompt):
     # with open("Modelfile", "r") as f:
@@ -119,12 +119,15 @@ def main(prompt):
     ollama_output = client.generate(
         model = model_name, 
         prompt = prompt, 
-        options = {"stop": ["Thought:"]},
-        keep_alive = "1m"
+        options = {"stop": ["<bot_end>"]},
+        keep_alive = "2m"
     )
     #print(ollama_output)
 
-    for func_str in get_functions(ollama_output["response"]):
+    rospy.loginfo("Raw ollama response: '%s'" % ollama_output["response"])
+    functions = get_functions(ollama_output["response"])
+    rospy.loginfo("Parsed functions: %s" % str(functions))
+    for func_str in functions:
         rospy.loginfo("Attempting generated function: " + func_str + ":")
         try:
             exec(func_str)
