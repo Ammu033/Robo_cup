@@ -15,7 +15,7 @@ import os
 
 whisper_api_url = rospy.get_param("/stt/whisper_api_url", "127.0.0.1:9000")
 pause = rospy.get_param("/stt/speech_recogn_pause_time", 0.8)
-energy = rospy.get_param("/stt/speech_recogn_energy", 400) 
+energy = rospy.get_param("/stt/speech_recogn_energy", 4000) 
 dynamic_energy = rospy.get_param("/stt/speech_recogn_dyn_energy_flag", False)
 no_speech_thresh = rospy.get_param("/stt/speech_confidence_thresh", 0.1)
 
@@ -40,7 +40,8 @@ class WhisperWrapper:
         recogniser.pause_threshold = pause
         recogniser.dynamic_energy_threshold = dynamic_energy
 
-        with sr.Microphone(sample_rate = 10000) as microphone:
+        with sr.Microphone() as microphone:
+            # recogniser.adjust_for_ambient_noise(microphone)
             rospy.loginfo("Listening...")
             while True and not rospy.is_shutdown():
                 audio = recogniser.listen(microphone)
@@ -60,21 +61,24 @@ class WhisperWrapper:
                 )
                 os.remove(audio_path)
                 o = req.json()
-                rospy.loginfo("Transcribed '%s'" % o["text"])
                 if o["text"] != "":
+                    no_speech_prob = o["segments"][0]["no_speech_prob"]
+                    rospy.loginfo("Transcribed '%s' (p=%.2f)" % (o["text"], no_speech_prob))
                     self.transcription_pub.publish(
                         text = o["text"],
                         language = o["language"],
                         temperature = o["segments"][0]["temperature"],
                         avg_logprob = o["segments"][0]["avg_logprob"],
                         compression_ratio = o["segments"][0]["compression_ratio"],
-                        no_speech_prob = o["segments"][0]["no_speech_prob"]
+                        no_speech_prob = no_speech_prob
                     )
 
-                    if o["segments"][0]["no_speech_prob"] < no_speech_thresh:
+                    if no_speech_prob < no_speech_thresh:
                         self.run_ollama(o["text"])
                     else:
-                        rospy.loginfo("Skipped due to low confidence it's actually speech.")
+                        rospy.loginfo("Skipped due to low confidence it's actually speech. (p=%.2f)" % no_speech_prob)
+                else:
+                    rospy.loginfo("Empty value for transcription recieved")
 
     def run_ollama(self, text):
         try:
