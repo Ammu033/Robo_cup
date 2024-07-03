@@ -53,7 +53,7 @@ def request_info_from_ollama(p, info, publish_info, speech_text, default_info, t
 
     while check:
         if rospy.get_time() - initial_start_time > timeout:
-            speech_for_whisper(p, listening_pub, [f"I_did_not_understand_you.I_will_set_your_{info}_to_{default_info}."])
+            speech_for_whisper(p, listening_pub, planner_intent_pub, publish_info, [f"I_did_not_understand_you.I_will_set_your_{info}_to_{default_info}."])
             check = False
             message_failed = True
             continue
