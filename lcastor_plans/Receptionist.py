@@ -26,6 +26,7 @@ def Receptionist(p):
 
     # - TODO: detect/learn face in parallel to asking the drink and name
     # - TODO: increase torso height to 0.3
+    p.exec_action('moveTorso', '0.2')
 
     p.exec_action('moveHead', '0_0.3')
 
