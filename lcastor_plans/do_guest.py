@@ -53,12 +53,15 @@ def do_guest(p, guest):
        rospy.set_param('LastSavedid' , 15384)
     p.exec_action('saveGuestData' , 'setid_{}'.format(guest))
 
-    p.exec_action('speak', 'Thank_you_' + rospy.get_param('/{}/name'.format(guest)).replace(" ", "_"))
-    p.exec_action('gotoRoom' , 'r_couch1')
+    p.exec_action('speak', 'Thank_you_' + rospy.get_param(f'/{guest}/name').replace(" ", "_"))
+
+    # p.exec_action('gotoRoom' , 'r_couch1')
     if guest == "guest2":
-       p.exec_action('gotoRoom' , 'r_couch1') #TODO PUT BACK change to couch 2
+        p.exec_action('speak', 'Please follow me to the couch.')
+        p.exec_action('gotoRoom' , 'r_couch1') #TODO PUT BACK change to couch 2
     elif guest == "guest1":
-       p.exec_action('gotoRoom' , 'r_couch1') #TODO PUT BACK 
+        p.exec_action('speak', 'Please follow me to the couch.')
+        p.exec_action('gotoRoom' , 'r_couch1') #TODO PUT BACK 
     p.exec_action('saveGuestData' , 'setloc_host')
     p.exec_action('saveGuestData' , 'setloc_' + guest)
     p.exec_action('saveGuestData' , 'setheadangle_' +guest+'_'  + str(0.0))
