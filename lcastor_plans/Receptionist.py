@@ -23,6 +23,13 @@ from pnp_cmd_ros import *
 def Receptionist(p):
     
     # p.exec_action('gotoRoom' , 'r_door') #TODO PUT BACK
+
+    # - TODO: detect/learn face in parallel to asking the drink and name
+    # - TODO: increase torso height to 0.3
+
+    p.exec_action('moveHead', '0_0.3')
+
+
     rospy.set_param('personSaved' , 0)
 
     rospy.set_param('/host/name' , 'john')
@@ -42,7 +49,7 @@ def Receptionist(p):
     wait_for_person(p)
     p.exec_action('saveGuestData' , 'setloc_host') #TODO Add this after going to couch
 
-    p.exec_action('personIdentification' , 'learn' )
+    p.action_cmd('personIdentification' , 'learn', 'start' )
     start_time = rospy.get_time()
     saved = rospy.get_param('personSaved')
     while not saved: 
@@ -52,6 +59,7 @@ def Receptionist(p):
         time.sleep(1)
     if not saved:
         rospy.set_param('LastSavedid' , 15384)
+    p.action_cmd('personIdentification' , 'learn', 'stop' )
 
     p.exec_action('saveGuestData' , 'setid_host')
 

@@ -34,25 +34,25 @@ def do_guest(p, guest):
        detected = p.get_condition("isPersonDetected")
        time.sleep(1)
 
-
-    p.exec_action('personIdentification' , 'learn' )
-
+    p.action_cmd('personIdentification' , 'learn','start')
     start_time = rospy.get_time()
+    
+    obtain_guest_information(p , guest , 'name')
+    obtain_guest_information(p , guest , 'drink')
+
     saved = rospy.get_param('personSaved')
     while not saved: 
        if rospy.get_time() - start_time > 30.:
            break
        time.sleep(1)
        saved = rospy.get_param('personSaved')
-    
+
+    p.action_cmd('personIdentification' , 'learn', 'stop')
+
     if not saved:
        rospy.set_param('LastSavedid' , 15384)
-
     p.exec_action('saveGuestData' , 'setid_{}'.format(guest))
 
-    ##
-    obtain_guest_information(p , guest , 'name')
-    obtain_guest_information(p , guest , 'drink')
     p.exec_action('speak', 'Thank_you_' + rospy.get_param('/{}/name'.format(guest)).replace(" ", "_"))
         
     #if guest == "guest2":
