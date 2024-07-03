@@ -54,7 +54,7 @@ def do_guest(p, guest):
     p.exec_action('saveGuestData' , 'setid_{}'.format(guest))
 
     p.exec_action('speak', 'Thank_you_' + rospy.get_param('/{}/name'.format(guest)).replace(" ", "_"))
-    p.exec_action('gotoRoom' , 'r_couch')
+    p.exec_action('gotoRoom' , 'r_couch1')
     #if guest == "guest2":
     #    p.exec_action('gotoRoom' , 'r_couch2') #TODO PUT BACK 
     #elif guest == "guest1":
