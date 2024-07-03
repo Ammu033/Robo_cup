@@ -54,7 +54,7 @@ def do_guest(p, guest):
     p.exec_action('saveGuestData' , 'setid_{}'.format(guest))
 
     p.exec_action('speak', 'Thank_you_' + rospy.get_param('/{}/name'.format(guest)).replace(" ", "_"))
-        
+    p.exec_action('gotoRoom' , 'r_couch')
     #if guest == "guest2":
     #    p.exec_action('gotoRoom' , 'r_couch2') #TODO PUT BACK 
     #elif guest == "guest1":
@@ -62,7 +62,7 @@ def do_guest(p, guest):
     p.exec_action('saveGuestData' , 'setloc_host')
     p.exec_action('saveGuestData' , 'setloc_' + guest)
     p.exec_action('saveGuestData' , 'setheadangle_' +guest+'_'  + str(0.0))
-    # introduce_people(p, 'host' , guest)
+    introduce_people(p, 'host' , guest)
 
     #if guest == "guest2":
     #    introduce_people(p, 'guest1' , 'guest2')

@@ -20,7 +20,7 @@ class saveGuestData(AbstractAction):
             rospy.set_param(guestparam + "/head_angle", 0.0)
             rospy.set_param(guestparam + "/name", self.params[2].lower())
         elif setparam == "setdrink":
-            rospy.set_param(guestparam + "/drink", "_".join(self.params[:].lower()))
+            rospy.set_param(guestparam + "/drink", "_".join(self.params[:]).lower())
         elif setparam == "setheadangle":
             rospy.set_param(guestparam + '/head_angle' , self.params[2])
         elif setparam  == "setloc":

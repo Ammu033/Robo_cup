@@ -26,7 +26,7 @@ def Receptionist(p):
 
     # - TODO: detect/learn face in parallel to asking the drink and name
     # - TODO: increase torso height to 0.3
-    p.exec_action('moveTorso', '0.2')
+    p.exec_action('moveTorso', '0.3')
 
     p.exec_action('moveHead', '0_0.3')
 
@@ -43,8 +43,7 @@ def Receptionist(p):
     time.sleep(2)
     p.exec_action('moveHead', '-1_0.3')
     p.exec_action('speak' , 'Hello_John,_I_am_your_receptionist_for_this_party!')
-    p.exec_action('speak', 'Please,_come_in_front_of_me.')
-    p.exec_action('speak' , 'Can_you_stand_in_front_of_me_and_look_at_my_eyes,_please?')
+    p.exec_action('speak' , 'Can_you_stand_in_front_of_me_and_look_at_my_eyes?')
 
     p.exec_action('moveHead', '0_0.3')
     wait_for_person(p)

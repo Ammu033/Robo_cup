@@ -53,7 +53,7 @@ def request_info_from_ollama(p, info, publish_info, speech_text, default_info, t
 
     while check:
         if rospy.get_time() - initial_start_time > timeout:
-            speech_for_whisper(p, listening_pub, f"I_did_not_understand_you.I_will_set_your_{info}_to_{default_info}.")
+            speech_for_whisper(p, listening_pub, [f"I_did_not_understand_you.I_will_set_your_{info}_to_{default_info}."])
             check = False
             message_failed = True
             continue
@@ -74,9 +74,6 @@ def request_info_from_ollama(p, info, publish_info, speech_text, default_info, t
                     info_output = rospy.wait_for_message(
                         "ollama_output", String, timeout=response_timeout
                     ).data
-
-                    #FIXME: sometimes it seems like reponse isn't captured if overlapping with speech?
-                    # the overlapping might not be the issue, need to investigate some more
 
                     info_output = info_output.replace(' ', '_')
                     check = False if info_output else True
@@ -136,12 +133,13 @@ def obtain_guest_information(p, person, info):
     topic = f"guest_{info}"
     success, info_response = request_info_from_ollama(p, info, topic, speech_text, default_info)
 
-    if success:        
+    if success:
         affirm_topic = "affirm_deny"
         affirm_info = "affirm_deny"
         speech_text = f"Did_you_say_{info_response}?"
+        cannot_hear_text = f"can_you_please_tell_me_if_that_is_correct?"
         default_info = "Yes"
-        affirm_success, affirm_response = request_info_from_ollama(p, affirm_info, affirm_topic, speech_text, default_info)
+        affirm_success, affirm_response = request_info_from_ollama(p, affirm_info, affirm_topic, speech_text, default_info, cannot_hear_text)
    
         if affirm_success and affirm_response == "yes":
             time.sleep(2)
@@ -153,7 +151,7 @@ def obtain_guest_information(p, person, info):
             get_info = rospy.get_param(f"/{person}/{info}")
             p.exec_action("speak", final_text+get_info)
         else:
-            rospy.loginfo("Couldn't obtain guest info stuff, ie in the else space DEBUG")
+            rospy.loginfo(f"Couldn't obtain guest info for {person}/{info}")
         return 
 
     time.sleep(2)
