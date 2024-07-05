@@ -64,8 +64,10 @@ class gotoRoom(AbstractAction):
             #               "receptionentrance" : [0.06, -0.18, 0.0, 0.0, 0.99, 0.12],
             #               "inspectionpoint" : [2.0, -2.33, 0.0, 0.0, -0.83, 0.54],
             #               "entranceinspection" : [-1.38, 0.13, 0.0, 0.0, -0.05, 0.99]
-            "couch1": [1.49, 1.84, 0.0, 0.0, 0.76, 0.64],
-            "door": [0.94, 0.71, 0.0, 0.0, -9.89, 0.45],
+            "couch1": [-1.53, 0.96, 0.0, 0.0, 0.67, 0.74],
+            "couch2": [0.31, 0.13, 0.0, 0.0, 0.54, 0.84],
+            "door": [-1.51, -0.20, 0.0, 0.0, -0.81, 0.58],
+            "center": [-1.23, 0.61, 0.0, 0.0, 0.18, 0.98],
                           }
         #NOTE: Assume self.params is a list of strings the first element is the name of the node to navigate to
         rospy.loginfo('Going to ' + " ".join(self.params) + ' ...')
