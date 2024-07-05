@@ -1,0 +1,24 @@
+from ollamamessages.srv import OllamaCall, OllamaCallResponse
+import rospy
+import random
+import sys
+import os
+
+with open(os.path.join(os.path.dirname(__file__), "tasks.csv"), "r") as f:
+    tasks = f.read().split("\n")[:-1]
+
+basictasks = [i.split("\t")[0] for i in tasks]
+rephrasedtasks = [i.split("\t")[1] for i in tasks]
+
+try:
+    if sys.argv[1] == "--rephrased":
+        task = random.choice(rephrasedtasks)
+    else:
+        task = random.choice(basictasks)
+except IndexError:
+    task = random.choice(basictasks)
+
+print("Sending task '%s'" % task)
+service_call = rospy.ServiceProxy("/gpsr/task_decomposition", OllamaCall)
+response = service_call(input = task)
+print(response)

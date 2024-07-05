@@ -1,5 +1,5 @@
 FROM lcas.lincoln.ac.uk/lcastor/lcastor_base
-RUN apt-get install -y portaudio19-dev python-all-dev python3-all-dev && pip3 install pyaudio 
+RUN apt-get install -y portaudio19-dev python-all-dev python3-all-dev vim && pip3 install pyaudio 
 RUN pip3 install jinja2 ollama geocoder requests python-dotenv parsimonious SpeechRecognition
 
 ENTRYPOINT ["/bin/bash", "/home/lcastor/ros_ws/src/LCASTOR/lcastor_docker/entrypoint_ollama.sh"]

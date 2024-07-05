@@ -1,5 +1,5 @@
 ---
-session: tmule_ollama
+session: gpsr
 init_cmd: |
   #exec /bin/bash
   cd @TMULE_CONFIG_DIR@ || true
@@ -35,6 +35,10 @@ windows:
   - sleep 2 && bash /home/lcastor/ros_ws/src/LCASTOR/ollamawrapper/start_ollama.sh 
 - name: ollama
   panes:
-  - sleep 5 && TMUX='' tmux && tmux attach -t ollama
+  - sleep 5 && TMUX='' tmux attach -t ollama
+- name: gpsr
+  panes:
+  - rosrun ollamawrapper gpsr.py
+  - cd /home/lcastor/ros_ws/src/LCASTOR/ollamawrapper && bash
 #############################################################################################
 

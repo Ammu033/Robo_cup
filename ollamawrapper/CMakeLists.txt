@@ -161,6 +161,7 @@ include_directories(
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
   src/ollamawrapper.py
+  src/gpsr.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
@@ -173,6 +174,7 @@ install(FILES
   src/Modelfile.jinja2
   src/ollamafunctiongrammar.ppeg
   src/parser.py
+  src/Modelfile_gpsr.jinja2
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
