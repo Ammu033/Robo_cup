@@ -3,6 +3,7 @@ import sys
 import rospy
 import time
 from std_msgs.msg import String, Bool
+import random
 
 from ollamamessages.msg import WhisperListening, OllamaResponse
 
@@ -120,11 +121,11 @@ def obtain_guest_information(p, person, info):
 
     if info == "name":
         speech_text = "Please_tell_me_your_name?"
-        default_info = "Max"
+        default_info = random.choice(["max","tom","alex","julie","farah","tammie"])
         final_text = "Thank_you_"
     elif info == "drink":
         speech_text = "Please_tell_me_your_favourite_drink?"
-        default_info = "Milk"
+        default_info = random.choice(["milk","wine","orange juice","hot chocolate","coffee"])
         final_text = "Hopefully_we_can_serve_you_some_"
     else:
         rospy.logerr("obtain_person_info: invalid info type.")
