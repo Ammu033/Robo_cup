@@ -33,8 +33,14 @@ def Receptionist(p):
 
     rospy.set_param('personSaved' , 0)
 
-    rospy.set_param('/host/name' , 'john')
-    rospy.set_param('/host/drink' , 'milk')
+    set_host_name = 'john'
+    set_host_drink = 'milk'
+
+    rospy.set_param('/host/name' , set_host_name)
+    rospy.set_param('/host/drink' , set_host_drink)
+
+    get_host_name = rospy.get_param('/host/name')
+    get_host_drink = rospy.get_param('/host/drink')
 
     while not rospy.get_param('modelLoaded'): time.sleep(0.01)
 
@@ -42,8 +48,8 @@ def Receptionist(p):
     p.exec_action('gotoRoom' , 'r_couch1') #TODO PUT BACK
     time.sleep(2)
     p.exec_action('moveHead', '-1_0.3')
-    p.exec_action('speak' , 'Hello_John,_I_am_your_receptionist_for_this_party!')
-    p.exec_action('speak' , 'Can_you_stand_in_front_of_me_and_look_at_my_eyes?')
+    p.exec_action('speak' , f'Hello_{get_host_name},_I_am_your_receptionist_for_this_party!')
+    p.exec_action('speak' , 'Please_look_into_my_eyes?')
 
     p.exec_action('moveHead', '0_0.3')
     wait_for_person(p)
@@ -51,6 +57,7 @@ def Receptionist(p):
 
     p.action_cmd('personIdentification' , 'learn', 'start' )
     start_time = rospy.get_time()
+    time.sleep(2)
     saved = rospy.get_param('personSaved')
     while not saved: 
         if rospy.get_time() - start_time > 30.:
@@ -64,11 +71,10 @@ def Receptionist(p):
     p.exec_action('saveGuestData' , 'setid_host')
 
     rospy.set_param('personSaved' , 0)
-
     p.exec_action('speak' , 'Thank_you,_I_will_wait_at_the_entrance_for_guests!')
 
     p.exec_action('gotoRoom' , 'r_door')
-    
+
     do_guest(p, "guest1")
     
     p.exec_action('speak' , 'I_will_now_go_to_the_entrance_and_wait_for_other_guests,_feel_at_home!!!')
