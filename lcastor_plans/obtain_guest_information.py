@@ -19,15 +19,15 @@ from pnp_cmd_ros import *
 from confirm_information_simple import confirm_information_simple
 
 OVERALL_TIMEOUT = 59.0
-RESPONSE_TIMEOUT = 20.0
+RESPONSE_TIMEOUT = 6.0
 MAX_TRIES = 2 
 
 def speech_for_whisper(p, listening_pub, planner_intent_pub, publish_info, speech_texts):
-    listening_pub.publish(listening=False)
+    # listening_pub.publish(listening=False)
     for speech in speech_texts:
         p.exec_action("speak", speech)
     planner_intent_pub.publish(publish_info)
-    listening_pub.publish(listening=True)
+    # listening_pub.publish(listening=True)
     start_time = rospy.get_time()
     return start_time
 
@@ -95,6 +95,7 @@ def request_info_from_ollama(p, info, publish_info, speech_text, default_info, t
                     tries += 1
                     continue
         else:
+            listening_pub.publish(listening=True)
             start_time = speech_for_whisper(p, listening_pub, planner_intent_pub, publish_info, ["Please_repeat_louder."])
             continue
 
@@ -108,7 +109,7 @@ def request_info_from_ollama(p, info, publish_info, speech_text, default_info, t
     rospy.loginfo(f'info captured: {info_output}')
     rospy.loginfo(f'success status: {success}')
     
-    return (success, info_output)
+    return (success, info_output.replace(' ', '_'))
 
 def obtain_guest_information(p, person, info):
     """
@@ -125,7 +126,7 @@ def obtain_guest_information(p, person, info):
         final_text = "Thank_you_"
     elif info == "drink":
         speech_text = "Please_tell_me_your_favourite_drink?"
-        default_info = random.choice(["milk","wine","orange juice","hot chocolate","coffee"])
+        default_info = random.choice(["milk","wine","orange_juice","hot_chocolate","coffee"])
         final_text = "Hopefully_we_can_serve_you_some_"
     else:
         rospy.logerr("obtain_person_info: invalid info type.")
@@ -146,7 +147,7 @@ def obtain_guest_information(p, person, info):
             time.sleep(2)
             rospy.loginfo(f"obtain_guest_info: saving guest data for {person}...")
             p.exec_action(
-                "saveGuestData", f"set{info}_" + person + "_" + info_response 
+                "saveGuestData", f"set{info}_{person}_{info_response}" 
             )
 
             get_info = rospy.get_param(f"/{person}/{info}")

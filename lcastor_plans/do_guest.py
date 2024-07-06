@@ -18,9 +18,6 @@ from wait_for_person import wait_for_person
 
 def do_guest(p, guest):
 
-    # if debug is not None:
-    #     debug_name, debug_drink = debug
-
     wait_for_person(p)
 
     p.exec_action('speak' , 'Hi,_my_name_is_tiago!')
@@ -59,31 +56,34 @@ def do_guest(p, guest):
     guest_name = rospy.get_param(f'/{guest}/name')
     p.exec_action('speak', f'Thank_you_{guest_name}').replace(" ", "_")
 
-    p.exec_action('gotoRoom' , 'r_center')
+    # p.exec_action('gotoRoom' , 'r_center')
     if guest == "guest2":
         p.exec_action('speak', 'Please_follow_me_to_the_couch.')
         p.exec_action('gotoRoom' , 'r_couch2') #TODO PUT BACK change to couch 2
     elif guest == "guest1":
         p.exec_action('speak', 'Please_follow_me_to_the_couch.')
         p.exec_action('gotoRoom' , 'r_couch1') #TODO PUT BACK 
-    p.exec_action('speak', 'Have_a_seat.')
+    p.exec_action('armAction', 'offer', 'start')
+    p.exec_action('speak' , 'Please_be_seated_on_the_couch_' + str(rospy.get_param('/{}/name'.format(guest))))
+    p.exec_action('armAction', 'home')
+
+    # p.exec_action('speak', 'Have_a_seat.')
     p.exec_action('saveGuestData' , 'setloc_host')
     p.exec_action('saveGuestData' , 'setloc_' + guest)
     p.exec_action('saveGuestData' , 'setheadangle_' +guest+'_'  + str(0.0))
-    introduce_people(p, 'host' , guest)
+    
+    # TODO: Introducing people
+    # p.exec_action('speak' , 'Please_stay_here_for_now')
+    # introduce_people(p, 'host' , guest)
 
-    if guest == "guest2":
-       introduce_people(p, 'guest1' , 'guest2')
+    # if guest == "guest2":
+    #    introduce_people(p, 'guest1' , 'guest2')
 
-    if guest == "guest2":
-       p.exec_action('gotoRoom' , 'r_couch2') #TODO PUT BACK 
-    elif guest == "guest1":
-       p.exec_action('gotoRoom' , 'r_couch1') #TODO PUT BACK 
-    p.action_cmd('armAction', 'offer', 'start')
-    p.exec_action('speak' , 'Please_be_seated_on_the_couch_' + str(rospy.get_param('/{}/name'.format(guest))))
-    time.sleep(1)
-    p.action_cmd('armAction', 'offer', 'stop')
-    p.exec_action('armAction', 'home')
+    # if guest == "guest2":
+    #    p.exec_action('gotoRoom' , 'r_couch2') #TODO PUT BACK 
+    # elif guest == "guest1":
+    #    p.exec_action('gotoRoom' , 'r_couch1') #TODO PUT BACK 
+
 
 
 if __name__ == "__main__":

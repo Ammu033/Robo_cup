@@ -23,9 +23,9 @@ from pnp_cmd_ros import *
 def Receptionist(p):
 
     ## Step 1 - Meet the host, learn the face and bring them to the couch
-    p.exec_action('gotoRoom' , 'r_door')
-    p.exec_action('moveTorso', '0.3')
-    p.exec_action('moveHead', '0_0.3')
+    p.exec_action('gotoRoom' , 'r_center')
+    p.exec_action('moveTorso', '0.35')
+    p.exec_action('moveHead', '0_0.0')
 
     rospy.set_param('personSaved' , 0)
     set_host_name = 'john'
@@ -40,12 +40,12 @@ def Receptionist(p):
     while not rospy.get_param('modelLoaded'): 
         time.sleep(0.01)
 
-    p.exec_action('gotoRoom' , 'r_couch1') #TODO PUT BACK
+    p.exec_action('gotoRoom' , 'r_center') #TODO PUT BACK
     time.sleep(2)
-    p.exec_action('moveHead', '-1_0.3')
+    p.exec_action('moveHead', '-1_0.0')
     p.exec_action('speak' , f'Hello_{get_host_name},_I_am_your_receptionist_for_this_party!')
     p.exec_action('speak' , 'Please_look_into_my_eyes?')
-    p.exec_action('moveHead', '0_0.3')
+    p.exec_action('moveHead', '0_0.0')
     wait_for_person(p)
 
     p.exec_action('saveGuestData' , 'setloc_host') #TODO Add this after going to couch
@@ -70,16 +70,14 @@ def Receptionist(p):
     p.exec_action('gotoRoom' , 'r_door')
 
     do_guest(p, "guest1")
-    # do_guest(p, "guest1", ["frank", "water"])
-
     
     p.exec_action('speak' , 'I_will_now_go_to_the_entrance_and_wait_for_other_guests,_feel_at_home!!!')
-
     p.exec_action('gotoRoom' , 'r_door')
 
     do_guest(p, "guest2")
 
     time.sleep(10)
+    p.exec_action('gotoRoom' , 'r_center') #TODO PUT BACK
     p.exec_action('speak' , 'Lets_have_some_fun!!!!')
 
 
