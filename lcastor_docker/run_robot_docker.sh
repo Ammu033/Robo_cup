@@ -2,7 +2,7 @@
 
 
 
-image_name=lcas.lincoln.ac.uk/lcastor/lcastor_base
+image_name=c46ffa70845d
 
 xhost + local:docker
 
@@ -15,6 +15,7 @@ docker run --privileged --network host \
            --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
            -v $(pwd)/../:/home/lcastor/ros_ws/src/LCASTOR \
            -v /dev/dri:/dev/dri \
+           -v /dev/*:/dev/* \
            --rm \
            --entrypoint /home/lcastor/ros_ws/src/LCASTOR/lcastor_docker/robot_entrypoint.sh \
            -it ${image_name}  \

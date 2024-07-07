@@ -5,7 +5,8 @@
 
 
 TIAGO_NUM=$1
-ETH=$2
+ETH=1
+#ETH=$2 # NEED TO REPLACE
 #echo $TIAGO_NUM
 
 # Change ROS Master
@@ -32,5 +33,6 @@ THIS_IP=`ip route get ${ROS_MASTER} | grep "src" | sed 's/.*src \([0-9\.]*\).*/\
 export ROS_HOSTNAME=${THIS_IP}
 export ROS_IP=${THIS_IP}
 
-sshpass -p "palroot" ssh root@${ROS_MASTER} "addLocalDns -u \"${HOSTNAME}\" -i \"${THIS_IP}\""
+#sshpass -p "palroot" ssh root@${ROS_MASTER} "addLocalDns -u \"${HOSTNAME}\" -i \"${THIS_IP}\""
 
+#return 0

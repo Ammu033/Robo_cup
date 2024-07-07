@@ -18,6 +18,7 @@ ROSPARAM = 'lcastor_person_follower/personID_to_follow'
 QUESTION_TIMEOUT = 10
 
 def PersonFollowing(p):
+    print('Able to start the plan')
     rospy.set_param(ROSPARAM, '')
     msg_missed = True
     
@@ -48,18 +49,18 @@ def PersonFollowing(p):
             
         p.action_cmd('followPerson', '', 'stop')
         # p.exec_action('speak', 'Person_to_follow_lost')
-        if rospy.get_time() - starting_time > 30:
-            start = rospy.get_time()
-            while msg_missed:
-                if rospy.get_time() - start > 30:
-                    break
-                p.exec_action("speak", 'Have_we_arrived?_Please_come_to_me,_and_say_yes_or_no!')
-                p.exec_action("activateRasa", "affirm_deny")
-                try:
-                    taskFinished = rospy.wait_for_message('/person_affirm_deny', Bool, timeout = QUESTION_TIMEOUT).data
-                    msg_missed = False
-                except:
-                    msg_missed = True
+        # if rospy.get_time() - starting_time > 30:
+            # start = rospy.get_time()
+            # while msg_missed:
+                # if rospy.get_time() - start > 30:
+                    # break
+                # p.exec_action("speak", 'Have_we_arrived?_Please_come_to_me,_and_say_yes_or_no!')
+                # p.exec_action("activateRasa", "affirm_deny")
+                # try:
+                    # taskFinished = rospy.wait_for_message('/person_affirm_deny', Bool, timeout = QUESTION_TIMEOUT).data
+                    # msg_missed = False
+                # except:
+                    # msg_missed = True
                 
 
 

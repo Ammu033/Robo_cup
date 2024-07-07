@@ -45,6 +45,7 @@ class speech_class:
             while True and not rospy.is_shutdown():
                 #print("MAIN",self.send_speech)
                 audio = r.listen(source)
+                print('I am here')
                 torch_audio = torch.from_numpy(np.frombuffer(audio.get_raw_data(), np.int16).flatten().astype(np.float32) / 32768.0)
                 audio_data = torch_audio
                 if self.send_speech==True: #only consider new audio if planner have requested speech recognition

@@ -72,7 +72,8 @@ def Receptionist(p):
     do_guest(p, "guest1")
     
     p.exec_action('speak' , 'I_will_now_go_to_the_entrance_and_wait_for_other_guests,_feel_at_home!!!')
-    p.exec_action('gotoRoom' , 'r_door')
+
+    # p.exec_action('gotoRoom' , 'r_receptionentrance')
 
     do_guest(p, "guest2")
 
