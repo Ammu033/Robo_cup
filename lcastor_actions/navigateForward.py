@@ -23,23 +23,19 @@ class navigateForward(AbstractAction):
 
     def _start_action(self):
         #NOTE: Assume self.params is a list of strings the first element is the name of the node to navigate to
-        rospy.loginfo('Going to ' + " ".join(self.params) + ' ...')
+        rospy.loginfo('Going forward for' + " ".join(self.params) + 's ...')
 
         if len(self.params) < 1:
-            rospy.logwarn("Wrong use of action, pass the coordinates the robots needs to reach in /map frame as X_Y_Theta")
+            rospy.logwarn("Wrong use of action, pass how many seconds the robot needs to navigate at 0.25m/s")
         else:
-            self.client = actionlib.SimpleActionClient('/move_base', MoveBaseAction)
-            rospy.loginfo("Connecting to /move_base AS...")
-            self.client.wait_for_server()
-            rospy.loginfo("Connected.")
-
-            # Create goal
+            # Create target velocity msg
             self.nav_msg = Twist()
-            self.nav_msg.linear.x = 0.5
+            self.nav_msg.linear.x = 0.25
 
             start_t = rospy.get_time()
-            while rospy.get_time() - start_t <= float(self.params[0]): nav_pub.publish(self.nav_msg)
             rospy.loginfo("Sending the robot forward...")
+            while rospy.get_time() - start_t <= float(self.params[0]): nav_pub.publish(self.nav_msg)
+            
 
     def _on_navigateForward_done(self, goalState, result):
         print("navigateForward DONE", goalState, result)
