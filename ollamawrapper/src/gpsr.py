@@ -77,7 +77,7 @@ class GPSRNode:
         rospy.loginfo("Recieved task decomposition string: '%s'" % human_str)
 
         func_name = "do_func"
-        locations_in_scene = list(gotoRoom.gotoRoom().room_dict.keys())
+        locations_in_scene = list(gotoRoom.ROOM_DICT.keys())
         objects_in_scene = ["toy", "sugar", "food"]
         rospy.loginfo("Locations in scene: %s" % str(locations_in_scene))
 

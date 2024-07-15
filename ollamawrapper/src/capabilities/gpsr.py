@@ -116,5 +116,14 @@ def follow_person():
 def done():
     publish_what_im_doing("done()")
 
+def engine_say(to_say):
+    p = PNPCmd()
+    p.begin()
+    # p.exec_action('speak' , to_say.replace(" ", "_"))
+    p.exec_action('moveHead', '-1_0.3')
+    p.end()
+
 if __name__ == "__main__":
-    goto_location("table")
+    # goto_location("table")
+    go_back_to_me()
+    # engine_say("Hello, world")
