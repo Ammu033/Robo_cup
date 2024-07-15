@@ -35,6 +35,13 @@ class navigateForward(AbstractAction):
             start_t = rospy.get_time()
             rospy.loginfo("Sending the robot forward...")
             while rospy.get_time() - start_t <= float(self.params[0]): nav_pub.publish(self.nav_msg)
+
+            self.nav_msg = Twist()
+            self.nav_msg.linear.x = 0.
+
+            nav_pub.publish(self.nav_msg)
+            nav_pub.publish(self.nav_msg)
+            self.params.append("done")
             
 
     def _on_navigateForward_done(self, goalState, result):

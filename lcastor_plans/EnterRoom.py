@@ -20,7 +20,7 @@ def EnterRoom(p):
     while(not p.get_condition("IsDoorOpen")): time.sleep(0.1)
     p.exec_action("speak", "Thank_you_for_opening_the_door")
     # print("Door is open")
-    p.exec_action("navigateForward", "2")
+    p.exec_action("navigateForward", "4")
     # print("Arrived")
     p.exec_action("speak", "I_ve_arrived_to_the_room")
 
