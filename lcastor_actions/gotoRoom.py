@@ -19,12 +19,7 @@ Starts and stops the object detection node
 ROS_PARAM = "/gotoRoom/status"
 class gotoRoom(AbstractAction):
 
-    def _start_action(self):
-        rospy.set_param(ROS_PARAM, "")
-        self.obj_dict = {"cup": "kitchen",
-                         "bed": "bedroom",
-                         "bagpack" : "livingroom"}
-        
+    def __init__(self):
         # The following coordinates are based on the Robocup house arena
         self.room_dict = {
             # "bed" :[6.70, -3.83, 0.0, 0.0,  0.70, -0.70 ],
@@ -64,9 +59,19 @@ class gotoRoom(AbstractAction):
             #               "receptionentrance" : [0.06, -0.18, 0.0, 0.0, 0.99, 0.12],
             #               "inspectionpoint" : [2.0, -2.33, 0.0, 0.0, -0.83, 0.54],
             #               "entranceinspection" : [-1.38, 0.13, 0.0, 0.0, -0.05, 0.99]
-            "couch1": [1.49, 1.84, 0.0, 0.0, 0.76, 0.64],
-            "door": [0.94, 0.71, 0.0, 0.0, -9.89, 0.45],
-                          }
+            # "couch1": [1.49, 1.84, 0.0, 0.0, 0.76, 0.64],
+            # "door": [0.94, 0.71, 0.0, 0.0, -9.89, 0.45],
+            "table": [0.3732430094704967, -6.73586330418651, 0.0, 0.0, -169.6681781],
+            "home": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+                            }
+
+    def _start_action(self):
+        rospy.set_param(ROS_PARAM, "")
+        self.obj_dict = {"cup": "kitchen",
+                         "bed": "bedroom",
+                         "bagpack" : "livingroom"}
+        
+        
         #NOTE: Assume self.params is a list of strings the first element is the name of the node to navigate to
         rospy.loginfo('Going to ' + " ".join(self.params) + ' ...')
 

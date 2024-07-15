@@ -27,7 +27,6 @@ os.environ["BINGMAPS"] = str(bing_api_key)
 
 print(os.environ["BINGMAPS"])
 
-rospy.init_node("ollama_wrapper_server")
 import capabilities
 from capabilities import *
 
@@ -39,6 +38,7 @@ class FunctionCapability:
     function: None
     docstring: str
     argnames: list
+    source: None
 
 class FunctionCapablilites(list):
     def to_modelfile(self, model):
@@ -59,7 +59,7 @@ def getfunctioncapabilities():
 
     for modulename, module in inspect.getmembers(capabilities):
                                         #  \/ horrible
-        if modulename in ["sys"]:
+        if modulename in ["sys", "time"]:
             continue
 
         if inspect.ismodule(module) and 'capabilities' in inspect.getfile(module):
@@ -77,7 +77,7 @@ def getfunctioncapabilities():
                     if decorators is None:
                         continue
                     if decorators == capabilities.contexts.ALL or ollama_intention in decorators:
-                        functioncapabilities.append(FunctionCapability(modulename, module, functionname, function, docstring, argnames))
+                        functioncapabilities.append(FunctionCapability(modulename, module, functionname, function, docstring, argnames, inspect.getsource(function)))
 
     return functioncapabilities
 
@@ -178,10 +178,12 @@ def planner_intention_sub_cb(intention):
     rospy.loginfo("Intention has been set to %s" % intention.data)
     ollama_intention = intention.data
 
-rospy.Subscriber("/planner_intention", String, planner_intention_sub_cb)
-s = rospy.Service("/stt/ollamacall", OllamaCall, handle_ollama_call)
-print("Node started correctly")
-rospy.spin()
+if __name__ == "__main__":
+    rospy.init_node("ollama_wrapper")
+    rospy.Subscriber("/planner_intention", String, planner_intention_sub_cb)
+    s = rospy.Service("/stt/ollamacall", OllamaCall, handle_ollama_call)
+    print("Node started correctly")
+    rospy.spin()
  
 
 

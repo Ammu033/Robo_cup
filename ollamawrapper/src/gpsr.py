@@ -16,70 +16,103 @@ import ast
 import os
 import re
 
-ollama_api_url = rospy.get_param("/stt/ollama_api_url", "127.0.0.1:11434")
-ollama_decomposition_model = rospy.get_param("/stt/ollama_decomposition_model", "llama3")
+sys.path.insert(1, os.path.join(os.path.dirname(__file__), "..", "..", "lcastor_actions"))
+import gotoRoom
 
-rospy.init_node("gpsr_node")
+ollama_api_url = rospy.get_param("/stt/ollama_api_url", "127.0.0.1:11434")
+ollama_decomposition_model = rospy.get_param("/stt/ollama_decomposition_model", 'deepseek-coder-v2:latest')
+# ollama_decomposition_model = rospy.get_param("/stt/ollama_decomposition_model", "deepseek-coder:6.7b")
+
+import capabilities
+from capabilities.gpsr import *
 
 class GPSRNode:
     def __init__(self):
-        print("Node started correctly")
         s = rospy.Service("/gpsr/task_decomposition", OllamaCall, self.handle_decomposition_call)
         self.intent_publisher = rospy.Publisher("/planner_intention", String, queue_size = 1)
+        print("Node started correctly")
         rospy.spin()
 
-    def get_modelfile(self):
-        environment = jinja2.Environment(loader = jinja2.FileSystemLoader(os.path.dirname(__file__)))
-        template = environment.get_template("Modelfile_gpsr.jinja2")
+    def parse_decorators(self, source):
+        # yes these two functions are almost identical to the ones in ollamawrapper
+        # but importing ROS stuff as python libraries causes wierd stuff to happen
+        # alas i do not have enough experience with ROS programming
+        for line in source.split("\n"):
+            if line.startswith("@"):
+                f = ast.parse(line[1:]).body[0].value 
+                if f.func.value.id == "contexts" and f.func.attr == "context":
+                    first_arg = f.args[0]
+                    if type(first_arg) is ast.Attribute:
+                        if first_arg.attr == "ALL" and first_arg.value.id == "contexts":
+                            return capabilities.contexts.ALL
+                    else:
+                        # it's a list
+                        o = []
+                        for i in first_arg.elts:
+                            o.append(i.value)
+                        return o
 
-        return template.render(ollama_decomposition_model = ollama_decomposition_model)
+    def gpsr_commands(self):
+        sources = []
+        for modulename, module in inspect.getmembers(capabilities):
+                                        #  \/ horrible
+            if modulename in ["sys", "time"]:
+                continue
+            if inspect.ismodule(module) and "gpsr" in inspect.getfile(module):
+                for functionname, function in inspect.getmembers(module):
+                    if inspect.isfunction(function):
+                        source = inspect.getsource(function)
+                        decorators = self.parse_decorators(source)
+                        if decorators is None: continue
+                        # print(decorators)
+                        if "gpsr" in decorators:
+                            sources.append(source)
+        return sources
     
-    def create_model(self):
-        model_name = "taskdecomposer:" + str(int(time.time()))
-        client = ollama.Client(host = "http://%s" % ollama_api_url)
-
-        for mn in [m["name"] for m in client.list()["models"]]:
-            if mn.startswith("taskdecomposer"):
-                client.delete(mn)
-
-        modelfile = self.get_modelfile()
-        # print(modelfile)
-        client.create(model = model_name, modelfile = modelfile)
-        return client, model_name
-    
-    def ollama_call_parser(self, raw_ollama):
-        return [i.strip() for i in re.split(r"\d.", raw_ollama) if i != ""]
-    
-    def do_task(self, subtask):
-        try:
-            service_call = rospy.ServiceProxy("/stt/ollamacall", OllamaCall)
-            response = service_call(input = subtask)
-            print(response)
-        except Exception as e:
-            print("Ollama failed: ", str(e))
-        else:
-            generated_cmd = rospy.wait_for_message(
-                "/ollama_output", String, timeout = 2
-            )
-            rospy.loginfo("Response: %s" % generated_cmd.data)
+    def parse_ollama_call(self, ollama_text):
+        return ollama_text.split("```python")[-1]
 
     def handle_decomposition_call(self, req):
         human_str = req.input
         rospy.loginfo("Recieved task decomposition string: '%s'" % human_str)
-        client, model_name = self.create_model()
 
+        func_name = "do_func"
+        locations_in_scene = list(gotoRoom.gotoRoom().room_dict.keys())
+        rospy.loginfo("Locations in scene: %s" % str(locations_in_scene))
+
+        # print(self.gpsr_commands())
+        source_functions = "\n".join(self.gpsr_commands())
+
+        prompt = \
+        f"You are the AI controlling a robot. You have access to the following functions: ```{source_functions}```.\
+        Given a locations list containing the locations in the scene with a list of string object names,\
+        You get a user request the robot to do: '{human_str}'. Create a function for completing the task\
+        The function signature must be: {func_name}(locations: list)->str. You cannot write anything outside the function. You do not need to def the functions in the context. \
+        The return value start with \"passed\" if the operation has been successful and \"failed\" otherwise. \
+        You do not need to explain your code. Call the function {func_name}.  \
+        We have the following locations in the scene: {locations_in_scene}. \
+        You may only use the functions provided to you in the context. Do not use print(str) but use engine_say(str) instead.\
+        You need to call the functions I gave you to complete the task. If a location or object is not in the scene, print out that it's not in the scene."
+
+        client = ollama.Client(host = "http://%s" % ollama_api_url)
         ollama_output = client.generate(
-            model = model_name, 
-            prompt = human_str, 
-            keep_alive = "0m"
+            model = ollama_decomposition_model, 
+            prompt = prompt, 
+            keep_alive = "0m",
+            options = {"stop": ["```\n"]}
         )
-        # rospy.loginfo("Raw ollama response: '%s'" % ollama_output["response"])
-        tasks = self.ollama_call_parser(ollama_output["response"])
-        rospy.loginfo("Parsed ollama call: " + str(tasks))
+        rospy.loginfo("Raw ollama response: =====\n%s\n=====" % ollama_output["response"])
 
-        self.intent_publisher.publish("gpsr")
-        for task in tasks:
-            self.do_task(task)
+        parsed_func = self.parse_ollama_call(ollama_output["response"])
+        parsed_func += "\n\n%s(locations = %s)" % (func_name, str(locations_in_scene))
+
+        print("To exec: ===\n%s\n===" % parsed_func)
+
+        try:
+            exec(parsed_func)
+        except Exception as e:
+            rospy.loginfo(e)
+
 
         return OllamaCallResponse(
             ollama_output["total_duration"],
@@ -91,4 +124,5 @@ class GPSRNode:
 
 
 if __name__ == "__main__":
+    rospy.init_node("gpsr_node")
     gpsr = GPSRNode()
