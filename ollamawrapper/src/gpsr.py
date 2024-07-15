@@ -78,6 +78,7 @@ class GPSRNode:
 
         func_name = "do_func"
         locations_in_scene = list(gotoRoom.gotoRoom().room_dict.keys())
+        objects_in_scene = ["toy", "sugar", "food"]
         rospy.loginfo("Locations in scene: %s" % str(locations_in_scene))
 
         # print(self.gpsr_commands())
@@ -85,12 +86,14 @@ class GPSRNode:
 
         prompt = \
         f"You are the AI controlling a robot. You have access to the following functions: ```{source_functions}```.\
-        Given a locations list containing the locations in the scene with a list of string object names,\
-        You get a user request the robot to do: '{human_str}'. Create a function for completing the task\
-        The function signature must be: {func_name}(locations: list)->str. You cannot write anything outside the function. You do not need to def the functions in the context. \
-        The return value start with \"passed\" if the operation has been successful and \"failed\" otherwise. \
+        Given a locations list containing the locations in the scene as a list of string location names, \
+        and a list of objects in the scene as a list of string object names, \
+        You get a user request the robot to do: '{human_str}'. Create a function for completing the task \
+        The function signature must be: {func_name}(locations: list, objects: list)->str. You cannot write anything outside the function. You do not need to def the functions in the context. \
+        In addition, if it fails, you should print out why it fails. You do not need to return this. \
         You do not need to explain your code. Call the function {func_name}.  \
         We have the following locations in the scene: {locations_in_scene}. \
+        There are the following objects in the scene: {objects_in_scene}. \
         You may only use the functions provided to you in the context. Do not use print(str) but use engine_say(str) instead.\
         You need to call the functions I gave you to complete the task. If a location or object is not in the scene, print out that it's not in the scene."
 
@@ -104,7 +107,7 @@ class GPSRNode:
         rospy.loginfo("Raw ollama response: =====\n%s\n=====" % ollama_output["response"])
 
         parsed_func = self.parse_ollama_call(ollama_output["response"])
-        parsed_func += "\n\n%s(locations = %s)" % (func_name, str(locations_in_scene))
+        parsed_func += "\n\n%s(locations = %s, objects = %s)" % (func_name, str(locations_in_scene), str(objects_in_scene))
 
         print("To exec: ===\n%s\n===" % parsed_func)
 
