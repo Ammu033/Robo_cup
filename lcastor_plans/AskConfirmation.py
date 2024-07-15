@@ -1,5 +1,6 @@
 import os
 import sys
+from request_ollama import request_ollama
 
 try:
     sys.path.insert(0, os.environ["PNP_HOME"] + '/scripts')
@@ -13,30 +14,36 @@ from pnp_cmd_ros import *
 from std_msgs.msg import Bool
 import rospy
 
+OVERALL_TIMEOUT = 30.0
+RESPONSE_TIMEOUT = 5.0
+MAX_TRIES = 2
 
-def AskConfirmation(p):
-    confirmed = False    
+def AskConfirmation(
+        p,
+        speech_text=f"Did_I_grab_it?",
+        cannot_hear_text = "please_say,_yes_you_can_grab_it,_if_that_is_correct.",
+        affirm_tries = 0,
+        max_tries = MAX_TRIES,
+    ):
+    topic = "affirm_deny"
+    info = "affirm_deny"
+    default_info = "no"
+    success = False
+    affirm_tries = 0
 
-    p.exec_action('activateRasa', "affirm_deny")
-    
-    start_time = rospy.get_time()
-    detected = p.get_condition("IsIntentDetected")
-    while not detected:
-        if rospy.get_time() - start_time > 10.:
-            p.exec_action('speak' , 'Please_repeat_louder,_I_did_not_understand_you.')
-            p.exec_action('activateRasa', "affirm_deny")
-            start_time = rospy.get_time()
+    while not success:
+        success, response = request_ollama(p, info, topic, speech_text, default_info, cannot_hear_text)
 
-        detected = p.get_condition("IsIntentDetected")
-        time.sleep(1)
+        if not success:
+            rospy.loginfo(f"AskConfirmation: Did not recieve an affirm response")
+            tries += 1
 
-    try:
-        confirmed = rospy.wait_for_message('/person_affirm_deny', Bool, timeout=5.)
-    except Exception as e:
-        confirmed = False    
+        if affirm_tries >= max_tries:
+            rospy.loginfo(f"AskConfirmation: Too many tries")
+            return (False, None)
 
-    return confirmed
-
+    rospy.loginfo(f"AskConfirmation: Recieved response")
+    return (success, response)
 
 
 
@@ -49,6 +56,6 @@ if __name__ == "__main__":
 
     p.begin()
 
-    confirm_information(p, "guest1", "name")
+    AskConfirmation(p, "guest1", "name")
 
     p.end()
