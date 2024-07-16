@@ -41,10 +41,24 @@ class gotoRoom(AbstractAction):
                          "bed": "bedroom",
                          "bagpack" : "livingroom"}
         
-        # The following coordinates are based on the Robocup house arena
-        self.room_dict = copy.deepcopy(ROOM_DICT)
-        
-
+        # The following coordinates are based on the Robocup house arena (X, Y, Z, R, P, Y)
+        self.room_dict = {"hallway_cabinet" : [2.62, 2.37, 0.0, 0.0, -0.59, 0.80],
+                          "entrance" : [0.72, 1.41, 0.0 , 0.0, -0.59, 0.80],
+                          "desk_p" : [-2.19, 1.67, 0.0, 0.0, -0.04, 0.99],
+                          "shelf_p" : [-3.03, 1.60, 0.0, 0.0, -0.69, 0.72],
+                          "coathanger" : [0.45, 2.79, 0.0, 0.0, 0.99, 0.07],
+                          "exit" : [-4.49, 3.42, 0.0, 0.0, 0.99, -0.03],
+                          "TV_table_p" : [1.75, 6.01, 0.0, 0.0, -0.64, 0.76],
+                          "lounge_chair" : [2.27, 6.86, 0.0, 0.0, 0.68, 0.72],
+                          "lamp" : [2.31, 8.44, 0.0, 0.0, 0.68, 0.73],
+                          "couch" : [-0.85, 8.13, 0.0, 0.0, 0.17, 0.98],
+                          "coffe_table_p" : [0.89, 6.58, 0.0, 0.0, 0.68, 0.728],
+                          "trashcan" : [-1.68, 5.27, 0.0, 0.0, -0.33, 0.94],
+                          "kitchen_cabinet_p" : [-4.59, 5.25, 0.0, 0.0, -0.71, 0.69],
+                          "dinner_table_p" : [-3.14, 5.15, 0.0, 0.0, 0.72, 0.68],
+                          "dishwasher_p" : [-3.39, 8.10, 0.0, 0.0, 0.77, 0.63],
+                          "kitchen_counter_p" : [-4.69, 8.18, 0.0, 0.0, 0.78, 0.62],
+                          }
         #NOTE: Assume self.params is a list of strings the first element is the name of the node to navigate to
         rospy.loginfo('Going to ' + " ".join(self.params) + ' ...')
 
