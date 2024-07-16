@@ -56,6 +56,6 @@ if __name__ == "__main__":
 
     p.begin()
 
-    AskConfirmation(p, "guest1", "name")
+    AskConfirmation(p, "Did_I_grab_the_bag", "please_say,_yes_you_can_grab_it,_if_that_is_correct.")
 
     p.end()

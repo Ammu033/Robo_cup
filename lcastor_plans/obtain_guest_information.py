@@ -102,5 +102,7 @@ if __name__ == "__main__":
     p.begin()
 
     obtain_guest_information(p, "guest1", "name")
+    obtain_guest_information(p, "guest1", "drink")
+
 
     p.end()
