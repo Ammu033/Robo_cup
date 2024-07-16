@@ -63,7 +63,10 @@ class followPerson(AbstractAction):
         rospy.logerr('personID' + str(personID))
         rospy.logerr('lastTrackedPerson' + str(self.lastTrackedPerson))
 
-        if self.is_person_lost(p) and self.lastTrackedPerson is not None:
+        personToFollowPos = self.get_person_pos(p, personID)
+        self.lastTrackedPos = personToFollowPos
+
+        if self.is_person_lost(p) and self.lastTrackedPerson is not None and self.lastTrackedPos is not None:
             dist = [math.sqrt((self.lastTrackedPos[0] - person.position.x)**2 + (self.lastTrackedPos[1] - person.position.y)**2) for person in p.people]
             rospy.logerr(dist)
             rospy.logerr(min(dist))
@@ -75,8 +78,8 @@ class followPerson(AbstractAction):
         self.lastTrackedPerson = personID
 
         # Get position of the person to follow
-        personToFollowPos = self.get_person_pos(p, personID)
-        self.lastTrackedPos = personToFollowPos
+        # personToFollowPos = self.get_person_pos(p, personID)
+        # self.lastTrackedPos = personToFollowPos
 
         if personToFollowPos is not None:
             # Follow the person
