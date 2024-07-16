@@ -58,6 +58,7 @@ class gotoRoom(AbstractAction):
                           "dinner_table_p" : [-3.14, 5.15, 0.0, 0.0, 0.72, 0.68],
                           "dishwasher_p" : [-3.39, 8.10, 0.0, 0.0, 0.77, 0.63],
                           "kitchen_counter_p" : [-4.69, 8.18, 0.0, 0.0, 0.78, 0.62],
+                          "inspection_point" : [0.05, 5.02, 0.0, 0.0, 0.74, 0.66],
                           }
         #NOTE: Assume self.params is a list of strings the first element is the name of the node to navigate to
         rospy.loginfo('Going to ' + " ".join(self.params) + ' ...')
