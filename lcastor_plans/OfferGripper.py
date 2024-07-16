@@ -1,8 +1,9 @@
 import os
 import sys
+from AskConfirmation import AskConfirmation
 
 try:
-    sys.path.insert(0, os.environ["PNP_HOME"] + '/scripts')
+    sys.path.insert(0, os.environ["PNP_HOME"] + "/scripts")
 except:
     print("Please set PNP_HOME environment variable to PetriNetPlans folder.")
     sys.exit(1)
@@ -18,7 +19,7 @@ from AskConfirmation import AskConfirmation
 QUESTION_TIMEOUT = 3
 def OfferGripper(p, msg, followup):
     confirmed = False
-    
+
     p.exec_action("armAction", "offer")
     p.exec_action("gripperAction", "open")
 

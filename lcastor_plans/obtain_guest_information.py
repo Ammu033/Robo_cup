@@ -4,7 +4,7 @@ import rospy
 import time
 from std_msgs.msg import String
 import random
-from request_ollama import request_ollama, affirm_deny_ollama
+from request_ollama import request_ollama
 from AskConfirmation import AskConfirmation
 
 from ollamamessages.msg import WhisperListening, OllamaResponse
@@ -24,7 +24,8 @@ OVERALL_TIMEOUT = 30.0
 RESPONSE_TIMEOUT = 5.0
 MAX_TRIES = 2
 
-def obtain_guest_information(p, person, info, tries = 0):
+
+def obtain_guest_information(p, person, info, tries=0):
     """
     person: "guest1" or "guest2"
     info: "name" or "drink"
@@ -35,11 +36,13 @@ def obtain_guest_information(p, person, info, tries = 0):
 
     if info == "name":
         speech_text = "Please_tell_me_your_name?"
-        default_info = random.choice(["max","tom","alex","julie","farah","tammie"])
+        default_info = random.choice(["max", "tom", "alex", "julie", "farah", "tammie"])
         final_text = "Thank_you_"
     elif info == "drink":
         speech_text = "Please_tell_me_your_favourite_drink?"
-        default_info = random.choice(["milk","wine","orange_juice","hot_chocolate","coffee"])
+        default_info = random.choice(
+            ["milk", "wine", "orange_juice", "hot_chocolate", "coffee"]
+        )
         final_text = "Hopefully_we_can_serve_you_some_"
     else:
         rospy.logerr("obtain_person_info: invalid info type.")
@@ -50,7 +53,9 @@ def obtain_guest_information(p, person, info, tries = 0):
     success = False
     while not success and tries < MAX_TRIES:
         time.sleep(2)
-        success, info_response = request_ollama(p, info, topic, speech_text, default_info)
+        success, info_response = request_ollama(
+            p, info, topic, speech_text, default_info
+        )
         if not success:
             tries += 1
         if tries >= MAX_TRIES:
@@ -64,7 +69,7 @@ def obtain_guest_information(p, person, info, tries = 0):
     affirm_success, affirm_response = AskConfirmation(
         p,
         speech_text=f"Is_your_{info}_{info_response}?",
-        cannot_hear_text = "please_try_saying,_correct_or_reject.",
+        cannot_hear_text="please_try_saying,_correct_or_reject.",
     )
 
     if not affirm_success:
@@ -75,26 +80,32 @@ def obtain_guest_information(p, person, info, tries = 0):
     # case 2: info is rejected by user (try again)
     if affirm_response == "no":
         tries += 1
-        obtain_guest_information(p, person, info, tries = tries)
+        obtain_guest_information(p, person, info, tries=tries)
         return
-    
+
     # case 2: info and affirmed by user (success case)
     if affirm_response == "yes":
         time.sleep(2)
         rospy.loginfo(f"obtain_guest_info: saving guest data for {person}...")
         p.exec_action("saveGuestData", f"set{info}_" + person + "_" + info_response)
         get_info = rospy.get_param(f"/{person}/{info}")
-        p.exec_action("speak", final_text+get_info)
+        p.exec_action("speak", final_text + get_info)
         return
 
     error_setting_defaults(p, info, person, default_info)
 
+
 def error_setting_defaults(p, info, person, default_info):
-    rospy.loginfo(f"obtain_guest_information: failed to obtain {info} for {person}, using default")
+    rospy.loginfo(
+        f"obtain_guest_information: failed to obtain {info} for {person}, using default"
+    )
     p.exec_action("saveGuestData", f"set{info}_" + person + "_" + default_info)
-    speech = f"sorry,_im_struggling_to_catch_your_{info}._It_will_be_set_to_{default_info}."
+    speech = (
+        f"sorry,_im_struggling_to_catch_your_{info}._It_will_be_set_to_{default_info}."
+    )
     p.exec_action("speak", speech)
-   
+
+
 if __name__ == "__main__":
 
     p = PNPCmd()

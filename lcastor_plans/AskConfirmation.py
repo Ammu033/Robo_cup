@@ -20,7 +20,7 @@ MAX_TRIES = 2
 
 def AskConfirmation(
         p,
-        speech_text=f"Did_I_grab_it?",
+        speech_text="Did_I_grab_it?",
         cannot_hear_text = "please_say,_yes_you_can_grab_it,_if_that_is_correct.",
         affirm_tries = 0,
         max_tries = MAX_TRIES,
@@ -29,14 +29,17 @@ def AskConfirmation(
     info = "affirm_deny"
     default_info = "no"
     success = False
+    response = None
     affirm_tries = 0
 
     while not success:
+        print('attempt ask confirm again')
         success, response = request_ollama(p, info, topic, speech_text, default_info, cannot_hear_text)
 
         if not success:
             rospy.loginfo(f"AskConfirmation: Did not recieve an affirm response")
-            tries += 1
+            affirm_tries += 1
+            print('increasing max tries')
 
         if affirm_tries >= max_tries:
             rospy.loginfo(f"AskConfirmation: Too many tries")
