@@ -35,7 +35,7 @@ init_cmd: |
   # export ROS_MASTER_URI="http://$ROS_MASTER:11311/"
   # export ROS_IP=$ROS_IP  
 
-  export_default ROBOT_NUM 89
+  export_default ROBOT_NUM 125
 
   source $HOME/LCASTOR/scripts/connect_tiago.sh $ROBOT_NUM 1
   
