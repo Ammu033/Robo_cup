@@ -18,9 +18,9 @@ import time
 def Receptionist(p):
 
     ## Step 1 - Meet the host, learn the face and bring them to the couch
-    p.exec_action('gotoRoom' , 'r_center')
+    p.exec_action('gotoRoom' , 'r_entrance')
     p.exec_action('moveTorso', '0.35')
-    p.exec_action('moveHead', '0_0.0')
+    p.exec_action('moveHead', '0_0.5')
 
     rospy.set_param('personSaved' , 0)
     set_host_name = 'john'
@@ -35,7 +35,7 @@ def Receptionist(p):
     while not rospy.get_param('modelLoaded'): 
         time.sleep(0.01)
 
-    p.exec_action('gotoRoom' , 'r_center') #TODO PUT BACK
+    p.exec_action('gotoRoom' , 'r_entrance') #TODO PUT BACK
     time.sleep(2)
     p.exec_action('moveHead', '-1_0.0')
     p.exec_action('speak' , f'Hello_{get_host_name},_I_am_your_receptionist_for_this_party!')
@@ -62,13 +62,12 @@ def Receptionist(p):
     rospy.set_param('personSaved' , 0)
     p.exec_action('speak' , 'Thank_you,_I_will_wait_at_the_entrance_for_guests!')
 
-    p.exec_action('gotoRoom' , 'r_door')
+    p.exec_action('gotoRoom' , 'r_entrance')
 
     do_guest(p, "guest1")
     
     p.exec_action('speak' , 'I_will_now_go_to_the_entrance_and_wait_for_other_guests,_feel_at_home!!!')
-
-    # p.exec_action('gotoRoom' , 'r_receptionentrance')
+    p.exec_action('gotoRoom' , 'r_entrance')
 
     do_guest(p, "guest2")
 

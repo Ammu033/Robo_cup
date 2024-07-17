@@ -60,10 +60,10 @@ def do_guest(p, guest):
     # p.exec_action('gotoRoom' , 'r_center')
     if guest == "guest2":
         p.exec_action("speak", "Please_follow_me_to_the_couch.")
-        p.exec_action("gotoRoom", "r_couch2")  # TODO PUT BACK change to couch 2
+        p.exec_action("gotoRoom", "r_couch")  # TODO PUT BACK change to couch 2
     elif guest == "guest1":
         p.exec_action("speak", "Please_follow_me_to_the_couch.")
-        p.exec_action("gotoRoom", "r_couch1")  # TODO PUT BACK
+        p.exec_action("gotoRoom", "r_couch")  # TODO PUT BACK
     p.exec_action("armAction", "offer", "start")
     p.exec_action(
         "speak",

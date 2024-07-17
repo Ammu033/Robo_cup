@@ -15,4 +15,5 @@ tmux send-keys -t whisper:0.1 C-z 'echo -e "\n\nTo manually set whisper to liste
 sleep 1
 tmux send-keys -t whisper:0.1 C-z 'rostopic pub /stt/listening ollamamessages/WhisperListening "listening: True" -1'
 sleep 10
+tmux send-keys -t whisper:0.0 C-z 'source ~/noetic-llama/whisper_ws/devel/setup.bash' Enter
 tmux send-keys -t whisper:0.0 C-z 'rosrun whisperwrapper whisperwrapper.py' Enter

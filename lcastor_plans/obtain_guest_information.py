@@ -39,7 +39,7 @@ def obtain_guest_information(p, person, info, tries=0):
         default_info = random.choice(["max", "tom", "alex", "julie", "farah", "tammie"])
         final_text = "Thank_you_"
     elif info == "drink":
-        speech_text = "Please_tell_me_your_favourite_drink?"
+        speech_text = "Whats_your_favourite_drink?"
         default_info = random.choice(
             ["milk", "wine", "orange_juice", "hot_chocolate", "coffee"]
         )
