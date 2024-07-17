@@ -84,11 +84,6 @@ def do_guest(p, guest):
     if guest == "guest2":
         introduce_people(p, "guest1", "guest2")
 
-    if guest == "guest2":
-        p.exec_action("gotoRoom", "r_couch2")  # TODO PUT BACK
-    elif guest == "guest1":
-        p.exec_action("gotoRoom", "r_couch1")  # TODO PUT BACK
-
 
 if __name__ == "__main__":
 

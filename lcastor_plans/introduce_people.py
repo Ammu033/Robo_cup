@@ -15,7 +15,7 @@ import rospy
 
 
 def introduce_people(p, person1, person2):
-    # rospy.log(f'introducing_{person1}_to_{person2}')
+    rospy.log(f'introducing_{person1}_to_{person2}')
     x_y_of_people = [
         str(rospy.get_param(person1 + "/x")),
         str(rospy.get_param(person1 + "/y")),
