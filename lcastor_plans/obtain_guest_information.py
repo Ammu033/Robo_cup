@@ -52,14 +52,14 @@ def obtain_guest_information(p, person, info, tries=0):
 
     success = False
     while not success and tries < MAX_TRIES:
-        time.sleep(2)
+        time.sleep(1)
         success, info_response = request_ollama(
             p, info, topic, speech_text, default_info
         )
         if not success:
             tries += 1
         if tries >= MAX_TRIES:
-            error_setting_defaults(p, info, person, default_info)
+            info_response = error_setting_defaults(p, info, person, default_info)
             return
 
     # affirm_tries = 0
@@ -74,13 +74,13 @@ def obtain_guest_information(p, person, info, tries=0):
 
     if not affirm_success:
         rospy.loginfo(f"Struggling with affirm {person}/{info}, setting defaults")
-        error_setting_defaults(p, info, person, default_info)
+        info_response = error_setting_defaults(p, info, person, default_info)
         return
 
     # case 2: info is rejected by user (try again)
     if affirm_response == "no":
         tries += 1
-        obtain_guest_information(p, person, info, tries=tries)
+        info_response = obtain_guest_information(p, person, info, tries=tries)
         return
 
     # case 2: info and affirmed by user (success case)
@@ -104,6 +104,7 @@ def error_setting_defaults(p, info, person, default_info):
         f"sorry,_im_struggling_to_catch_your_{info}._It_will_be_set_to_{default_info}."
     )
     p.exec_action("speak", speech)
+    return default_info
 
 
 if __name__ == "__main__":

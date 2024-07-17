@@ -57,4 +57,4 @@ windows:
   - name: whisper
     tags: ['core', 'whisper']
     panes:
-    - 'cd /home/robocup/LCASTOR/whisperwrapper && sleep 10 && bash start_whisper.sh && TMUX="" tmux attach -t whisper' 
+      - 'cd /home/robocup/LCASTOR/whisperwrapper && sleep 10 && bash start_whisper.sh && TMUX="" tmux attach -t whisper' 

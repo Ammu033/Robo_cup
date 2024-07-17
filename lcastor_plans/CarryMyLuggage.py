@@ -15,6 +15,8 @@ from OfferGripper import OfferGripper
 
 
 def CarryMyLuggage(p):  
+
+    p.exec_action('setNavigationMode', 'MAP')
     
     p.exec_action('moveHead', '0.0_0.0')
     p.exec_action("armAction", "home")
@@ -45,7 +47,9 @@ def CarryMyLuggage(p):
     
     # 8. Resetting initial settings
     p.exec_action('moveHead', '0.0_0.0')
-    # p.exec_action('setNavigationMode', 'LOC')
+    p.exec_action('setNavigationMode', 'LOC')
+
+    # os.system("rosservice call /pal_navigation_sm \"input: 'LOC'\"")
     
 
 if __name__ == "__main__":

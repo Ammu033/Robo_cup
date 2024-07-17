@@ -65,8 +65,8 @@ windows:
   - name: whisper
     tags: ['core', 'whisper']
     panes:
-    - 'source $CONDA_DIRECT/etc/profile.d/conda.sh ; conda activate $CONDA_VIRT_ENV ; if $USE_WHISPER ; then roslaunch robocup_nlu stt.launch ; fi'
-    - rostopic echo /user_speech
-    - rostopic echo /robot_speech
-    - rostopic echo /rasa_confirmation
-    - rostopic echo /planner_intention
+      - 'source $CONDA_DIRECT/etc/profile.d/conda.sh ; conda activate $CONDA_VIRT_ENV ; if $USE_WHISPER ; then roslaunch robocup_nlu stt.launch ; fi'
+      - rostopic echo /user_speech
+      - rostopic echo /robot_speech
+      - rostopic echo /rasa_confirmation
+      - rostopic echo /planner_intention
