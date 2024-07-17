@@ -38,13 +38,25 @@ def obtain_guest_information(p, person, info, tries=0):
     if info == "name":
         speech_text = "Please_tell_me_your_name?"
         default_info = random.choice(["max", "tom", "alex", "julie", "farah", "tammie"])
-        final_text = "Thank_you_"
+        final_text = random.choice([
+            "Thank_you_",
+            "My_best_friend_is_also_called_",
+            "pleasure_to_meet_you_",
+            "Nice_to_meet_you_",
+        ])
     elif info == "drink":
         speech_text = "Whats_your_favourite_drink?"
         default_info = random.choice(
             ["milk", "wine", "orange_juice", "hot_chocolate", "coffee"]
         )
-        final_text = "Hopefully_we_can_serve_you_some_"
+        final_text = random.choice(
+                [
+                "Hopefully_we_can_serve_you_some_",
+                "Oh_nice_choice_its_been_some_time_since_ive_had_",
+                "Good_choice,_weve_just_restocked_up_with_",
+                "strange_choice_for_this_kind_of_evening,_but_we'll_find_you_some_"
+                 ]
+        )
     else:
         rospy.logerr("obtain_person_info: invalid info type.")
         return
@@ -67,7 +79,6 @@ def obtain_guest_information(p, person, info, tries=0):
     if info_response is None: 
         info_response = error_setting_defaults(p, info, person, default_info)
 
-    # affirm_tries = 0
     affirm_success = False
 
     # case 1: ollama returns a false response (try again)
