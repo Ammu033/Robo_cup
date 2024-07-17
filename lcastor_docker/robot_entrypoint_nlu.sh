@@ -54,6 +54,12 @@ echo " "
     echo "It will connect to tiago ${ROBOT_NUM}"
   fi 
    echo "source /home/lcastor/ros_ws/src/LCASTOR/scripts/connect_tiago.sh ${ROBOT_NUM} ${ETH}" >> /home/lcastor/.bashrc
+      echo "echo \"==========================\"" >> /home/lcastor/.bashrc
+   echo "echo \"WE ARE IN ARENA:\"" >> /home/lcastor/.bashrc
+   echo "echo \"                 \$(rosparam get /arena)\"" >> /home/lcastor/.bashrc
+   echo "echo \"To set, e.g.: rosparam set /arena arena_b\"" >> /home/lcastor/.bashrc
+   echo "echo \"==========================\"" >> /home/lcastor/.bashrc
+
 
    catkin build
    source /home/lcastor/ros_ws/devel/setup.bash

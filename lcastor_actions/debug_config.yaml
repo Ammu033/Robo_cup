@@ -1,5 +1,5 @@
 Debug: 
-  Active: False 
+  Active: True 
   Mode: "NoMove" 
 
 Configurations:
@@ -9,8 +9,6 @@ Configurations:
   # If BOTH are present, ONLY the Active list will be used
   NoMove: # name of the mode
     Inactive:
-      # armAction
-      # moveHead
       goto
       gotoRoom
       # moveTorso

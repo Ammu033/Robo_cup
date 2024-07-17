@@ -38,6 +38,11 @@ echo " "
    echo "function s(){ tmule -c ~/ros_ws/src/LCASTOR/lcastor_bringup/tmule/lcastor_simulated.yaml -W 3 launch && tmule -c $(rospack find ollamawrapper)/tmule/ollama_tmule.yaml -W 3 launch ; }" >> /home/lcastor/.bashrc
    echo "function t(){ tmux kill-ses -t ollama && tmule -c ~/ros_ws/src/LCASTOR/lcastor_bringup/tmule/lcastor_simulated.yaml -W 3 terminate && tmule -c $(rospack find ollamawrapper)/tmule/ollama_tmule.yaml terminate ; }" >> /home/lcastor/.bashrc
    echo "function r(){ tmule -c ~/ros_ws/src/LCASTOR/lcastor_bringup/tmule/lcastor_simulated.yaml -W 3 relaunch && tmule -c $(rospack find ollamawrapper)/tmule/ollama_tmule.yaml -W 3 relaunch ; }" >> /home/lcastor/.bashrc
+   echo "echo \"==========================\"" >> /home/lcastor/.bashrc
+   echo "echo \"WE ARE IN ARENA:\"" >> /home/lcastor/.bashrc
+   echo "echo \"                 \$(rosparam get /arena)\"" >> /home/lcastor/.bashrc
+   echo "echo \"To set, e.g.: rosparam set /arena arena_b\"" >> /home/lcastor/.bashrc
+   echo "echo \"==========================\"" >> /home/lcastor/.bashrc
 
   #  tmule -c $(rospack find ollamawrapper)/tmule/ollama_tmule.yaml -W 3 launch
    exec su lcastor
