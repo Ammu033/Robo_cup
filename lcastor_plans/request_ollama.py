@@ -16,8 +16,8 @@ from pnp_cmd_ros import *
 from std_msgs.msg import Bool
 import rospy
 
-OVERALL_TIMEOUT = 59.0
-RESPONSE_TIMEOUT = 20.0
+OVERALL_TIMEOUT = 30.0
+RESPONSE_TIMEOUT = 6.0
 MAX_TRIES = 2 
 
 
@@ -27,6 +27,7 @@ def speech_for_whisper(p, listening_pub, plan_intent_pub, publish_info, speech_t
     for speech in speech_texts:
         p.exec_action("speak", speech)
     plan_intent_pub.publish(publish_info)
+    time.sleep(1)
     listening_pub.publish(listening=True)
     start_time = rospy.get_time()
     return start_time
