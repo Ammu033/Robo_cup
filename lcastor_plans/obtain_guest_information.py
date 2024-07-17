@@ -33,6 +33,7 @@ def obtain_guest_information(p, person, info, tries=0):
 
     person = person.lower()
     info = info.lower()
+    info_response = None
 
     if info == "name":
         speech_text = "Please_tell_me_your_name?"
@@ -58,9 +59,13 @@ def obtain_guest_information(p, person, info, tries=0):
         )
         if not success:
             tries += 1
+        
         if tries >= MAX_TRIES:
             info_response = error_setting_defaults(p, info, person, default_info)
             return
+    
+    if info_response is None: 
+        info_response = error_setting_defaults(p, info, person, default_info)
 
     # affirm_tries = 0
     affirm_success = False
