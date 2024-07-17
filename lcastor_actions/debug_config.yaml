@@ -1,16 +1,14 @@
 Debug: 
-  Active: False 
-  Mode: "Test3" 
+  Active: True 
+  Mode: "NoSpeech" 
 
 Configurations:
   # Modes should have either an Active or Inactive list
   # Active actions are the actions that are enabled in the mode
   # Inactive actions are the actions that are disabled in the mode
   # If BOTH are present, ONLY the Active list will be used
-  Test1: # name of the mode
-    Active:
-      # armAction
-      # moveHead
+  NoSpeech:
+    Inactive:
       speak
       # moveTorso
   Test2: # name of the mode
