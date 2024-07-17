@@ -12,13 +12,8 @@ import time
 import pnp_cmd_ros
 from pnp_cmd_ros import *
 from wait_for_person import wait_for_person
-from identify_person import identify_person
-from obtain_person_information import obtain_person_information
-from introduce_people import introduce_people
 from do_guest import do_guest
 import time
-import pnp_cmd_ros
-from pnp_cmd_ros import *
 
 def Receptionist(p):
 
