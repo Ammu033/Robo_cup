@@ -23,7 +23,13 @@ echo " "
    echo "function t(){  tmule -c $(rospack find robocup_human_sensing)/tmule/reco_launch.yaml terminate ; }" >> /home/lcastor/.bashrc
    echo "function r(){  tmule -c $(rospack find robocup_human_sensing)/tmule/reco_launch.yaml -W 3 relaunch ; }" >> /home/lcastor/.bashrc
   #  tmule -c $(rospack find robocup_human_sensing)/tmule/reco_launch.yaml launch
+   mkdir /home/lcastor/ros_ws/src/LCASTOR/robocup_human_sensing/database
+   echo $(ls -la /home/lcastor/ros_ws/src/LCASTOR/robocup_human_sensing/)
+
    exec su lcastor
+   mkdir /home/lcastor/ros_ws/src/LCASTOR/robocup_human_sensing/database
+   echo $(ls -la /home/lcastor/ros_ws/src/LCASTOR/robocup_human_sensing/)
+
    tmule -c $(rospack find robocup_human_sensing)/tmule/reco_launch.yaml launch
 
 
