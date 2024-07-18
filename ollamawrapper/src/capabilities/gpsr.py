@@ -25,11 +25,20 @@ ollama_api_url = rospy.get_param("/gpsr/ollama_api_url", "192.168.69.253:11434")
 # ollama_api_url = rospy.get_param("/gpsr/ollama_api_url", "127.0.0.1:11434")
 ollama_multimodal_model = rospy.get_param("/gpsr/ollama_multimodal_model", 'llava:7b')
 
+def exception_handling(func):
+    def wrapper(*args, **kwargs):
+        try:
+            func(*args, **kwargs)
+        except Exception as e:
+            rospy.logerr("Exception {} occurred during execution of {}".format(e, func.__name__))
+    return wrapper
+
 def publish_what_im_doing(what_im_doing):
     print(what_im_doing)
     # ollama_out_pub.publish('Generated subtask, I am going to "%s"' % what_im_doing)
 
 @contexts.context(["gpsr"])
+@exception_handling
 def goto_location(p, location_name):
     """Go to a named location name, such as 'side tables', 'bedroom' or 'cabinet' or 'bedside table'
 
@@ -41,6 +50,7 @@ def goto_location(p, location_name):
     p.exec_action('gotoRoom', "r_" + location_name)
 
 @contexts.context(["gpsr"])
+@exception_handling
 def go_back_to_me(p):
     """Go back to me"""
     publish_what_im_doing("go_back_to_me()")
@@ -48,6 +58,7 @@ def go_back_to_me(p):
     p.exec_action('gotoRoom' , 'r_inspectionpoint')
 
 @contexts.context(["gpsr"])
+@exception_handling
 def grasp_object(p, object_name):
     """Grasps a given object, for example 'fruit' or 'bowl'
 
@@ -65,6 +76,7 @@ def grasp_object(p, object_name):
     p.exec_action('speak', 'Thanks')
 
 @contexts.context(["gpsr"])
+@exception_handling
 def offer_object(p):
     """Grasps the object currently being held. This means that `grasp_object()
     must have previously been called"""
@@ -75,6 +87,7 @@ def offer_object(p):
     p.exec_action("gripperAction", "open")
 
 @contexts.context(["gpsr"])
+@exception_handling
 def ask_for_person(p, person_name):
     """Ask for a person with a given name, for example 'Angel' or 'Morgan'.
     It can also be a descriptive action, e.g. 'person pointing to the right'
@@ -85,7 +98,7 @@ def ask_for_person(p, person_name):
     publish_what_im_doing("ask_for_person(person_name='%s')" % person_name)
 
     p.exec_action('speak', 'I_am_looking_for_{}'.format(person_name.replace(" ", "_")))
-    p.exec_action('speak', 'Can_{}_you_please_come_in_front_of_me?'.format(person_name.replace(" ", "_")))
+    p.exec_action('speak', 'Can_you,_{},_please_come_in_front_of_me?'.format(person_name.replace(" ", "_")))
     time.sleep(3)
 
 # @contexts.context(["gpsr"])
@@ -99,6 +112,7 @@ def ask_for_person(p, person_name):
 #     publish_what_im_doing("identify_people(what_to_idenfify='%s')" % what_to_identify)
 
 @contexts.context(["gpsr"])
+@exception_handling
 def identify_objects(p, what_to_idenfify):
     """Given something to look for, for example, the biggest food item or the smallest toy
     or the number of plates, do perception to indentify this. 'Tell me' tasks consist of an
@@ -141,6 +155,7 @@ def identify_objects(p, what_to_idenfify):
     p.exec_action('moveHead', '0.0_0.0')
 
 @contexts.context(["gpsr"])
+@exception_handling
 def report_information(p):
     """Report back a previous identification task. This therefore means that `identify_objects()`
     must previously have been called.
@@ -151,6 +166,7 @@ def report_information(p):
     p.exec_action('speak', 'I_have_identified_{}'.format(report.replace(" ", "_")))
 
 @contexts.context(["gpsr"])
+@exception_handling
 def salute(p):
     """Salute a person"""
     publish_what_im_doing("salute()")
@@ -160,6 +176,7 @@ def salute(p):
     p.action_cmd("armAction", "wave", "stop")
 
 @contexts.context(["gpsr"])
+@exception_handling
 def follow_person(p):
     """Follow the person directly in front of you. This means `ask_for_person()` must previously have been called."""
     publish_what_im_doing("following someone")
@@ -167,6 +184,7 @@ def follow_person(p):
     PersonFollowing(p)
 
 @contexts.context(["gpsr"])
+@exception_handling
 def guide_person(p):
     """Ask a human to follow the robot. `ask_for_person()` must have previously been called"""
     publish_what_im_doing("guide_person()")
@@ -174,16 +192,19 @@ def guide_person(p):
     p.exec_action('speak', 'Please,_follow_me!')
 
 @contexts.context(["gpsr"])
+@exception_handling
 def done(p):
     publish_what_im_doing("done()")
 
 @contexts.context(["gpsr"])
+@exception_handling
 def cease_all_motor_functions(p):
     engine_say(p, "Like fire and powder, which as they kiss consume,")
     engine_say(p, "The sweetest honeys loathsome in his own deliciousness,")
     engine_say(p, "These violent delights have violent ends")
 
 @contexts.context(["gpsr"])
+@exception_handling
 def engine_say(p, to_say):
     publish_what_im_doing("engine_say(%s)" % to_say)
     # p.exec_action('speak' , to_say.replace(" ", "_"))
