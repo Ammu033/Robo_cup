@@ -18,6 +18,7 @@ from tensorflow.keras.models import model_from_json
 import sys
 import copy
 import random
+DETECT_DIST = 1.5
 
 def imgmsg_to_cv2(img_msg):
     if img_msg.encoding != "bgr8":
@@ -104,12 +105,13 @@ class face_identifier:
 	
 	def register_new_face(self , img_copy, x , y , w  ,h):
 		print('New Face Detected')
+		rospy.logerr(x ,y)
 		#print('Tell your name')
 		#os.system('mpg321 name_promp.mp3')
 		#new_img_name = str(input())
 		new_img_name = "".join(random.choices("1234567890", k=5))
 		filename = self.emp_db + new_img_name + '.jpg'
-		cv2.imwrite(filename, img_copy[int(y):int(y+h), int(x):int(x+w)])
+		# cv2.imwrite(filename, img_copy[int(y):int(y+h), int(x):int(x+w)])
 		self.ret_emp()
 		return new_img_name
 	
@@ -144,7 +146,7 @@ class face_identifier:
 		for i in self.employees:
 			employee_name = i
 			if index == np.argmin(distances):
-				if distances[index] <= 1.0:
+				if distances[index] <= DETECT_DIST:
 					is_found = True
 					color  = (0 , 200 ,0)
 					name = employee_name

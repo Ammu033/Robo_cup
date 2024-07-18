@@ -35,7 +35,7 @@ init_cmd: |
   # export ROS_MASTER_URI="http://$ROS_MASTER:11311/"
   # export ROS_IP=$ROS_IP  
 
-  export_default ROBOT_NUM 29
+  export_default ROBOT_NUM 125
 
   source $HOME/LCASTOR/scripts/connect_tiago.sh $ROBOT_NUM 1
   
@@ -53,8 +53,8 @@ windows:
   - name: ollama
     tags: ['core', 'nlu']
     panes:
-      - 'cd $HOME/LCASTOR_eden/lcastor_docker; ./run_robot_docker_ollama.sh $ROBOT_NUM 1'
+      - 'cd $HOME/LCASTOR/lcastor_docker; ./run_robot_docker_ollama.sh $ROBOT_NUM 1'
   - name: whisper
     tags: ['core', 'whisper']
     panes:
-    - 'cd /home/robocup/LCASTOR_eden/whisperwrapper && sleep 10 && bash start_whisper.sh && TMUX="" tmux attach -t whisper' 
+      - 'cd /home/robocup/LCASTOR/whisperwrapper && sleep 10 && bash start_whisper.sh && TMUX="" tmux attach -t whisper' 

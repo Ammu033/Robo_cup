@@ -59,10 +59,12 @@ MAX_SCALING_ROIS = 2
 cropped_face_width = 128
 cropped_face_height = 128
 
+MIN_DET_CONF = 0.9
+
 class peopleDetection:
     def __init__(self):
         rospy.set_param('modelLoaded' , False)
-        self.detector = mp_face_detection.FaceDetection(model_selection = 1 , min_detection_confidence = 0.8)
+        self.detector = mp_face_detection.FaceDetection(model_selection = 1 , min_detection_confidence = MIN_DET_CONF)
         self.name = face_identifier(database_direct,models_direct)
         #self.gender = gender_identifier(models_direct)
         #self.age = age_identifier(models_direct)

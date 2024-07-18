@@ -35,7 +35,7 @@ init_cmd: |
   # export ROS_MASTER_URI="http://$ROS_MASTER:11311/"
   # export ROS_IP=$ROS_IP  
 
-  export_default ROBOT_NUM 29
+  export_default ROBOT_NUM 125
 
   source $HOME/LCASTOR/scripts/connect_tiago.sh $ROBOT_NUM 1
   
@@ -65,8 +65,8 @@ windows:
   - name: whisper
     tags: ['core', 'whisper']
     panes:
-    - 'source $CONDA_DIRECT/etc/profile.d/conda.sh ; conda activate $CONDA_VIRT_ENV ; if $USE_WHISPER ; then roslaunch robocup_nlu stt.launch ; fi'
-    - rostopic echo /user_speech
-    - rostopic echo /robot_speech
-    - rostopic echo /rasa_confirmation
-    - rostopic echo /planner_intention
+      - 'source $CONDA_DIRECT/etc/profile.d/conda.sh ; conda activate $CONDA_VIRT_ENV ; if $USE_WHISPER ; then roslaunch robocup_nlu stt.launch ; fi'
+      - rostopic echo /user_speech
+      - rostopic echo /robot_speech
+      - rostopic echo /rasa_confirmation
+      - rostopic echo /planner_intention

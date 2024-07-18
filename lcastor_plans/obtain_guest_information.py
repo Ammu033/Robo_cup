@@ -33,17 +33,30 @@ def obtain_guest_information(p, person, info, tries=0):
 
     person = person.lower()
     info = info.lower()
+    info_response = None
 
     if info == "name":
         speech_text = "Please_tell_me_your_name?"
         default_info = random.choice(["max", "tom", "alex", "julie", "farah", "tammie"])
-        final_text = "Thank_you_"
+        final_text = random.choice([
+            "Thank_you_",
+            "My_best_friend_is_also_called_",
+            "pleasure_to_meet_you_",
+            "Nice_to_meet_you_",
+        ])
     elif info == "drink":
-        speech_text = "Please_tell_me_your_favourite_drink?"
+        speech_text = "Whats_your_favourite_drink?"
         default_info = random.choice(
             ["milk", "wine", "orange_juice", "hot_chocolate", "coffee"]
         )
-        final_text = "Hopefully_we_can_serve_you_some_"
+        final_text = random.choice(
+                [
+                "Hopefully_we_can_serve_you_some_",
+                "Oh_nice_choice_its_been_some_time_since_ive_had_",
+                "Good_choice,_weve_just_restocked_up_with_",
+                "strange_choice_for_this_kind_of_evening,_but_we'll_find_you_some_"
+                 ]
+        )
     else:
         rospy.logerr("obtain_person_info: invalid info type.")
         return
@@ -52,17 +65,20 @@ def obtain_guest_information(p, person, info, tries=0):
 
     success = False
     while not success and tries < MAX_TRIES:
-        time.sleep(2)
+        time.sleep(1)
         success, info_response = request_ollama(
             p, info, topic, speech_text, default_info
         )
         if not success:
             tries += 1
+        
         if tries >= MAX_TRIES:
-            error_setting_defaults(p, info, person, default_info)
+            info_response = error_setting_defaults(p, info, person, default_info)
             return
+    
+    if info_response is None: 
+        info_response = error_setting_defaults(p, info, person, default_info)
 
-    # affirm_tries = 0
     affirm_success = False
 
     # case 1: ollama returns a false response (try again)
@@ -74,13 +90,13 @@ def obtain_guest_information(p, person, info, tries=0):
 
     if not affirm_success:
         rospy.loginfo(f"Struggling with affirm {person}/{info}, setting defaults")
-        error_setting_defaults(p, info, person, default_info)
+        info_response = error_setting_defaults(p, info, person, default_info)
         return
 
     # case 2: info is rejected by user (try again)
     if affirm_response == "no":
         tries += 1
-        obtain_guest_information(p, person, info, tries=tries)
+        info_response = obtain_guest_information(p, person, info, tries=tries)
         return
 
     # case 2: info and affirmed by user (success case)
@@ -104,6 +120,7 @@ def error_setting_defaults(p, info, person, default_info):
         f"sorry,_im_struggling_to_catch_your_{info}._It_will_be_set_to_{default_info}."
     )
     p.exec_action("speak", speech)
+    return default_info
 
 
 if __name__ == "__main__":

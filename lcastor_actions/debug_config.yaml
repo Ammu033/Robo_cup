@@ -1,0 +1,50 @@
+Debug: 
+  Active: False 
+  Mode: "NoMove" 
+
+Configurations:
+  NoMove: # name of the mode
+    Inactive:
+      # goto
+      # gotoRoom
+      armAction
+ 
+
+
+
+
+
+
+
+    # Active:
+    #   # activateRasa
+    #   # armAction
+    #   # debug_config
+    #   # findClosestPersonToTrack
+    #   # followPerson
+    #   # followPerson_ats
+    #   # gestureDetection
+    #   # getContinueConfirmation
+    #   # getTextInput
+    #   # getYesNoConfirmation
+    #   # goto
+    #   # gotoRoom
+    #   # gotoRoom
+    #   # graspObject
+    #   # gripperAction
+    #   # listen
+    #   # lookAtClosestPerson
+    #   # moveGripperTo
+    #   # moveHead
+    #   # speak
+    #   # moveTorso
+    #   # navigateForward
+    #   # objectDetection
+    #   # peopleDetection
+    #   # personIdentification
+    #   # recog_action
+    #   # saveGuestData
+    #   # setNavigationMode
+    #   # speak
+    #   # test
+    #   # waitOpenDoor

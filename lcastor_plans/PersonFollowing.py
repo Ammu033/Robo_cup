@@ -1,6 +1,8 @@
 import os
 import sys
 import rospy
+from AskConfirmation import AskConfirmation
+
 try:
     sys.path.insert(0, os.environ["PNP_HOME"] + '/scripts')
 except:
@@ -18,6 +20,7 @@ ROSPARAM = 'lcastor_person_follower/personID_to_follow'
 QUESTION_TIMEOUT = 10
 
 def PersonFollowing(p):
+    print('Able to start the plan')
     rospy.set_param(ROSPARAM, '')
     msg_missed = True
     
@@ -26,17 +29,19 @@ def PersonFollowing(p):
     while(not taskFinished):
         
         p.exec_action('speak', 'Can_you_stand_2_meters_in_front_of_me,_please?')
-        time.sleep(2)
+        # time.sleep(2)
         p.exec_action('findClosestPersonToTrack', '')
+
+        p.action_cmd('followPerson', '', 'start')
 
         p.exec_action('speak', "Hey_you,_I_am_following_you._Please_start_moving.")
         # p.exec_action('speak', "Hey_person_" + str(rospy.get_param(ROSPARAM)) + ",_I_am_following_you")
         
-        p.action_cmd('followPerson', '', 'start')
+        
         
         dist_notification = time.time()
 
-        while not taskFinished and not p.get_condition("IsPersonLost"):
+        while not p.get_condition("IsPersonLost"):
             
             # IsPersonTooFar notification
             t_dist = time.time() - dist_notification
@@ -50,19 +55,13 @@ def PersonFollowing(p):
         # p.exec_action('speak', 'Person_to_follow_lost')
         if rospy.get_time() - starting_time > 30:
             start = rospy.get_time()
-            while msg_missed:
+            response = None
+            while response is None:
                 if rospy.get_time() - start > 30:
                     break
-                p.exec_action("speak", 'Have_we_arrived?_Please_come_to_me,_and_say_yes_or_no!')
-                p.exec_action("activateRasa", "affirm_deny")
-                try:
-                    taskFinished = rospy.wait_for_message('/person_affirm_deny', Bool, timeout = QUESTION_TIMEOUT).data
-                    msg_missed = False
-                except:
-                    msg_missed = True
-                
-
-
+                success, response = AskConfirmation(p, 'Have_we_arrived?', "Please_confirm_if_we_have_arrived")
+                if success and (response == "yes"):
+                    taskFinished = True
 
 
 if __name__ == "__main__":

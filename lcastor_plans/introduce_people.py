@@ -15,7 +15,7 @@ import rospy
 
 
 def introduce_people(p, person1, person2):
-    # rospy.log(f'introducing_{person1}_to_{person2}')
+    rospy.loginfo(f'introducing_{person1}_to_{person2}')
     x_y_of_people = [
         str(rospy.get_param(person1 + "/x")),
         str(rospy.get_param(person1 + "/y")),
@@ -38,20 +38,22 @@ def introduce_people(p, person1, person2):
     p.exec_action("speak", "Hi_" + person1_name + ".Please_meet_" + person2_name)
     # FIXME not sure where it is going at the moment
     # p.exec_action('goto' , "_".join(x_y_of_people) + '_' + str(person2_w) )
+
+    p.action_cmd("speak", "Their_favourite_drink_is" + person2_drink, "start")
     p.exec_action("moveHead", str(person2_head_angle) + "_0.0")
     # p.exec_action('goto' , "_".join(x_y_of_people) + '_' + str(person1_w) )
     p.exec_action("moveHead", str(person1_head_angle) + "_0.0")
-    p.exec_action("speak", "Their_favourite_drink_is" + person2_drink)
+    p.action_cmd("speak", "Their_favourite_drink_is_" + person2_drink, "stop")
 
     # intrducve 2 to 1
     # p.exec_action('goto' , "_".join(x_y_of_people) + '_' + str(person2_w) )
-    # p.exec_action('moveHead', str(person2_head_angle) + '_0.0')
-    # p.exec_action('speak' , 'Hi_' + person2_name + '.Please_meet_' + person1_name)
+    p.exec_action('moveHead', str(person2_head_angle) + '_0.0')
+    p.exec_action('speak' , 'Hi_' + person2_name + '.Please_meet_' + person1_name)
     # p.exec_action('goto' , "_".join(x_y_of_people) + '_' + str(person1_w) )
     # p.exec_action('moveHead', str(person1_head_angle) + '_0.0')
     # p.exec_action('goto' , "_".join(x_y_of_people) + '_' + str(person2_w) )
-    # p.exec_action('moveHead', str(person2_head_angle) + '_0.0')
-    # p.exec_action('speak' , 'Their_favourite_drink_is' + person1_drink)
+    p.exec_action('moveHead', str(person2_head_angle) + '_0.0')
+    p.exec_action('speak' , 'Their_favourite_drink_is' + person1_drink)
 
 
 if __name__ == "__main__":

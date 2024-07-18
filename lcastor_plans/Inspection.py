@@ -16,15 +16,18 @@ from OfferGripper import OfferGripper
 def Inspection(p):
     
     # 0. Set Head position
-    p.exec_action("moveHead", "0.0_-0.75")
-    p.exec_action("moveTorso", "0.20")
+    # p.exec_action("moveHead", "0.0_-0.75")
+    # p.exec_action("moveTorso", "0.20")
 
     # 1. Wait for the door open
     p.exec_action("speak", "Can_you_please_open_the_door_for_me_?")
-    while(not p.get_condition("IsDoorOpen")): time.sleep(0.1)
+    while(not p.get_condition("isDoorOpen")): time.sleep(0.1)
     p.exec_action("speak", "Thank_you_for_opening_the_door")
 
-    # 2. Go to the living room
+    # 2. Enter in the room
+    p.exec_action("navigateForward", "4")
+
+    # 3. Go to inspection_point
     p.exec_action("gotoRoom", "r_inspectionpoint")
     p.exec_action("speak", "Ready_for_the_inspection!")
 
