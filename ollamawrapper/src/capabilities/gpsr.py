@@ -4,6 +4,7 @@ import capabilities.contexts as contexts
 from cv_bridge import CvBridge, CvBridgeError
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
+from PersonFollowing import PersonFollowing
 import tempfile
 import random
 import ollama
@@ -44,7 +45,7 @@ def go_back_to_me(p):
     """Go back to me"""
     publish_what_im_doing("go_back_to_me()")
 
-    p.exec_action('gotoRoom' , 'r_home')
+    p.exec_action('gotoRoom' , 'r_inspectionpoint')
 
 @contexts.context(["gpsr"])
 def grasp_object(p, object_name):
@@ -55,11 +56,23 @@ def grasp_object(p, object_name):
     """
     publish_what_im_doing("grasp_object(object_name='%s')" % object_name)
 
+    p.exec_action('speak', 'I_am_not_able_to_grasp_the_{}.'.format(object_name.replace(" ", "_")))
+    p.action_cmd('speak', 'Can_you_place_it_in_my_hand?', 'start')
+    p.exec_action("gripperAction", "open")
+    p.action_cmd('speak', 'Can_you_place_it_in_my_hand?', 'stop')
+    time.sleep(3)
+    p.exec_action("gripperAction", "close")
+    p.exec_action('speak', 'Thanks')
+
 @contexts.context(["gpsr"])
 def offer_object(p):
-    """Grasps the onject currently being held. This means that `grasp_object()
+    """Grasps the object currently being held. This means that `grasp_object()
     must have previously been called"""
     publish_what_im_doing("offer_object()")
+
+    p.exec_action('speak', 'Here_is_the_item_you_have_requested,_please_take_it_from_my_hand.')
+    time.sleep(3)
+    p.exec_action("gripperAction", "open")
 
 @contexts.context(["gpsr"])
 def ask_for_person(p, person_name):
@@ -70,6 +83,10 @@ def ask_for_person(p, person_name):
         person_name (str): The person's name to ask for
     """
     publish_what_im_doing("ask_for_person(person_name='%s')" % person_name)
+
+    p.exec_action('speak', 'I_am_looking_for_{}'.format(person_name.replace(" ", "_")))
+    p.exec_action('speak', 'Can_{}_you_please_come_in_front_of_me?'.format(person_name.replace(" ", "_")))
+    time.sleep(3)
 
 # @contexts.context(["gpsr"])
 # def identify_people(what_to_identify):
@@ -130,21 +147,32 @@ def report_information(p):
     """
     publish_what_im_doing("report_information()")
 
+    report = rospy.set_param("/gpsr/saved_information", "I_am_not_sure.")
+    p.exec_action('speak', 'I_have_identified_{}'.format(report.replace(" ", "_")))
+
 @contexts.context(["gpsr"])
 def salute(p):
     """Salute a person"""
     publish_what_im_doing("salute()")
+
+    p.action_cmd("armAction", "wave", "start")
+    p.exec_action('speak', 'Hello!')
+    p.action_cmd("armAction", "wave", "stop")
 
 @contexts.context(["gpsr"])
 def follow_person(p):
     """Follow the person directly in front of you. This means `ask_for_person()` must previously have been called."""
     publish_what_im_doing("following someone")
 
+    PersonFollowing(p)
+
 @contexts.context(["gpsr"])
 def guide_person(p):
     """Ask a human to follow the robot. `ask_for_person()` must have previously been called. You must go to a location
     immediately after this."""
     publish_what_im_doing("guide_person()")
+
+    p.exec_action('speak', 'Please,_follow_me!')
 
 @contexts.context(["gpsr"])
 def cease_all_motor_functions(p):
