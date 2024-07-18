@@ -12,57 +12,9 @@ from AbstractAction import AbstractAction
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 import actionlib
 import math
-import copy
 """
 Starts and stops the object detection node
 """
-
-
-ROOM_DICT_B = {
-    "hallwaycabinet" : [-3.04, 4.81, 0.0, 0.0, 0.97, -0.23],
-    "entrance" : [-3.12, -2.77, 0.0 , 0.0, 0.98, -0.17],
-    "desk" : [-2.86, -0.17, 0.0, 0.0, -0.74, 0.66],
-    "shelf" : [-3.29, 1.4, 0.0, 0.0, 0.99, -0.03],
-    "coathanger" : [-2.36, -3.08, 0.0, 0.0, 0.74, 0.66],
-    "exit" : [-1.02, 1.83, 0.0, 0.0, 0.67, 0.73],
-    "TVtable" : [0.69, -4.54, 0.0, 0.0, 0.99, 0.05],
-    "loungechair" : [1.59, -3.86, 0.0, 0.0, -0.37, 0.92],
-    "lamp" : [3.26, -5.12, 0.0, 0.0, -0.12, 0.99],
-    "couch" : [3.20, -2.56, 0.0, 0.0, -0.37, 0.92],
-    "coffetable" : [2.50, -3.06, 0.0, 0.0, -0.42, 0.90],
-    "trashcan" : [0.43, -0.92, 0.0, 0.0, 0.96, -0.25],
-    "kitchencabinet" : [0.46, 1.95, 0.0, 0.0, 0.99, -0.01],
-    "dinnertable" : [-1.09, 1.17, 0.0, 0.0, 0.01, 0.99],
-    "dishwasher" : [3.36, 0.06, 0.0, 0.0, 0.13, 0.99],
-    "kitchencounter" : [3.66, 1.94, 0.0, 0.0, 0.11, 0.99],
-    "inspectionpoint" : [0.26, -2.79, 0.0, 0.0, -0.34, 0.93],
-}
-
-
-ROOM_DICT_C = {
-    "hallwaycabinet" : [2.62, 2.37, 0.0, 0.0, -0.59, 0.80],
-    "entrance" : [0.72, 1.41, 0.0 , 0.0, -0.59, 0.80],
-    "desk" : [-2.19, 1.67, 0.0, 0.0, -0.04, 0.99],
-    "shelf" : [-3.03, 1.60, 0.0, 0.0, -0.69, 0.72],
-    "coathanger" : [0.45, 2.79, 0.0, 0.0, 0.99, 0.07],
-    "exit" : [-4.49, 3.42, 0.0, 0.0, 0.99, -0.03],
-    "TVTableP" : [1.75, 6.01, 0.0, 0.0, -0.64, 0.76],
-    "loungechair" : [2.27, 6.86, 0.0, 0.0, 0.68, 0.72],
-    "lamp" : [2.31, 8.44, 0.0, 0.0, 0.68, 0.73],
-    "couch" : [-0.85, 8.13, 0.0, 0.0, 0.17, 0.98],
-    "coffetable" : [0.89, 6.58, 0.0, 0.0, 0.68, 0.728],
-    "trashcan" : [-1.68, 5.27, 0.0, 0.0, -0.33, 0.94],
-    "kitchencabinet" : [-4.59, 5.25, 0.0, 0.0, -0.71, 0.69],
-    "dinnertable" : [-3.14, 5.15, 0.0, 0.0, 0.72, 0.68],
-    "dishwasher" : [-3.39, 8.10, 0.0, 0.0, 0.77, 0.63],
-    "kitchencounter" : [-4.69, 8.18, 0.0, 0.0, 0.78, 0.62],
-    "inspectionpoint" : [0.05, 5.02, 0.0, 0.0, 0.74, 0.66],
-}
-
-ROOM_DICT = {
-    "arena_b" : ROOM_DICT_B,
-    "arena_c" : ROOM_DICT_C
-}
 
 ROS_PARAM = "/gotoRoom/status"
 
@@ -76,20 +28,79 @@ class gotoRoom(AbstractAction):
                          "bagpack" : "livingroom"}
         
         # The following coordinates are based on the Robocup house arena (X, Y, Z, R, P, Y)
-        self.room_dict = copy.deepcopy(ROOM_DICT)
-        self.room_dict_b = copy.deepcopy(ROOM_DICT_B)
-        self.room_dict_c = copy.deepcopy(ROOM_DICT_C)
+        self.room_dict_b = {"hallwaycabinet" : [-3.04, 4.81, 0.0, 0.0, 0.97, -0.23],
+                          "entrance" : [-3.12, -2.77, 0.0 , 0.0, 0.98, -0.17],
+                          "desk" : [-2.86, -0.17, 0.0, 0.0, -0.74, 0.66],
+                          "shelf" : [-3.29, 1.4, 0.0, 0.0, 0.99, -0.03],
+                          "coathanger" : [-2.36, -3.08, 0.0, 0.0, 0.74, 0.66],
+                          "exit" : [-1.02, 1.83, 0.0, 0.0, 0.67, 0.73],
+                          "TVtable" : [0.69, -4.54, 0.0, 0.0, 0.99, 0.05],
+                          "loungechair" : [1.59, -3.86, 0.0, 0.0, -0.37, 0.92],
+                          "lamp" : [3.26, -5.12, 0.0, 0.0, -0.12, 0.99],
+                          "couch" : [3.20, -2.56, 0.0, 0.0, -0.37, 0.92],
+                          "coffetable" : [2.50, -3.06, 0.0, 0.0, -0.42, 0.90],
+                          "trashcan" : [0.43, -0.92, 0.0, 0.0, 0.96, -0.25],
+                          "kitchencabinet" : [0.46, 1.95, 0.0, 0.0, 0.99, -0.01],
+                          "dinnertable" : [-1.09, 1.17, 0.0, 0.0, 0.01, 0.99],
+                          "dishwasher" : [3.36, 0.06, 0.0, 0.0, 0.13, 0.99],
+                          "kitchencounter" : [3.66, 1.94, 0.0, 0.0, 0.11, 0.99],
+                          "inspectionpoint" : [0.26, -2.79, 0.0, 0.0, -0.34, 0.93],
+                          }
+
+        self.room_dict_c = {"hallwaycabinet" : [2.62, 2.37, 0.0, 0.0, -0.59, 0.80],
+                          "entrance" : [0.72, 1.41, 0.0 , 0.0, -0.59, 0.80],
+                          "desk" : [-2.19, 1.67, 0.0, 0.0, -0.04, 0.99],
+                          "shelf" : [-3.03, 1.60, 0.0, 0.0, -0.69, 0.72],
+                          "coathanger" : [0.45, 2.79, 0.0, 0.0, 0.99, 0.07],
+                          "exit" : [-4.49, 3.42, 0.0, 0.0, 0.99, -0.03],
+                          "TVtable" : [1.75, 6.01, 0.0, 0.0, -0.64, 0.76],
+                          "loungechair" : [2.27, 6.86, 0.0, 0.0, 0.68, 0.72],
+                          "lamp" : [2.31, 8.44, 0.0, 0.0, 0.68, 0.73],
+                          "couch" : [-0.85, 8.13, 0.0, 0.0, 0.17, 0.98],
+                          "coffetable" : [0.89, 6.58, 0.0, 0.0, 0.68, 0.728],
+                          "trashcan" : [-1.68, 5.27, 0.0, 0.0, -0.33, 0.94],
+                          "kitchencabinet" : [-4.59, 5.25, 0.0, 0.0, -0.71, 0.69],
+                          "dinnertable" : [-3.14, 5.15, 0.0, 0.0, 0.72, 0.68],
+                          "dishwasher" : [-3.39, 8.10, 0.0, 0.0, 0.77, 0.63],
+                          "kitchencounter" : [-4.69, 8.18, 0.0, 0.0, 0.78, 0.62],
+                          "inspectionpoint" : [0.05, 5.02, 0.0, 0.0, 0.74, 0.66],
+                          }
+
+        self.room_dict = {"arena_b" : self.room_dict_b,
+                         "arena_c" : self.room_dict_c}
 
         #NOTE: Assume self.params is a list of strings the first element is the name of the node to navigate to
         rospy.loginfo('Going to ' + " ".join(self.params) + ' ...')
 
 
         if "r" in self.params[0]:
-            if self.params[1] in self.room_dict[ROOM]:
-                self.coordinates = self.room_dict[ROOM][self.params[1]]
-            else:
-                rospy.set_param(ROS_PARAM, "Failed")
-                self._stop_action()
+            self.coordinates = self.room_dict[ROOM][self.params[1]]
+            
+            # tmp_room_dict = self.room_dict[ROOM]
+            # if self.params[1] in tmp_room_dict:
+            #     self.coordinates = tmp_room_dict[self.params[1]]
+        else:
+            self.coordinates = None
+
+        # if "r" in self.params[0] and self.params[1] in self.room_dict:
+        #         self.coordinates = self.room_dict[self.params[1]]
+        # else: 
+        #     if self.params[0] in self.obj_dict.keys():
+        #         self.room = self.obj_dict[self.params[0]]
+        #         self.coordinates = self.room_dict[self.room]
+        #     else:
+        #         self.coordinates = None
+
+        # if "b" in self.params[0]:
+        #     self.coordinates = self.room_dict_b[self.params[1]]
+        # else if "c" in self.params[0]:
+        #     self.coordinates = self.room_dict_c[self.params[1]]
+        # else:
+        #     print("Wrong room name - select [b] or [c]")
+        #     return
+
+        print(self.params)
+        print(self.coordinates)
 
         self.client = actionlib.SimpleActionClient('/move_base', MoveBaseAction)
 
@@ -118,8 +129,9 @@ class gotoRoom(AbstractAction):
                 rospy.loginfo("Waiting for goTo result...")
                 # self.client.wait_for_result()
                 rospy.set_param(ROS_PARAM, "Succeded")
-        self._stop_action()
-
+        else:
+            rospy.set_param(ROS_PARAM, "Failed")
+            self._stop_action()
 
     def _on_goTo_done(self, goalState, result):
         print("goToRoom DONE", goalState, result)
