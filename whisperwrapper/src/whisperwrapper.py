@@ -13,11 +13,12 @@ import time
 import json
 import os
 
-whisper_api_url = rospy.get_param("/stt/whisper_api_url", "127.0.0.1:9000")
-pause = rospy.get_param("/stt/speech_recogn_pause_time", 0.8)
-energy = rospy.get_param("/stt/speech_recogn_energy", 4000) 
-dynamic_energy = rospy.get_param("/stt/speech_recogn_dyn_energy_flag", False)
-no_speech_thresh = rospy.get_param("/stt/speech_confidence_thresh", 0.2)
+PAUSE = 0.8
+ENERGY = 4000 
+WHISPER_API_URL = "127.0.0.1:9000"
+DYNAMIC_ENERGY = False
+NO_SPEECH_THRESH = 0.2
+USE_OLLAMA = True
 
 class WhisperWrapper:
 
@@ -27,18 +28,17 @@ class WhisperWrapper:
         self.transcription_pub = rospy.Publisher("/stt/transcription", WhisperTranscription, queue_size = 1)
         self.listening_sub = rospy.Subscriber("/stt/listening", WhisperListening, self.listening_sub_cb)
         self.listening_pub = rospy.Publisher("/stt/listening", WhisperListening, queue_size = 1)
-
-        self.record_audio(pause, energy, dynamic_energy)
+        self.record_audio()
 
     def listening_sub_cb(self, set_listening):
         rospy.loginfo("Set listening = %s" % str(set_listening.listening))
         self.listening = set_listening.listening
 
-    def record_audio(self, pause, energy, dynamic_energy):
+    def record_audio(self):
         recogniser = sr.Recognizer()
-        recogniser.energy_threshold = energy
-        recogniser.pause_threshold = pause
-        recogniser.dynamic_energy_threshold = dynamic_energy
+        recogniser.energy_threshold = rospy.get_param("/stt/speech_recogn_energy", ENERGY)
+        recogniser.pause_threshold = rospy.get_param("/stt/speech_recogn_pause_time", PAUSE)
+        recogniser.dynamic_energy_threshold = rospy.get_param("/stt/speech_recogn_dyn_energy_flag", DYNAMIC_ENERGY)
 
         with sr.Microphone() as microphone:
             # recogniser.adjust_for_ambient_noise(microphone)
@@ -56,7 +56,7 @@ class WhisperWrapper:
 
                 rospy.loginfo("I heard something... Written to %s" % audio_path)
                 req = requests.post(
-                    "http://%s/asr?output=json" % whisper_api_url,
+                    "http://%s/asr?output=json" % rospy.get_param("/stt/whisper_api_url", WHISPER_API_URL),
                     files = {"audio_file": open(audio_path, "rb")}
                 )
                 os.remove(audio_path)
@@ -72,9 +72,9 @@ class WhisperWrapper:
                         compression_ratio = o["segments"][0]["compression_ratio"],
                         no_speech_prob = no_speech_prob
                     )
-
-                    if no_speech_prob < no_speech_thresh:
-                        self.run_ollama(o["text"])
+                    if no_speech_prob < rospy.get_param("/stt/speech_confidence_thresh", NO_SPEECH_THRESH):
+                        if rospy.get_param("/stt/use_ollama", USE_OLLAMA):
+                            self.run_ollama(o["text"])
                     else:
                         rospy.loginfo("Skipped due to low confidence it's actually speech. (p=%.2f)" % no_speech_prob)
                 else:

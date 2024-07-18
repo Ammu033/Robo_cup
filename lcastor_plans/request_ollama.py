@@ -20,8 +20,6 @@ OVERALL_TIMEOUT = 30.0
 RESPONSE_TIMEOUT = 6.0
 MAX_TRIES = 2 
 
-
-
 def speech_for_whisper(p, listening_pub, plan_intent_pub, publish_info, speech_texts):
     listening_pub.publish(listening=False)
     for speech in speech_texts:
@@ -31,14 +29,6 @@ def speech_for_whisper(p, listening_pub, plan_intent_pub, publish_info, speech_t
     listening_pub.publish(listening=True)
     start_time = rospy.get_time()
     return start_time
-
-def affirm_deny_ollama(p):
-    topic = "affirm_deny"
-    info = "affirm_deny"
-    speech_text = f"Did_you_say_{info}?"
-    cannot_hear_text = f"please_say_correct_if_that_is_correct."
-    default_info = "Yes"
-    return request_ollama(p, info, topic, speech_text, default_info, cannot_hear_text)
 
 def request_ollama(
         p,
