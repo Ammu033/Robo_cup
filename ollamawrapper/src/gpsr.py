@@ -111,6 +111,7 @@ class GPSRNode:
         You may only use the functions provided to you in the context. Do not use print(str) but use engine_say(str) instead. \
         The engine_say(str) also speaks out loud. You need to call the functions I gave you to complete the task. \
         You may import and use modules in the standard python library. \
+        Today is friday. Your team's name is LCASTOR. \
         If a location or object is not in the scene, print out that it's not in the scene. \
         For example, the task 'tell me what is the heaviest object on the sink' could call: \
         goto_location(p, location_name='sink') then identify_objects(p, what_to_idenfify='the heaviest object') \

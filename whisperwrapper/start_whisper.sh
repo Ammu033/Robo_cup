@@ -1,8 +1,9 @@
 # to be run on the *HOST* (the dell laptop)
 
 echo 'robocup' | sudo -S docker compose -f ~/noetic-llama/docker-compose.yaml up -d
-curl http://localhost:11434/api/pull -d '{"name": "llama3"}'
-curl http://localhost:11434/api/pull -d '{"name": "nexusraven:13b-v2-q2_K"}'
+curl http://localhost:11434/api/pull -d '{"name": "deepseek-coder-v2:16b"}'
+curl http://localhost:11434/api/pull -d '{"name": "deepseek-coder-v2:16b"}'
+curl http://localhost:11434/api/pull -d '{"name": "llava:7b"}'
 
 tmux new-session -s whisper -d  "cd ~/noetic-llama/whisper_ws && catkin_make && source devel/setup.bash && bash"
 
