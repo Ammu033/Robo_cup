@@ -174,7 +174,7 @@ install(FILES
   src/Modelfile.jinja2
   src/ollamafunctiongrammar.ppeg
   src/parser.py
-  src/Modelfile_gpsr.jinja2
+  src/gpsr_runner.py.jinja2
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

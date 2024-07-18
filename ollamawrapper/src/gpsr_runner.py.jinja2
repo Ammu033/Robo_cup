@@ -1,0 +1,25 @@
+import sys
+import os
+
+try:
+    sys.path.insert(0, os.environ["PNP_HOME"] + '/scripts')
+except:
+    print("Please set PNP_HOME environment variable to PetriNetPlans folder.")
+    sys.exit(1)
+
+import time
+import pnp_cmd_ros
+from pnp_cmd_ros import *
+
+sys.path.insert(1, "{{ cwd }}")
+from capabilities.gpsr import *
+
+import rospy
+{# rospy.init_node("gpsr_runner") #}
+
+{{ main_func }}
+
+p = PNPCmd()
+p.begin()
+{{ func_call }}
+p.end()
