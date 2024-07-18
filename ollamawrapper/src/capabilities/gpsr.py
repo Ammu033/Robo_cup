@@ -86,7 +86,7 @@ def identify_objects(p, what_to_idenfify):
     """Given something to look for, for example, the biggest food item or the smallest toy
     or the number of plates, do perception to indentify this. 'Tell me' tasks consist of an
     `identify_objects()` task followed by a `report_information()` task after the robot has
-    moved back to its reporting position.
+    moved back to its reporting position. You probably need to go to a location before calling this.
 
     Args:
         what_to_idenfify (str): Something to identify
@@ -126,7 +126,7 @@ def identify_objects(p, what_to_idenfify):
 @contexts.context(["gpsr"])
 def report_information(p):
     """Report back a previous identification task. This therefore means that `identify_objects()`
-    must previously have been called.
+    must previously have been called. You must go back to you before calling this function.
     """
     publish_what_im_doing("report_information()")
 
@@ -142,12 +142,9 @@ def follow_person(p):
 
 @contexts.context(["gpsr"])
 def guide_person(p):
-    """Ask a human to follow the robot. `ask_for_person()` must have previously been called"""
+    """Ask a human to follow the robot. `ask_for_person()` must have previously been called. You must go to a location
+    immediately after this."""
     publish_what_im_doing("guide_person()")
-
-@contexts.context(["gpsr"])
-def done(p):
-    publish_what_im_doing("done()")
 
 @contexts.context(["gpsr"])
 def cease_all_motor_functions(p):
