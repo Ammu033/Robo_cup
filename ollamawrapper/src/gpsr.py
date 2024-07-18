@@ -82,7 +82,11 @@ class GPSRNode:
         return sources
     
     def parse_ollama_call(self, ollama_text):
-        return ollama_text.split("```python")[-1]
+        # print(ollama_text.split("```"))
+        s = ollama_text.split("```")[1]
+        if s.startswith("python"):
+            s = s[6:]
+        return s
 
     def handle_decomposition_call(self, req):
         human_str = req.input

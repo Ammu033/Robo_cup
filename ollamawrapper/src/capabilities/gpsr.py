@@ -1,3 +1,8 @@
+import sys
+import os
+
+sys.path.insert(1, os.path.join(os.path.dirname(__file__), "..", "..", "..", "lcastor_plans"))
+
 import rospy
 import capabilities.contexts as contexts
 # import capabilities.receptionist as receptionist
@@ -9,9 +14,7 @@ import tempfile
 import random
 import ollama
 import time
-import sys
 import cv2
-import os
 
 # rospy.init_node("gpsr_executor")
 # ollama_out_pub = rospy.Publisher(

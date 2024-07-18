@@ -14,6 +14,8 @@ from pnp_cmd_ros import *
 sys.path.insert(1, "{{ cwd }}")
 from capabilities.gpsr import *
 
+sys.path.insert(1, os.path.join(os.path.dirname(__file__), "..", "..", "..", "lcastor_plans"))
+
 import rospy
 {# rospy.init_node("gpsr_runner") #}
 
