@@ -56,7 +56,7 @@ def gpsr(p):
     p.exec_action("navigateForward", "4")
 
     # TODO: MUST SET THE INSTRUCTION POINT!!
-    p.exec_action("gotoRoom", "r_instructionpoint")
+    p.exec_action("gotoRoom", "r_inspectionpoint")
     listening_pub = rospy.Publisher("/stt/listening", WhisperListening, queue_size=1)
 
     tries = 0
