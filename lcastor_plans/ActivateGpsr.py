@@ -73,22 +73,30 @@ def gpsr(p):
         p.exec_action('speak', 'Sadly_I_could_not_catch_what_you_said,_have_a_nice_day')
         return
     
-    AskConfirmation(
+    success, response = AskConfirmation(
         p, 
         speech_text="Did_I_hear_you_say_"+heard_speech.replace(' ','_')+"?", 
         cannot_hear_text="please_say_yes_if_that_is_correct.",
         max_tries=0
     )
+    
+    if not success: 
+        p.exec_action('speak', 'Sorry,_I_did_not_understand_your_confirmation,_have_a_nice_day')
+        return
+    
+    if response != 'yes':
+        p.exec_action('speak', 'Sorry,_It_seems_I_misunderstood,_have_a_nice_day')
+        return
 
     try:
         service_call = rospy.ServiceProxy("/gpsr/task_decomposition", OllamaCall)
         response = service_call(input = heard_speech)
         print(response)
     except Exception as e:
-        print("Gpsr failed: ", str(e))
+        print("GPSR failed: ", str(e))
         p.exec_action('speak', 'Sorry,_the_tasks_might_have_been_difficult_to_understand,_have_a_nice_day')
             
-    rospy.loginfo("Successfully sent, generating GPSR, stopping listning.")
+    rospy.loginfo("Successfully sent, generating GPSR, stopping listening.")
     listening_pub.publish(listening = False)   
 
 
