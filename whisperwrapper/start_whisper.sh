@@ -1,6 +1,6 @@
 # to be run on the *HOST* (the dell laptop)
 
-sudo docker compose -f ~/noetic-llama/docker-compose.yaml up -d
+echo 'robocup' | sudo -S docker compose -f ~/noetic-llama/docker-compose.yaml up -d
 curl http://localhost:11434/api/pull -d '{"name": "llama3"}'
 curl http://localhost:11434/api/pull -d '{"name": "nexusraven:13b-v2-q2_K"}'
 

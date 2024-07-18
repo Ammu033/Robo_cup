@@ -30,10 +30,14 @@ def CarryMyLuggage(p):
     PersonFollowing(p) 
 
     # 6. after reaching the car, the operator takes the bag back and thanks the robot.
-    p.exec_action('moveHead', '0.0_0.0')
-    p.exec_action('speak', "Please_take_the_bag_from_my_hand.")
-    OfferGripper(p, "Please_confirm_with_yes_or_no_after_you_take_the_bag_from_my_hand.")
-    
+    p.exec_action("moveHead", "0.0_0.0")
+    p.exec_action("speak", "Please_take_the_bag_from_my_hand.")
+    OfferGripper(
+        p,
+        "Please_say_confirm_when_you_have_taken_the_luggage.",
+        "please_say,_I_confirm,_more_loudly_if_it_has_been_picked.",
+    )
+
     # 7. Go back to the initial position
     p.exec_action('speak', "Thank_you,I_will_now_go_back_to_the_starting_position.")
     p.exec_action('moveHead', '0.0_-0.75')

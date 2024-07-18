@@ -44,6 +44,7 @@ class gotoRoom(AbstractAction):
         # The following coordinates are based on the Robocup house arena
         self.room_dict = copy.deepcopy(ROOM_DICT)
         
+
         #NOTE: Assume self.params is a list of strings the first element is the name of the node to navigate to
         rospy.loginfo('Going to ' + " ".join(self.params) + ' ...')
 

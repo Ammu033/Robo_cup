@@ -1,8 +1,9 @@
 import os
 import sys
+from AskConfirmation import AskConfirmation
 
 try:
-    sys.path.insert(0, os.environ["PNP_HOME"] + '/scripts')
+    sys.path.insert(0, os.environ["PNP_HOME"] + "/scripts")
 except:
     print("Please set PNP_HOME environment variable to PetriNetPlans folder.")
     sys.exit(1)
@@ -12,12 +13,13 @@ import pnp_cmd_ros
 from pnp_cmd_ros import *
 import rospy
 from std_msgs.msg import Bool
+from AskConfirmation import AskConfirmation
 
 
 QUESTION_TIMEOUT = 3
-def OfferGripper(p, msg):
+def OfferGripper(p, msg, followup):
     confirmed = False
-    
+
     p.exec_action("armAction", "offer")
     p.exec_action("gripperAction", "open")
 
@@ -25,15 +27,10 @@ def OfferGripper(p, msg):
     while not confirmed:
         if n == 2:
             break
-        p.exec_action("speak", msg)
-        p.exec_action("activateRasa", "affirm_deny")
-        try:
-            confirmed = rospy.wait_for_message('/person_affirm_deny' , Bool, timeout=QUESTION_TIMEOUT).data
-        except:
-            confirmed = False
-
-        n += 1
-            
+        success, response = AskConfirmation(p, msg, followup)
+        if success:
+            break
+        n += 1    
     
     p.exec_action("gripperAction", "close")
     p.exec_action("armAction", "home")
@@ -45,6 +42,6 @@ if __name__ == "__main__":
 
     p.begin()
 
-    OfferGripper(p, "Please_confirm_when_you_have_placed_the_bag_in_my_hand.")
+    OfferGripper(p, "Please_confirm_when_you_have_placed_the_bag_in_my_hand.", "please_say_affirm")
 
     p.end()

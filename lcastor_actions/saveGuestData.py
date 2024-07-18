@@ -20,7 +20,8 @@ class saveGuestData(AbstractAction):
             rospy.set_param(guestparam + "/head_angle", 0.0)
             rospy.set_param(guestparam + "/name", self.params[2].lower())
         elif setparam == "setdrink":
-            rospy.set_param(guestparam + "/drink", "_".join(self.params[:]).lower())
+            drinks = self.params[2:]
+            rospy.set_param(guestparam + "/drink", "_".join(drinks).lower())
         elif setparam == "setheadangle":
             rospy.set_param(guestparam + '/head_angle' , self.params[2])
         elif setparam  == "setloc":
@@ -36,8 +37,8 @@ class saveGuestData(AbstractAction):
 
     def get_position(self):
         now = rospy.Time()
-        self.tf.waitForTransform("/base_link", "/map", now, rospy.Duration(4.0))
-        return self.tf.lookupTransform("/base_link", "/map", now)
+        self.tf.waitForTransform("base_link", "/map", now, rospy.Duration(4.0))
+        return self.tf.lookupTransform("base_link", "/map", now)
 
     def _stop_action(self):
         self.params.append("done")
