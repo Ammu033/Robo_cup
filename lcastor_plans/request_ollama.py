@@ -41,6 +41,8 @@ def request_ollama(
         response_timeout = RESPONSE_TIMEOUT,
         retry_timout = RESPONSE_TIMEOUT
     ):
+    get_is_use_ollama = rospy.get_param("/stt/use_ollama")
+    rospy.set_param("/stt/use_ollama", True)
 
     # preparing publishers
     listening_pub = rospy.Publisher("/stt/listening", WhisperListening, queue_size=1)
@@ -116,6 +118,7 @@ def request_ollama(
     rospy.loginfo(f'info captured: {info_output}')
     rospy.loginfo(f'success status: {success}')
 
+    rospy.set_param("/stt/use_ollama", get_is_use_ollama)
     return (success, info_output)
 
 

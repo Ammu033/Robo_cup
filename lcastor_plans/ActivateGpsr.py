@@ -1,8 +1,10 @@
 import os
 import sys
+from lcastor_plans import AskConfirmation
 from ollamamessages.msg import WhisperTranscription, WhisperListening
 from ollamamessages.msg import WhisperListening
 from ollamamessages.srv import OllamaCall, OllamaCallResponse
+from AskConfirmation import AskConfirmation
 
 try:
     sys.path.insert(0, os.environ["PNP_HOME"] + '/scripts')
@@ -16,12 +18,8 @@ from pnp_cmd_ros import *
 from std_msgs.msg import Bool
 import rospy
 
-no_speech_thresh = 0.2 
 
-def send_to_gpsr_service():
-    raise NotImplementedError
-
-def call_whisper(listening_pub,  tries):
+def call_whisper(listening_pub,  tries, no_speech_thresh=0.2):
     listening_pub.publish(listening=False)
     if tries == 0: 
         p.exec_action('speak', 'Im_ready_for_my_instructions')
@@ -35,15 +33,10 @@ def call_whisper(listening_pub,  tries):
     text = transcription['text']
     if transcription['no_speech_prob'] <= no_speech_thresh:
         return True, text
-    return False, text
-
-def run_gpsr_sevice(listening_pub, text):
-   
+    return False, text   
 
 
 def gpsr(p):
-
-    
     pause = 0.8
     energy = 4000
     dynamic_energy = False
@@ -63,19 +56,36 @@ def gpsr(p):
     p.exec_action("navigateForward", "4")
 
     # TODO: MUST SET THE INSTRUCTION POINT!!
-    p.exec_action("gotoRoom", "r_instructionpoint")
+    p.exec_action("gotoRoom", "r_inspectionpoint")
     listening_pub = rospy.Publisher("/stt/listening", WhisperListening, queue_size=1)
 
     tries = 0
     success = False
     heard_speech = None
 
-    while (tries <= 2 and success == False) or (success == True):
-        success, heard_speech = call_whisper(listening_pub, tries)
+    while tries <= 2:
+        success, heard_speech = call_whisper(listening_pub, tries, no_speech_thresh)
+        if success == True:
+            break
         tries += 1 
 
     if heard_speech is None:
         p.exec_action('speak', 'Sadly_I_could_not_catch_what_you_said,_have_a_nice_day')
+        return
+    
+    success, response = AskConfirmation(
+        p, 
+        speech_text="Did_I_hear_you_say_"+heard_speech.replace(' ','_')+"?", 
+        cannot_hear_text="please_say_yes_if_that_is_correct.",
+        max_tries=0
+    )
+    
+    if not success: 
+        p.exec_action('speak', 'Sorry,_I_did_not_understand_your_confirmation,_have_a_nice_day')
+        return
+    
+    if response != 'yes':
+        p.exec_action('speak', 'Sorry,_It_seems_I_misunderstood,_have_a_nice_day')
         return
 
     try:
@@ -83,10 +93,10 @@ def gpsr(p):
         response = service_call(input = heard_speech)
         print(response)
     except Exception as e:
-        print("Gpsr failed: ", str(e))
+        print("GPSR failed: ", str(e))
         p.exec_action('speak', 'Sorry,_the_tasks_might_have_been_difficult_to_understand,_have_a_nice_day')
             
-    rospy.loginfo("Successfully sent, generating GPSR, stopping listning.")
+    rospy.loginfo("Successfully sent, generating GPSR, stopping listening.")
     listening_pub.publish(listening = False)   
 
 
