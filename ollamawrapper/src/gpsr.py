@@ -82,6 +82,8 @@ class GPSRNode:
         return sources
     
     def parse_ollama_call(self, ollama_text):
+        if "```" not in ollama_text:
+            return ollama_text
         # print(ollama_text.split("```"))
         s = ollama_text.split("```")[1]
         if s.startswith("python"):
