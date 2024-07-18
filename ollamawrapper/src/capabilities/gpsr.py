@@ -141,6 +141,11 @@ def follow_person(p):
     publish_what_im_doing("following someone")
 
 @contexts.context(["gpsr"])
+def guide_person(p):
+    """Ask a human to follow the robot. `ask_for_person()` must have previously been called"""
+    publish_what_im_doing("guide_person()")
+
+@contexts.context(["gpsr"])
 def done(p):
     publish_what_im_doing("done()")
 

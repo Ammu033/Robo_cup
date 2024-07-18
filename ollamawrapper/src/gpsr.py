@@ -23,7 +23,7 @@ import gotoRoom
 
 ollama_api_url = rospy.get_param("/gpsr/ollama_api_url", "127.0.0.1:11434")
 # ollama_api_url = rospy.get_param("/gpsr/ollama_api_url", "192.168.69.253:11434")
-ollama_decomposition_model = rospy.get_param("/gpsr/ollama_decomposition_model", 'deepseek-coder-v2:latest')
+ollama_decomposition_model = rospy.get_param("/gpsr/ollama_decomposition_model", 'deepseek-coder-v2:17b')
 # ollama_decomposition_model = rospy.get_param("/gpsr/ollama_decomposition_model", "deepseek-coder:6.7b")
 
 import capabilities
@@ -118,6 +118,7 @@ class GPSRNode:
         then go_back_to_me(p) then report_information(p)."
 
         client = ollama.Client(host = "http://%s" % ollama_api_url)
+        print(client.list())
         ollama_output = client.generate(
             model = ollama_decomposition_model, 
             prompt = prompt, 
