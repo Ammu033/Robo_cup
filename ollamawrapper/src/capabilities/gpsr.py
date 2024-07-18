@@ -61,13 +61,14 @@ def go_back_to_me(p):
     p.exec_action('gotoRoom' , 'r_inspectionpoint')
 
 @contexts.context(["gpsr"])
-@exception_handling
-def grasp_object(p, object_name):
+def grasp_object(p, object_name = None):
     """Grasps a given object, for example 'fruit' or 'bowl'
 
     Args:
         object_name (str): The name of the object to grasp
     """
+    if object_name is None:
+        object_name = "the object"
     publish_what_im_doing("grasp_object(object_name='%s')" % object_name)
 
     p.exec_action('speak', 'I_am_not_able_to_grasp_the_{}.'.format(object_name.replace(" ", "_")))
@@ -81,8 +82,9 @@ def grasp_object(p, object_name):
 @contexts.context(["gpsr"])
 @exception_handling
 def offer_object(p):
-    """Grasps the object currently being held. This means that `grasp_object()
-    must have previously been called"""
+    """Grasps the object currently being held. This means that `grasp_object()`
+    must have previously been called. Moreover it might be a good idea to go back to you,
+    or another person, before doing this."""
     publish_what_im_doing("offer_object()")
 
     p.exec_action('speak', 'Here_is_the_item_you_have_requested,_please_take_it_from_my_hand.')
@@ -93,7 +95,8 @@ def offer_object(p):
 @exception_handling
 def ask_for_person(p, person_name):
     """Ask for a person with a given name, for example 'Angel' or 'Morgan'.
-    It can also be a descriptive action, e.g. 'person pointing to the right'
+    It can also be a descriptive action, e.g. 'person pointing to the right'.
+    You probably should have called `goto_location()` first.
 
     Args:
         person_name (str): The person's name to ask for
@@ -204,10 +207,10 @@ def cease_all_motor_functions(p):
 @contexts.context(["gpsr"])
 @exception_handling
 def engine_say(p, to_say):
-    publish_what_im_doing("engine_say(%s)" % to_say)
-    # p.exec_action('speak' , to_say.replace(" ", "_"))
+    publish_what_im_doing("engine_say('%s')" % to_say)
+    p.exec_action('speak' , to_say.replace(" ", "_"))
 
-    p.exec_action('moveHead', '%d_0.3' % random.randint(-10, 10) / 10)
+    # p.exec_action('moveHead', '%d_0.3' % random.randint(-10, 10) / 10)
 
 if __name__ == "__main__":
     import sys
