@@ -1,3 +1,8 @@
+import sys
+import os
+
+sys.path.insert(1, os.path.join(os.path.dirname(__file__), "..", "..", "..", "lcastor_plans"))
+
 import rospy
 import capabilities.contexts as contexts
 # import capabilities.receptionist as receptionist
@@ -9,9 +14,7 @@ import tempfile
 import random
 import ollama
 import time
-import sys
 import cv2
-import os
 
 # rospy.init_node("gpsr_executor")
 # ollama_out_pub = rospy.Publisher(
@@ -117,7 +120,7 @@ def identify_objects(p, what_to_idenfify):
     """Given something to look for, for example, the biggest food item or the smallest toy
     or the number of plates, do perception to indentify this. 'Tell me' tasks consist of an
     `identify_objects()` task followed by a `report_information()` task after the robot has
-    moved back to its reporting position.
+    moved back to its reporting position. You probably need to go to a location before calling this.
 
     Args:
         what_to_idenfify (str): Something to identify
@@ -158,7 +161,7 @@ def identify_objects(p, what_to_idenfify):
 @exception_handling
 def report_information(p):
     """Report back a previous identification task. This therefore means that `identify_objects()`
-    must previously have been called.
+    must previously have been called. You must go back to you before calling this function.
     """
     publish_what_im_doing("report_information()")
 
@@ -184,17 +187,12 @@ def follow_person(p):
     PersonFollowing(p)
 
 @contexts.context(["gpsr"])
-@exception_handling
 def guide_person(p):
-    """Ask a human to follow the robot. `ask_for_person()` must have previously been called"""
+    """Ask a human to follow the robot. `ask_for_person()` must have previously been called. You must go to a location
+    immediately after this."""
     publish_what_im_doing("guide_person()")
 
     p.exec_action('speak', 'Please,_follow_me!')
-
-@contexts.context(["gpsr"])
-@exception_handling
-def done(p):
-    publish_what_im_doing("done()")
 
 @contexts.context(["gpsr"])
 @exception_handling

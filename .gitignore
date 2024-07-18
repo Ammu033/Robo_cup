@@ -417,3 +417,5 @@ docs/_build/
 *.code-workspace
 
 */ollama_benchmarks.csv
+
+!tasks.csv

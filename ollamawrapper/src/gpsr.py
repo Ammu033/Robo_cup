@@ -23,7 +23,7 @@ import gotoRoom
 
 ollama_api_url = rospy.get_param("/gpsr/ollama_api_url", "127.0.0.1:11434")
 # ollama_api_url = rospy.get_param("/gpsr/ollama_api_url", "192.168.69.253:11434")
-ollama_decomposition_model = rospy.get_param("/gpsr/ollama_decomposition_model", 'deepseek-coder-v2:17b')
+ollama_decomposition_model = rospy.get_param("/gpsr/ollama_decomposition_model", 'llama3')
 # ollama_decomposition_model = rospy.get_param("/gpsr/ollama_decomposition_model", "deepseek-coder:6.7b")
 
 import capabilities
@@ -82,14 +82,23 @@ class GPSRNode:
         return sources
     
     def parse_ollama_call(self, ollama_text):
-        return ollama_text.split("```python")[-1]
+        # print(ollama_text.split("```"))
+        s = ollama_text.split("```")[1]
+        if s.startswith("python"):
+            s = s[6:]
+        return s
 
     def handle_decomposition_call(self, req):
         human_str = req.input
         rospy.loginfo("Recieved task decomposition string: '%s'" % human_str)
 
         func_name = "do_func"
-        locations_in_scene = list(gotoRoom.ROOM_DICT.keys())
+        # locations_in_scene = list(gotoRoom.ROOM_DICT.keys())
+        if rospy.get_param("/arena") == "arena_b":
+            locations_in_scene = list(gotoRoom.ROOM_DICT_B.keys())
+        else:
+            locations_in_scene = list(gotoRoom.ROOM_DICT_C.keys())
+
         objects_in_scene = ["toy", "sugar", "food"]
         rospy.loginfo("Locations in scene: %s" % str(locations_in_scene))
 
@@ -102,30 +111,30 @@ class GPSRNode:
         and a list of objects in the scene as a list of string object names, \
         You get a user request the robot to do: '{human_str}'. Create a function for completing the task. \
         Always set the `p` parameter to the variable `p`, and assume it is already defined. \
-        The function signature must be: {func_name}(p, locations: list, objects: list)->str. You cannot write anything outside the function. \
+        The function signature must be: {func_name}(p, locations: list)->str. You cannot write anything outside the function. \
+        The function should not have any decorators. \
         You do not need to def the functions in the context. \
-        In addition, if it fails, you should print out why it fails. You do not need to return this. \
         You do not need to explain your code. \
         We have the following locations in the scene: {locations_in_scene}. \
-        There are the following objects in the scene: {objects_in_scene}. \
         You may only use the functions provided to you in the context. Do not use print(str) but use engine_say(str) instead. \
         The engine_say(str) also speaks out loud. You need to call the functions I gave you to complete the task. \
+        You should start by saying a repetition of the task: for example 'my task is to...'. \
         You may import and use modules in the standard python library. \
-        Today is friday. Your team's name is LCASTOR. \
-        If a location or object is not in the scene, print out that it's not in the scene. \
+        You do not need to check of an object or location is in the scene. \
+        Today is friday. Your team's name is LCASTOR. Our team is based in the city of Lincoln. \
         For example, the task 'tell me what is the heaviest object on the sink' could call: \
         goto_location(p, location_name='sink') then identify_objects(p, what_to_idenfify='the heaviest object') \
         then go_back_to_me(p) then report_information(p)."
 
         client = ollama.Client(host = "http://%s" % ollama_api_url)
-        print(client.list())
+        # print(client.list())
         ollama_output = client.generate(
             model = ollama_decomposition_model, 
             prompt = prompt, 
             keep_alive = "0m",
-            options = {"stop": ["```\n"]}
+            options = {"stop": ["```\n\n"]}
         )
-        # rospy.loginfo("Raw ollama response: =====\n%s\n=====" % ollama_output["response"])
+        rospy.loginfo("Raw ollama response: =====\n%s\n=====" % ollama_output["response"])
 
         parsed_func = self.parse_ollama_call(ollama_output["response"])
 
@@ -138,7 +147,7 @@ class GPSRNode:
             f.write(template.render(
                 cwd = os.path.dirname(__file__), 
                 main_func = parsed_func, 
-                func_call = "%s(p = p, locations = %s, objects = %s)" % (func_name, str(locations_in_scene), str(objects_in_scene))
+                func_call = "%s(p = p, locations = %s)" % (func_name, str(locations_in_scene))
             ))
             filename = f.name
         rospy.loginfo(str(filename))
