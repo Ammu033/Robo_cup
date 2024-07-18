@@ -1,9 +1,7 @@
 import os
 import sys
-from lcastor_plans import AskConfirmation
 from ollamamessages.msg import WhisperTranscription, WhisperListening
-from ollamamessages.msg import WhisperListening
-from ollamamessages.srv import OllamaCall, OllamaCallResponse
+from ollamamessages.srv import OllamaCall
 from AskConfirmation import AskConfirmation
 
 try:

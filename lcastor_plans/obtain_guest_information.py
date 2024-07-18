@@ -49,14 +49,12 @@ def obtain_guest_information(p, person, info, tries=0):
         default_info = random.choice(
             ["milk", "wine", "orange_juice", "hot_chocolate", "coffee"]
         )
-        final_text = random.choice(
-                [
-                "Hopefully_we_can_serve_you_some_",
-                "Oh_nice_choice_its_been_some_time_since_ive_had_",
-                "Good_choice,_weve_just_restocked_up_with_",
-                "strange_choice_for_this_kind_of_evening,_but_we'll_find_you_some_"
-                 ]
-        )
+        final_text = random.choice([
+            "Hopefully_we_can_serve_you_some_",
+            "Oh_nice_choice_its_been_some_time_since_ive_had_",
+            "Good_choice,_weve_just_restocked_up_with_",
+            "strange_choice_for_this_kind_of_evening,_but_we'll_find_you_some_"
+        ])
     else:
         rospy.logerr("obtain_person_info: invalid info type.")
         return
