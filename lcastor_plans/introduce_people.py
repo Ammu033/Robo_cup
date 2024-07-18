@@ -47,13 +47,13 @@ def introduce_people(p, person1, person2):
 
     # intrducve 2 to 1
     # p.exec_action('goto' , "_".join(x_y_of_people) + '_' + str(person2_w) )
-    # p.exec_action('moveHead', str(person2_head_angle) + '_0.0')
-    # p.exec_action('speak' , 'Hi_' + person2_name + '.Please_meet_' + person1_name)
+    p.exec_action('moveHead', str(person2_head_angle) + '_0.0')
+    p.exec_action('speak' , 'Hi_' + person2_name + '.Please_meet_' + person1_name)
     # p.exec_action('goto' , "_".join(x_y_of_people) + '_' + str(person1_w) )
     # p.exec_action('moveHead', str(person1_head_angle) + '_0.0')
     # p.exec_action('goto' , "_".join(x_y_of_people) + '_' + str(person2_w) )
-    # p.exec_action('moveHead', str(person2_head_angle) + '_0.0')
-    # p.exec_action('speak' , 'Their_favourite_drink_is' + person1_drink)
+    p.exec_action('moveHead', str(person2_head_angle) + '_0.0')
+    p.exec_action('speak' , 'Their_favourite_drink_is' + person1_drink)
 
 
 if __name__ == "__main__":

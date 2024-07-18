@@ -20,13 +20,13 @@ def look_for_person(p, person):
     person_w = rospy.get_param(person + "/w")
     # p.exec_action('goto' , str(person_x) + "_" + str(person_y) + "_"  + str(person_w))
     person_h_angle = float(rospy.get_param(person + "/head_angle"))
-    p.exec_action("moveHead", str(person_h_angle) + "_0.0")
+    p.exec_action("moveHead", str(person_h_angle) + "_0.013")
     person_found = p.get_condition("isPersonDetected_" + person)
     counter = 0
     if not person_found:
         while not person_found:
             counter = counter + 1
-            start_angle = -1.3
+            start_angle = -1
             increament = 0.3
             while not p.get_condition("isPersonDetected_" + person):
                 start_angle = start_angle + increament
@@ -36,11 +36,11 @@ def look_for_person(p, person):
                     person_found = True
                     p.exec_action("saveGuestData", "setloc_" + person)
                     p.exec_action(
-                        "saveGuestData", "setheadangle_" + person + "_" + "0.0"
+                        "saveGuestData", "setheadangle_" + person + "_" + "0.013"
                     )
                     break
-                p.exec_action("moveHead", str(start_angle) + "_0.0")
-            if not start_angle >= 1.3:
+                p.exec_action("moveHead", str(start_angle) + "_0.013")
+            if not start_angle >= 1:
                 person_found = True
                 p.exec_action("saveGuestData", "setloc_" + person)
                 p.exec_action(
