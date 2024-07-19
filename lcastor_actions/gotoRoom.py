@@ -12,6 +12,7 @@ from AbstractAction import AbstractAction
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 import actionlib
 import math
+import copy
 """
 Starts and stops the object detection node
 """

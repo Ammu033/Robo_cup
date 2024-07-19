@@ -236,9 +236,9 @@ def cease_all_motor_functions(p):
 @exception_handling
 def engine_say(p, to_say):
     publish_what_im_doing("engine_say('%s')" % to_say)
-    p.exec_action('speak' , to_say.replace(" ", "_"))
+    # p.exec_action('speak' , to_say.replace(" ", "_"))
 
-    # p.exec_action('moveHead', '%d_0.3' % random.randint(-10, 10) / 10)
+    p.exec_action('moveHead', '%d_0.0' % random.randint(-10, 10) / 10)
 
 if __name__ == "__main__":
     import sys
