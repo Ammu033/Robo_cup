@@ -101,9 +101,9 @@ class gotoRoom(AbstractAction):
                 self.coordinates = self.room_dict[ROOM][self.params[1]]
             else:
                 #FIXME: FOR GPSR BRANCH PLEASE CHANGE BACK TO THE OTHER ELSE AFTER ROBOCUP 24
-                random_loc = list(self.room_dict[ROOM].keys())
-                rospy.loginfo('Could not find ' + self.params[1] + ', going to ' + random_loc + ' instead')
-                self.coordinates = random.choice(random_loc)
+                random_loc = random.choice(list(self.room_dict[ROOM].keys()))
+                rospy.loginfo('LOC not found, going to ' + random_loc + ' instead')#
+                self.coordinates = random.choice(self.room_dict[ROOM][random_loc])
             # else:
             #     rospy.set_param(ROS_PARAM, "Failed")
             #     self._stop_action()
