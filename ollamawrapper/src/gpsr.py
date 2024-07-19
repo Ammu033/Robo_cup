@@ -160,12 +160,17 @@ class GPSRNode:
         with open(filename, "r") as f:
             rospy.loginfo("******* %s consists of the following: *******\n\n%s\n****************************************" % (filename, f.read()))
         # subprocess.run(["tmux", "new-session", "-s", "gpsr_runner", "-d", "'", "python3", filename, "'"])
-        proc = subprocess.Popen(["python3", filename], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-        while True:
-            line = proc.stdout.readline()
-            if not line:
-                break
-            rospy.loginfo("[GPSR Runner] %s" % line.rstrip().decode())
+
+        try:
+            proc = subprocess.Popen(["python3", filename], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+            while True:
+                line = proc.stdout.readline()
+                if not line:
+                    break
+                rospy.loginfo("[GPSR Runner] %s" % line.rstrip().decode())
+        except KeyboardInterrupt:
+            proc.terminate()
+            rospy.loginfo("Proc terminated")
 
         return OllamaCallResponse(
             ollama_output["total_duration"],

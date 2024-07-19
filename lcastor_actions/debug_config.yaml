@@ -1,14 +1,11 @@
 Debug: 
-  Active: False 
-  Mode: "NoMove" 
+  Active: True 
+  Mode: "NoSpeech" 
 
 Configurations:
-  NoMove: # name of the mode
+   NoSpeech: # name of the mode
     Inactive:
-      # goto
-      # gotoRoom
-      armAction
- 
+      speak
 
 
 

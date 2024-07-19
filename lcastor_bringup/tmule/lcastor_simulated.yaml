@@ -36,7 +36,7 @@ init_cmd: |
   export_default LOCAL_PLANNER "teb"
   export_default LOCALIZATION "fake"
   export_default CONFIG_BASE_PATH "$(rospack find lcastor_navigation)"
-  export_default MAP "$HOME/.pal/tiago_maps/configurations/$WORLD"
+  export_default MAP "$(rospack find lcastor_navigation)/maps/$WORLD"
   export_default LASER_MODEL "sick-571"
   export_default RGBD_SENSORS "false"
   export_default BASE_TYPE "pmb2"
