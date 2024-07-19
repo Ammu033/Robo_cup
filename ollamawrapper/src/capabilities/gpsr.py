@@ -24,7 +24,7 @@ import cv2
 #     latch=True,
 # )
 
-ollama_api_url = rospy.get_param("/gpsr/ollama_api_url", "127.0.0.1:11434")
+ollama_api_url = rospy.get_param("/gpsr/ollama_api_url", "192.168.69.253:11434")
 # ollama_api_url = rospy.get_param("/gpsr/ollama_api_url", "127.0.0.1:11434")
 ollama_multimodal_model = rospy.get_param("/gpsr/ollama_multimodal_model", 'llava:7b')
 
@@ -235,6 +235,12 @@ def cease_all_motor_functions(p):
     engine_say(p, "Like fire and powder, which as they kiss consume,")
     engine_say(p, "The sweetest honeys loathsome in his own deliciousness,")
     engine_say(p, "These violent delights have violent ends")
+
+@contexts.context(["gpsr"])
+@exception_handling
+def answer_quiz(p):
+    engine_say(p, "Hello, I am supposed to answer your quiz. Please ask me a question.")
+    time.sleep(1)
 
 @contexts.context(["gpsr"])
 @exception_handling

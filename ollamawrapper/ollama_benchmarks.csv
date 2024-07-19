@@ -261,3 +261,11 @@ robocup-dell,3.5,1,guest_name,True,17
 robocup-dell,1.4,1,affirm_deny,True,5
 robocup-dell,1.8,1,guest_drink,True,30
 robocup-dell,1.3,1,affirm_deny,True,5
+thinkpad-p14s-ros2,67.0,1,quiz,True,43
+thinkpad-p14s-ros2,70.7,1,quiz,True,43
+thinkpad-p14s-ros2,46.9,1,quiz,True,27
+thinkpad-p14s-ros2,80.6,2,quiz,True,27
+thinkpad-p14s-ros2,58.1,1,quiz,True,27
+thinkpad-p14s-ros2,77.3,1,quiz,True,50
+thinkpad-p14s-ros2,88.2,2,quiz,True,43
+thinkpad-p14s-ros2,161.6,3,quiz,True,35

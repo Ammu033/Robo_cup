@@ -4,3 +4,4 @@ from .basicmaths import *
 from .receptionist import *
 from .contexts import *
 from .gpsr import *
+from .quiz import *
