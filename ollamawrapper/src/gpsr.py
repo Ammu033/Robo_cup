@@ -21,7 +21,6 @@ import re
 sys.path.insert(1, os.path.join(os.path.dirname(__file__), "..", "..", "lcastor_actions"))
 import gotoRoom
 
-ollama_api_url = rospy.get_param("/gpsr/ollama_api_url", "127.0.0.1:11434")
 # ollama_api_url = rospy.get_param("/gpsr/ollama_api_url", "192.168.69.253:11434")
 ollama_decomposition_model = rospy.get_param("/gpsr/ollama_decomposition_model", 'llama3')
 # ollama_decomposition_model = rospy.get_param("/gpsr/ollama_decomposition_model", "deepseek-coder:6.7b")
@@ -132,6 +131,8 @@ class GPSRNode:
         `guide_person(p)` and then finally `goto_location(p, location_name='hallway')` \
         After you finish your task you should always come back to me."
 
+        ollama_api_url = rospy.get_param("/gpsr/ollama_api_url", "127.0.0.1:11434")
+        rospy.loginfo("Using ollama HTTP API at %s" % ollama_api_url)
         client = ollama.Client(host = "http://%s" % ollama_api_url)
         # print(client.list())
         ollama_output = client.generate(
@@ -162,21 +163,21 @@ class GPSRNode:
             rospy.loginfo("******* %s consists of the following: *******\n\n%s\n****************************************" % (filename, f.read()))
         # subprocess.run(["tmux", "new-session", "-s", "gpsr_runner", "-d", "'", "python3", filename, "'"])
 
-        try:
-            proc = subprocess.Popen(["python3", filename], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-            while True:
-                line = proc.stdout.readline()
-                if not line:
-                    break
-                rospy.loginfo("[GPSR Runner] %s" % line.rstrip().decode())
-            while True:
-                line = proc.stderr.readline()
-                if not line:
-                    break
-                rospy.logwarn("[GPSR Runner] %s" % line.rstrip().decode())
-        except KeyboardInterrupt:
-            proc.terminate()
-            rospy.loginfo("Proc terminated")
+        # try:
+        #     proc = subprocess.Popen(["python3", filename], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+        #     while True:
+        #         line = proc.stdout.readline()
+        #         if not line:
+        #             break
+        #         rospy.loginfo("[GPSR Runner] %s" % line.rstrip().decode())
+        #     while True:
+        #         line = proc.stderr.readline()
+        #         if not line:
+        #             break
+        #         rospy.logwarn("[GPSR Runner] %s" % line.rstrip().decode())
+        # except KeyboardInterrupt:
+        #     proc.terminate()
+        #     rospy.loginfo("Proc terminated")
 
         return OllamaCallResponse(
             ollama_output["total_duration"],

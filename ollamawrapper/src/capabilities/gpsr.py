@@ -121,6 +121,7 @@ def identify_people(p, what_to_identify):
         what_to_identify (str): Action to identify
     """
     publish_what_im_doing("identify_people(what_to_idenfify='%s')" % what_to_identify)
+    engine_say(p, "I am identifying people who are %s" % what_to_identify)
 
     bridge = CvBridge()
     im = rospy.wait_for_message(
@@ -161,6 +162,7 @@ def identify_objects(p, what_to_idenfify):
         what_to_idenfify (str): Something to identify
     """
     publish_what_im_doing("identify_object(what_to_idenfify='%s')" % what_to_idenfify)
+    engine_say(p, "I am identifying %s" % what_to_idenfify)
 
     p.exec_action('moveHead', '0.0_-0.5')
     
