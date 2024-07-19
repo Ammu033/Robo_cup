@@ -24,7 +24,7 @@ import cv2
 #     latch=True,
 # )
 
-ollama_api_url = rospy.get_param("/gpsr/ollama_api_url", "192.168.69.253:11434")
+ollama_api_url = rospy.get_param("/gpsr/ollama_api_url", "127.0.0.1:11434")
 # ollama_api_url = rospy.get_param("/gpsr/ollama_api_url", "127.0.0.1:11434")
 ollama_multimodal_model = rospy.get_param("/gpsr/ollama_multimodal_model", 'llava:7b')
 
@@ -143,6 +143,7 @@ def identify_people(p, what_to_identify):
             keep_alive = "0m"
         )["response"]
     print(ollama_output)
+    time.sleep(1)
     rospy.set_param("/gpsr/saved_information", ollama_output)
 
 @contexts.context(["gpsr"])
@@ -184,6 +185,7 @@ def identify_objects(p, what_to_idenfify):
             keep_alive = "0m"
         )["response"]
     print(ollama_output)
+    time.sleep(1)
     rospy.set_param("/gpsr/saved_information", ollama_output)
 
     p.exec_action('moveHead', '0.0_0.0')
@@ -192,12 +194,14 @@ def identify_objects(p, what_to_idenfify):
 @exception_handling
 def report_information(p):
     """Report back a previous identification task. This therefore means that `identify_objects()`
-    must previously have been called. You must go back to you before calling this function.
+    must previously have been called. You must go back to you (the inspection point) before calling this function.
     """
     publish_what_im_doing("report_information()")
 
-    report = rospy.set_param("/gpsr/saved_information", "I_am_not_sure.")
-    p.exec_action('speak', 'I_have_identified_{}'.format(report.replace(" ", "_")))
+    time.sleep(1)
+    report = rospy.get_param("/gpsr/saved_information", "I am not sure.")
+    # p.exec_action('speak', 'I_have_identified_{}'.format(report.replace(" ", "_")))
+    engine_say(p, report)
 
 @contexts.context(["gpsr"])
 @exception_handling
@@ -220,7 +224,7 @@ def follow_person(p):
 @contexts.context(["gpsr"])
 def guide_person(p):
     """Ask a human to follow the robot. `goto_location()` and `ask_for_person()` must have previously been called, in that order. You must go to a location
-    immediately after this."""
+    immediately after this. You should only call this function if 'guide' or 'accompany' specifically has been said."""
     publish_what_im_doing("guide_person()")
 
     p.exec_action('speak', 'Please,_follow_me!')
@@ -236,9 +240,9 @@ def cease_all_motor_functions(p):
 @exception_handling
 def engine_say(p, to_say):
     publish_what_im_doing("engine_say('%s')" % to_say)
-    # p.exec_action('speak' , to_say.replace(" ", "_"))
+    p.exec_action('speak' , to_say.replace(" ", "_"))
 
-    p.exec_action('moveHead', '%d_0.0' % random.randint(-10, 10) / 10)
+    # p.exec_action('moveHead', '%d_0.0' % random.randint(-10, 10) / 10)
 
 if __name__ == "__main__":
     import sys
@@ -258,6 +262,6 @@ if __name__ == "__main__":
     p = PNPCmd()
     p.begin()
 
-    identify_objects(p, "toys")
+    identify_objects(p, "how many fingers are held up")
     
     p.end()

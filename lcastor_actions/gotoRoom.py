@@ -21,7 +21,7 @@ Starts and stops the object detection node
 
 ROOM_DICT_B = { "hallwaycabinet" : [-2.93, -4.47, 0.0, 0.0, 0.99, -0.08],
                 "hallway" : [-1.41, -2.64, 0.0, 0.0, 0.95, -0.30],
-                "entrance" : [-2.56, -2.99, 0.0 , 0.0, 0.99, 0.13],
+                "entrance" : [-1.41, -2.64, 0.0, 0.0, 0.95, -0.30],
                 "desk" : [-2.79, -0.46, 0.0, 0.0, -0.78, 0.61],
                 "office" : [-0.96, -1.21, 0.0, 0.0, 0.85, 0.52],
                 "studio" : [-0.96, -1.21, 0.0, 0.0, 0.85, 0.52],
@@ -36,7 +36,7 @@ ROOM_DICT_B = { "hallwaycabinet" : [-2.93, -4.47, 0.0, 0.0, 0.99, -0.08],
                 "lounge" : [2.72, -1.96, 0.0, 0.0, -0.67, 0.73],
                 "livingroom" : [2.72, -1.96, 0.0, 0.0, -0.67, 0.73],
                 "trashcan" : [0.58, -1.16, 0.0, 0.0, 0.98, -0.17],
-                "kitchen" : [3.34, -1.76, 0.0, 0.0, 84, 0.54],
+                "kitchen" : [3.34, -1.76, 0.0, 0.0, 0.84, 0.54],
                 "kitchencabinet" : [0.62, 2.29, 0.0, 0.0, 0.99, 0.03],
                 "dinnertable" : [1.44, 1.28, 0.0, 0.0, -0.02, 0.99],
                 "dishwasher" : [3.67, 0.73, 0.0, 0.0, 0.04, 0.99],
@@ -136,6 +136,7 @@ class gotoRoom(AbstractAction):
                 rospy.loginfo("Waiting for goTo result...")
                 # self.client.wait_for_result()
                 rospy.set_param(ROS_PARAM, "Succeded")
+        #self._stop_action()
 
     def _on_goTo_done(self, goalState, result):
         print("goToRoom DONE", goalState, result)

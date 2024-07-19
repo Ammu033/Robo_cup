@@ -129,7 +129,8 @@ class GPSRNode:
         goto_location(p, location_name='sink') then identify_objects(p, what_to_idenfify='the heaviest object') \
         then go_back_to_me(p) then report_information(p). Another example is that 'lead Robin from the dinner table to the hallway' \
         could call `goto_location(p, location_name='sink')` then `ask_for_person(p, person_name='Robin'), then` \
-        `guide_person(p)` and then finally `goto_location(p, location_name='hallway')`"
+        `guide_person(p)` and then finally `goto_location(p, location_name='hallway')` \
+        After you finish your task you should always come back to me."
 
         client = ollama.Client(host = "http://%s" % ollama_api_url)
         # print(client.list())
@@ -168,6 +169,11 @@ class GPSRNode:
                 if not line:
                     break
                 rospy.loginfo("[GPSR Runner] %s" % line.rstrip().decode())
+            while True:
+                line = proc.stderr.readline()
+                if not line:
+                    break
+                rospy.logwarn("[GPSR Runner] %s" % line.rstrip().decode())
         except KeyboardInterrupt:
             proc.terminate()
             rospy.loginfo("Proc terminated")
