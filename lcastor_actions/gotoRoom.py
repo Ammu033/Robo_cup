@@ -18,7 +18,6 @@ import copy
 Starts and stops the object detection node
 """
 
-
 ROOM_DICT_B = { 
     "hallwaycabinet" : [-2.93, -4.47, 0.0, 0.0, 0.99, -0.08],
     "hallway" : [-1.41, -2.64, 0.0, 0.0, 0.95, -0.30],
