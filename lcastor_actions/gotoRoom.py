@@ -12,6 +12,7 @@ from AbstractAction import AbstractAction
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 import actionlib
 import math
+import random
 import copy
 """
 Starts and stops the object detection node
@@ -87,9 +88,6 @@ class gotoRoom(AbstractAction):
                          "bagpack" : "livingroom"}
         
         # The following coordinates are based on the Robocup house arena (X, Y, Z, R, P, Y)
-
-
-        # The following coordinates are based on the Robocup house arena (X, Y, Z, R, P, Y)
         self.room_dict = copy.deepcopy(ROOM_DICT)
         self.room_dict_b = copy.deepcopy(ROOM_DICT_B)
         self.room_dict_c = copy.deepcopy(ROOM_DICT_C)
@@ -99,33 +97,16 @@ class gotoRoom(AbstractAction):
 
 
         if "r" in self.params[0]:
-            self.coordinates = self.room_dict[ROOM][self.params[1]]
-            
-            # tmp_room_dict = self.room_dict[ROOM]
-            # if self.params[1] in tmp_room_dict:
-            #     self.coordinates = tmp_room_dict[self.params[1]]
-        else:
-            self.coordinates = None
-
-        # if "r" in self.params[0] and self.params[1] in self.room_dict:
-        #         self.coordinates = self.room_dict[self.params[1]]
-        # else: 
-        #     if self.params[0] in self.obj_dict.keys():
-        #         self.room = self.obj_dict[self.params[0]]
-        #         self.coordinates = self.room_dict[self.room]
-        #     else:
-        #         self.coordinates = None
-
-        # if "b" in self.params[0]:
-        #     self.coordinates = self.room_dict_b[self.params[1]]
-        # else if "c" in self.params[0]:
-        #     self.coordinates = self.room_dict_c[self.params[1]]
-        # else:
-        #     print("Wrong room name - select [b] or [c]")
-        #     return
-
-        print(self.params)
-        print(self.coordinates)
+            if self.params[1] in self.room_dict[ROOM]:
+                self.coordinates = self.room_dict[ROOM][self.params[1]]
+            else:
+                #FIXME: FOR GPSR BRANCH PLEASE CHANGE BACK TO THE OTHER ELSE AFTER ROBOCUP 24
+                random_loc = list(self.room_dict[ROOM].keys())
+                rospy.loginfo('Could not find ' + self.params[1] + ', going to ' + random_loc + ' instead')
+                self.coordinates = random.choice(random_loc)
+            # else:
+            #     rospy.set_param(ROS_PARAM, "Failed")
+            #     self._stop_action()
 
         self.client = actionlib.SimpleActionClient('/move_base', MoveBaseAction)
 
@@ -154,9 +135,7 @@ class gotoRoom(AbstractAction):
                 rospy.loginfo("Waiting for goTo result...")
                 # self.client.wait_for_result()
                 rospy.set_param(ROS_PARAM, "Succeded")
-        else:
-            rospy.set_param(ROS_PARAM, "Failed")
-            self._stop_action()
+        self._stop_action()
 
     def _on_goTo_done(self, goalState, result):
         print("goToRoom DONE", goalState, result)
