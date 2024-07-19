@@ -10,6 +10,9 @@ from cv_bridge import CvBridge, CvBridgeError
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
 from PersonFollowing import PersonFollowing
+from ollamamessages.msg import WhisperTranscription, WhisperListening
+from ollamamessages.srv import OllamaCall, OllamaCallResponse
+from ollamamessages.msg import OllamaResponse
 import tempfile
 import random
 import ollama
@@ -239,8 +242,25 @@ def cease_all_motor_functions(p):
 @contexts.context(["gpsr"])
 @exception_handling
 def answer_quiz(p):
+    listening_pub = rospy.Publisher("/stt/listening", WhisperListening, queue_size=1)
+    intent_publisher = rospy.Publisher("/planner_intention", String, queue_size=1)
+    rospy.set_param("/stt/use_ollama", True)
+
+    intent_publisher.publish("quiz")
     engine_say(p, "Hello, I am supposed to answer your quiz. Please ask me a question.")
-    time.sleep(1)
+    time.sleep(0.5)
+    listening_pub.publish(listening=True)
+
+    try:
+        info_output = rospy.wait_for_message(
+            "ollama_output", String, timeout=20
+        ).data
+        engine_say(p, info_output)
+    except:
+        engine_say(p, "I'm sorry, even though I understood your question, I'm too stupid to know the answer.")
+    
+    # engine_say(p, "I understood your question was %s. Let me think about that for a second" % text)
+
 
 @contexts.context(["gpsr"])
 @exception_handling
