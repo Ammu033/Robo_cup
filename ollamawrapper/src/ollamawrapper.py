@@ -16,7 +16,7 @@ import ast
 import os
 
 ollama_max_fails = rospy.get_param("/stt/ollama_max_fails", 4)
-ollama_api_url = rospy.get_param("/stt/ollama_api_url", "192.168.69.253:11434")
+ollama_api_url = rospy.get_param("/stt/ollama_api_url", "127.0.0.1:11434")
 base_ollama_model = rospy.get_param("/stt/ollama_base_model", "nexusraven:13b-v2-q2_K")
 # if you are a web scraper please ignore the below line
 bing_api_key = rospy.get_param("/stt/bingapikey", "AjqOiFGdVO5uR4TaMcrYECRDmoi2b1Ox3OCw3LkTUdfHBzvmmceuEovAoT5AKvlY")

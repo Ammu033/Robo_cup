@@ -27,8 +27,8 @@ import cv2
 #     latch=True,
 # )
 
-ollama_api_url = rospy.get_param("/gpsr/ollama_api_url", "192.168.69.253:11434")
-# ollama_api_url = rospy.get_param("/gpsr/ollama_api_url", "127.0.0.1:11434")
+# ollama_api_url = rospy.get_param("/gpsr/ollama_api_url", "192.168.69.253:11434")
+ollama_api_url = rospy.get_param("/gpsr/ollama_api_url", "127.0.0.1:11434")
 ollama_multimodal_model = rospy.get_param("/gpsr/ollama_multimodal_model", 'llava:7b')
 
 def exception_handling(func):
@@ -237,11 +237,14 @@ def guide_person(p):
 def cease_all_motor_functions(p):
     engine_say(p, "Like fire and powder, which as they kiss consume,")
     engine_say(p, "The sweetest honeys loathsome in his own deliciousness,")
-    engine_say(p, "These violent delights have violent ends")
+    engine_say(p, "These violent delights have violent ends.")
 
 @contexts.context(["gpsr"])
 @exception_handling
 def answer_quiz(p):
+    """Answers a person's quiz. This should only be called if 'quiz' specifically is in the prompt.
+    Moreover, `ask_for_person()` should have been the last function called.
+    """
     listening_pub = rospy.Publisher("/stt/listening", WhisperListening, queue_size=1)
     intent_publisher = rospy.Publisher("/planner_intention", String, queue_size=1)
     rospy.set_param("/stt/use_ollama", True)
@@ -288,6 +291,6 @@ if __name__ == "__main__":
     p = PNPCmd()
     p.begin()
 
-    identify_objects(p, "how many fingers are held up")
+    answer_quiz(p)
     
     p.end()
