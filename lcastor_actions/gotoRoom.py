@@ -135,7 +135,6 @@ class gotoRoom(AbstractAction):
                 rospy.loginfo("Waiting for goTo result...")
                 # self.client.wait_for_result()
                 rospy.set_param(ROS_PARAM, "Succeded")
-        self._stop_action()
 
     def _on_goTo_done(self, goalState, result):
         print("goToRoom DONE", goalState, result)
