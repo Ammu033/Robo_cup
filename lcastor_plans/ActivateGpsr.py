@@ -60,6 +60,8 @@ def gpsr(p):
     tries = 0
     success = False
     heard_speech = None
+    fail = False
+    response = none
 
     while tries <= 2:
         success, heard_speech = call_whisper(listening_pub, tries, no_speech_thresh)
@@ -68,23 +70,24 @@ def gpsr(p):
         tries += 1 
 
     if heard_speech is None:
-        p.exec_action('speak', 'Sadly_I_could_not_catch_what_you_said,_have_a_nice_day')
-        return
-    
-    success, response = AskConfirmation(
-        p, 
-        speech_text="Did_I_hear_you_say_"+heard_speech.replace(' ','_')+"?", 
-        cannot_hear_text="please_say_yes_if_that_is_correct.",
-        max_tries=0
-    )
+        fail = True
+    else: 
+        success, response = AskConfirmation(
+            p, 
+            speech_text="Did_I_hear_you_say_"+heard_speech.replace(' ','_')+"?", 
+            cannot_hear_text="please_say_yes_if_that_is_correct.",
+            max_tries=0
+        )
     
     if not success: 
-        p.exec_action('speak', 'Sorry,_I_did_not_understand_your_confirmation,_have_a_nice_day')
-        return
+        fail = True
+    else:
+        if response != 'yes':
+            fail = True
     
-    if response != 'yes':
-        p.exec_action('speak', 'Sorry,_It_seems_I_misunderstood,_have_a_nice_day')
-        return
+    if fail == True:
+        p.exec_action('speak', 'Sorry,_it_seems_i_couldnt_understand_please_type_out_the_gpsr_command')
+        heard_speech = input("Please type out the gpsr command: ")
 
     try:
         service_call = rospy.ServiceProxy("/gpsr/task_decomposition", OllamaCall)
