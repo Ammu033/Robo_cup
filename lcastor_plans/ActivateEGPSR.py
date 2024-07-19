@@ -154,7 +154,14 @@ class EGPSR:
         for object in trash:
             self.send_to_trash(object)
         raise NotImplemented
+
+    def scan_location_trash_alt(self, location):
+        # find all trash 
+        # send a request back to ollama to capture the image now to check for trash
+        # this would return speech saying what trash was foind in the image, thats as far as it goes
+        raise NotImplemented
     
+
     def send_to_trash(self, object):
         #TODO: sarah - it's late I'm not that sure to be honest
         # basically we want to spot the trash and then either speak 
@@ -168,10 +175,10 @@ class EGPSR:
             self.p.exec_action('gotoRoom', 'r_'+location)
             self.p.exec_action('speak', 'checking_'+location+'_for_misplaced_items')
             self.p.exec_action('moveHead', head_tilt)
-            self.scan_location(location)
+            self.scan_location_objects(location)
         raise NotImplemented
     
-    def scan_location(self, location):
+    def scan_location_objects(self, location):
         # find all objects
         # TODO: Niko to find the objects in the image frame -> returns a list objects -> array
         objects = ['found', 'objects'] # <- example of the outputs from the scene
@@ -179,6 +186,12 @@ class EGPSR:
             if OBJECT_LOCATIONS[object] != location:
                 self.object_in_wrong_location(object)
         raise NotImplemented
+
+    def scan_location_objects_alt(self, location):
+        # find all objects in the wrong place 
+        # this would return speech saying what objects were found in the image, thats as far as it goes
+        raise NotImplemented
+    
 
     def object_in_wrong_location(self, object):
         # TODO: do something (grasping attempts?) 
