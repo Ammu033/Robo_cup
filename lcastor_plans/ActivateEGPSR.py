@@ -217,19 +217,23 @@ class EGPSR:
         raise NotImplemented
 
     def scan_location_trash(self):
-        
-
-        # find all trash 
-        trash_poses = ObjectFloorPoseResponse()
-        req = ObjectFloorPoseRequest()
-        req.z_cutoff = 0.5
-
-        detect_service_call = rospy.ServiceProxy("object_floor_pose", ObjectFloorPose)
+       
         try:
+            # find all trash 
+            req = ObjectFloorPoseRequest()
+            req.z_cutoff = 0.5
+
+            detect_service_call = rospy.ServiceProxy("get_object_floor_poses", ObjectFloorPose)
+            detect_service_call.wait_for_service(timeout=3.0) # wait for service to be available
+
             trash = detect_service_call(req)
+
             for object in trash:
                 self.send_to_trash(object)
+
         except rospy.ServiceException as e:
+            rospy.logerr(e)
+        except Exception as e:
             rospy.logerr(e)
         
 
