@@ -11,7 +11,10 @@ except:
     print("Please set PNP_HOME environment variable to PetriNetPlans folder.")
     sys.exit(1)
 
+sys.path.insert(1, os.path.join(os.path.dirname(__file__), "..", "lcastor_actions"))
+import gotoRoom
 from gotoRoom import ROOM_DICT_B
+
 import time
 import pnp_cmd_ros
 from pnp_cmd_ros import *
