@@ -65,7 +65,7 @@ def go_back_to_me(p):
 
 @contexts.context(["gpsr"])
 @exception_handling
-def grasp_object(p, object_name = None):
+def grasp_object(p, object_name):
     """Grasps a given object, for example 'fruit' or 'bowl'
 
     Args:
@@ -229,7 +229,7 @@ def follow_person(p):
 @contexts.context(["gpsr"])
 def guide_person(p):
     """Ask a human to follow the robot. `goto_location()` and `ask_for_person()` must have previously been called, in that order. You must go to a location
-    immediately after this. You should only call this function if 'guide' or 'accompany' specifically has been said."""
+    immediately after this. You should only call this function if the verb 'guide' or 'take' or 'escort' is in the prompt."""
     publish_what_im_doing("guide_person()")
 
     p.exec_action('speak', 'Please,_follow_me!')

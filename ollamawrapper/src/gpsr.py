@@ -129,6 +129,11 @@ class GPSRNode:
         then go_back_to_me(p) then report_information(p). Another example is that 'lead Robin from the dinner table to the hallway' \
         could call `goto_location(p, location_name='sink')` then `ask_for_person(p, person_name='Robin'), then` \
         `guide_person(p)` and then finally `goto_location(p, location_name='hallway')` \
+        Another example is that 'get a toy from the dinner table and deliver it to Noah in the kitchen' should become: \
+        `goto_location(p, location_name='dinnertable')`; `grasp_object(p, object_name='toy')`; `goto_location(p, location_name='kitchen')`; \
+        `ask_for_person(p, person_name='Noah')`; then finally `offer_object(p)`. Another example is that 'tell me how many people in the kitchen are wearing white coats' \
+        could become `goto_location(p, location_name='kitchen')`; `identify_people(p, what_to_identify='how many people are wearing white shirts')`; \
+        `go_back_to_me(p)`; and then finally `report_information(p)`. \
         After you finish your task you should always come back to me."
 
         ollama_api_url = rospy.get_param("/gpsr/ollama_api_url", "127.0.0.1:11434")
