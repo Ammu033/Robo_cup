@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+
+    <!-- Launch rqt_image_view >
+    <node name="rqt_image_view" pkg="rqt_image_view" type="rqt_image_view" respawn="true" output="screen" /-->
+
+    <!-- Required for contact graspnet -->    
+    <node pkg="pick_up_object" name="tf_transform" type="tf_transform.py" respawn="true" output="screen"/>
+
+    <include file="$(find contact_graspnet)/launch/contact_graspnet.launch"/>
+
+</launch>
