@@ -157,10 +157,16 @@ class EGPSR:
         rospy.loginfo("Successfully sent, generating GPSR, stopping listening.")
         self.on_quest = True
 
-    # def object_location(self, object):
-    #     try:
-    #         if object in OBJECT_CATEGORY.keys()
-    #
+    def object_location(self, object):
+        try:
+            if object in OBJECT_CATEGORY.keys():
+                category = OBJECT_CATEGORY[object]
+                location = CATRGORY_LOCATION[category]
+        except Exception as e:
+            rospy.logerr('issue getting object locations')
+            location = 'unknown'
+        return location
+
     def open_door(self) -> None:
         self.p.exec_action("moveHead", "0.0_0.0")
         self.p.exec_action("speak", "Can_you_please_open_the_door_for_me_?")
@@ -274,36 +280,22 @@ class EGPSR:
 
     def scan_location_objects(self, location):
         # find all objects
-        # TODO: Niko to find the objects in the image frame -> returns a list objects -> array
         detect_service_call = rospy.ServiceProxy("/get_object_list", OllamaCall)
         response = service_call(input = quest_speech)
     
         req = ObjectList()
-        # req
         detect_service_call = rospy.ServiceProxy("detect_object_list", ObjectList)
-            try:
-                trash = detect_service_call()
-                for object in trash:
-                    self.send_to_trash(object)
-            except rospy.ServiceException as e:
-                rospy.logerr(e)
-     
-        objects = ['found', 'objects'] # <- example of the outputs from the scene
-        objects = 
 
-        for object in objects:
-            if OBJECT_LOCATIONS[object] != location:
-                self.object_in_wrong_location(object)
-        raise NotImplemented
-
-    def scan_location_objects_alt(self, location):
-        # find all objects in the wrong place 
-        # this would return speech saying what objects were foind in the image, thats as far as it goes
-        raise NotImplemented
-    
+        try:
+            detected_objects = detect_service_call()
+            for object in detected_objects:
+                if self.object_location(object) != location: 
+                    self.object_in_wrong_location(object)
+        except rospy.ServiceException as e:
+            rospy.logerr(e)
 
     def object_in_wrong_location(self, object):
-        self.p.exec_action('speak', object+'_is_incorrectly_placed,_it_should_be_in_'+ OBJECT_LOCATIONS[object])
+        self.p.exec_action('speak', object+'_is_incorrectly_placed,_it_should_be_in_'+ self.object_location(object))
         # for more points, do we want to try grabbing the objects?
     
     def start(self):
