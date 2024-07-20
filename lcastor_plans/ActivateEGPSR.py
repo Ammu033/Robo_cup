@@ -1,6 +1,8 @@
 import os import sys
 from ollamamessages.msg import WhisperTranscription, WhisperListening
 from ollamamessages.srv import OllamaCall
+from lcastor_grasping.srv import ObjectList, ObjectListRequest, ObjectListResponse
+from lcastor_grasping.srv import ObjectFloorPose, ObjectFloorPoseRequest, ObjectFloorPoseResponse
 from AskConfirmation import AskConfirmation
 
 try:
@@ -15,6 +17,20 @@ import pnp_cmd_ros
 from pnp_cmd_ros import *
 from std_msgs.msg import Bool, String
 import rospy
+import numpy as np
+import math
+import tf
+from geometry_msgs.msg import PointStamped , PoseWithCovarianceStamped
+
+DES_DIST = 1.2
+l = None
+rotation_angle = None
+person_point = None
+robot_pose = None
+goal_msg = None
+client = None
+goal_tolerance_client = None
+gotopersonDone = False
 
 LOCATIONS = list(ROOM_DICT_B.keys())
 
@@ -24,7 +40,7 @@ POSSIBLE_PEOPLE_AREAS ['fill','sensible','locations','...']
 POSSIBLE_OBJECT_AREAS = ['coffetable', 'table', '...']
 POSSIBLE_TRASH_AREAS = ['trash_loc_1', 'trash_loc_2', '...']
 
-OBJECT_LOCATIONS = {
+OBJECT_CATEGORY = {
     "soap":  "cleaning_supplies",
     "dishwasher_tab":  "cleaning_supplies",
     "washcloth":  "cleaning_supplies",
@@ -66,6 +82,16 @@ OBJECT_LOCATIONS = {
     "knife":  "dishes",
 }
 
+CATRGORY_LOCATION = {
+    'desk',	'decorations'
+    'shelf',	'cleaning_supplies'
+    'TVtable',	'toys'
+    'coffetable',	'fruits'
+    'kitchencabinet',	'drinks'
+    'dinnertable',	'snacks'
+    'dishwasher',	'dishes'
+    'kitchencounter',	'food'
+}
 
 # whisper situations
 WAITING = 0
@@ -131,14 +157,10 @@ class EGPSR:
         rospy.loginfo("Successfully sent, generating GPSR, stopping listening.")
         self.on_quest = True
 
-    # # @property
-    # def get_new_location(self):
-    #     idx_loc = ROOM_LOCATION_CYCLE.index(self.current_goal_location)
-    #     new_idx = idx_loc + 1
-    #     if new_idx > len(ROOM_LOCATION_CYCLE):
-    #         new_idx = 0
-    #     ROOM_LOCATION_CYCLE[new_idx]
-
+    # def object_location(self, object):
+    #     try:
+    #         if object in OBJECT_CATEGORY.keys()
+    #
     def open_door(self) -> None:
         self.p.exec_action("moveHead", "0.0_0.0")
         self.p.exec_action("speak", "Can_you_please_open_the_door_for_me_?")
@@ -185,11 +207,13 @@ class EGPSR:
 
     def scan_location_trash(self):
         # find all trash 
-        # TODO: Niko to find the trash in the image frame -> returns a list trash -> array
-        # cut off objects above a certain z height 
+        trash_poses = ObjectFloorPoseResponse()
+        req = ObjectFloorPoseRequest()
+        req.z_cutoff = 0.5
+
         detect_service_call = rospy.ServiceProxy("object_floor_pose", ObjectFloorPose)
         try:
-            trash = detect_service_call()
+            trash = detect_service_call(req)
             for object in trash:
                 self.send_to_trash(object)
         except rospy.ServiceException as e:
@@ -209,7 +233,32 @@ class EGPSR:
         #TODO: sarah - it's late I'm not that sure to be honest
         # basically we want to spot the trash and then either speak 
         # or try to pick it up and take it to the bin
-        raise NotImplemented
+        global goal_msg, robot_pose, person_point
+        # Obtain the current robot pose
+        robot_pose_data  = rospy.wait_for_message('/robot_pose' , PoseWithCovarianceStamped )
+        q = (
+                    robot_pose_data.pose.pose.orientation.x,
+                    robot_pose_data.pose.pose.orientation.y,
+                    robot_pose_data.pose.pose.orientation.z,
+                    robot_pose_data.pose.pose.orientation.w
+                )
+        m = tf.transformations.quaternion_matrix(q)
+        robot_pose.x = robot_pose_data.pose.pose.position.x
+        robot_pose.y = robot_pose_data.pose.pose.position.y
+        robot_pose.theta = tf.transformations.euler_from_matrix(m)[2]
+        # Compute distance in cartesian space between obj and robot
+        obj_pos = np.array([object_poses.point.x , object_poses.point.y])
+        robot_pos = np.array([robot_pose.x , robot_pose.y])
+        vector_to_obj = obj_pos - robot_pos
+        distance_to_obj = math.sqrt(vector_to_obj[0]**2 + vector_to_obj[1]**2)
+        # Normalize the vector to the desired distance
+        normalized_vector = vector_to_obj / distance_to_obj
+        # Calculate the orientation needed to reach the obj
+        goal_orientation = math.atan2(normalized_vector[1], normalized_vector[0])
+        # Calculate the goal position based on the desired distance
+        goal_position = obj_pos - DES_DIST * normalized_vector
+        p.execAction('goto', str(goal_position[0]) + "_" + str(goal_position[1]) + '_' + str(goal_orientation))
+        # raise NotImplemented
 
     def phase_look_for_incorrectly_placed_objects(self):
         head_tilt = '0.0_0.0' #TODO: we need a better head tilt
@@ -230,7 +279,7 @@ class EGPSR:
         response = service_call(input = quest_speech)
     
         req = ObjectList()
-        req
+        # req
         detect_service_call = rospy.ServiceProxy("detect_object_list", ObjectList)
             try:
                 trash = detect_service_call()
@@ -276,5 +325,6 @@ if __name__ == "__main__":
     p = PNPCmd()
     p.begin()
     gpsr = EGPSR(p)
-    gpsr.start()
+    # gpsr.start()
+    gpsr.obtain_quest_from_person()
     p.end()
