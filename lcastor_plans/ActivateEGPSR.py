@@ -34,9 +34,20 @@ gotopersonDone = False
 
 LOCATIONS = list(ROOM_DICT_B.keys())
 
-#TODO: these locations needs to be set and configured for this task - ricardo
-POSSIBLE_PEOPLE_AREAS ['fill','sensible','locations','...']
-POSSIBLE_TRASH_AREAS = ['trash_loc_1', 'trash_loc_2', '...']
+POSSIBLE_PEOPLE_AREAS = [
+    'findTrashEntrance',
+    'findTrashOffice',
+    'findTrashKitchen2',
+    'findTrashLivingRoom',
+]
+
+POSSIBLE_TRASH_AREAS = [
+    'findTrashEntrance', 
+    'findTrashOffice', 
+    'findTrashKitchen1',
+    'findTrashKitchen2',
+    'findTrashLivingRoom',
+]
 
 OBJECT_CATEGORY = {
     "soap":  "cleaning_supplies",
@@ -188,8 +199,6 @@ class EGPSR:
             if rospy.get_param('reached_person' , False) :
                 reached_person = True
         return reached_person and found_person
-        #TODO: Hari
-        raise NotImplemented
 
     def phase_look_for_people(self) -> None:
         ''' THERE SHOULD ONLY BE 2 PEOPLE WITH TASKS'''
@@ -217,7 +226,6 @@ class EGPSR:
         raise NotImplemented
 
     def scan_location_trash(self):
-       
         try:
             # find all trash 
             req = ObjectFloorPoseRequest()
