@@ -266,6 +266,7 @@ class EGPSR:
         
 
     def send_to_trash(self, object_poses):
+        DES_DIST = 1.2
         # object poses in the map frame 
         global goal_msg, robot_pose, person_point
         # Obtain the current robot pose
