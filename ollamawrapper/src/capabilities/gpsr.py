@@ -68,7 +68,7 @@ def go_back_to_me(p):
 
 @contexts.context(["gpsr"])
 @exception_handling
-def grasp_object(p, object_name = None):
+def grasp_object(p, object_name):
     """Grasps a given object, for example 'fruit' or 'bowl'
 
     Args:
@@ -102,7 +102,7 @@ def offer_object(p):
 @exception_handling
 def ask_for_person(p, person_name):
     """Ask for a person with a given name, for example 'Angel' or 'Morgan'.
-    It can also be a descriptive action, e.g. 'person pointing to the right'.
+    It can also be a descriptive action, e.g. 'person pointing to the right'. It can be a description not a name.
     You probably should have called `goto_location()` first.
 
     Args:
@@ -118,12 +118,14 @@ def ask_for_person(p, person_name):
 @exception_handling
 def identify_people(p, what_to_identify):
     """Identifies and counts the number of people in a room doing a given action.
-    For example what_to_identify could be 'standing persons' or 'pointing to the right'
+    For example what_to_identify could be 'standing persons' or 'pointing to the right'.
+    This function should be called if 'pose' is in the prompt.
 
     Args:
         what_to_identify (str): Action to identify
     """
     publish_what_im_doing("identify_people(what_to_idenfify='%s')" % what_to_identify)
+    engine_say(p, "I am identifying people who are %s" % what_to_identify)
 
     bridge = CvBridge()
     im = rospy.wait_for_message(
@@ -137,7 +139,7 @@ def identify_people(p, what_to_identify):
         prompt = "You are the perception part of a mobile helper robot. Tell me about the '%s' about the people in this image. \
         You should only refer to this and not to anything else in the scene. You should reply as shortly as possible. \
         Do not refer to the image at all, pretend it is your eyes instead. \
-        Do not say that you are a chatbot or an AI assistant." % what_to_identify
+        Do not say that you are a chatbot or an AI assistant. Do not mention 'image' or 'images'." % what_to_identify
         print(prompt)
         # prompt = "Describe the image"
         
@@ -164,8 +166,9 @@ def identify_objects(p, what_to_idenfify):
         what_to_idenfify (str): Something to identify
     """
     publish_what_im_doing("identify_object(what_to_idenfify='%s')" % what_to_idenfify)
+    engine_say(p, "I am identifying %s" % what_to_idenfify)
 
-    p.exec_action('moveHead', '0.0_-0.5')
+    p.exec_action('moveHead', '0.0_-0.8')
     
     bridge = CvBridge()
     im = rospy.wait_for_message(
@@ -179,7 +182,7 @@ def identify_objects(p, what_to_idenfify):
         prompt = "You are the perception part of a mobile helper robot. Tell me about the '%s' in this image. \
         You should only refer to this and not to anything else in the scene. You should reply as shortly as possible. \
         Do not refer to the image at all, pretend it is your eyes instead: for example, 'I can't see any toys'. \
-        Do not say that you are a chatbot or an AI assistant." % what_to_idenfify
+        Do not say that you are a chatbot or an AI assistant. Do not mention 'image' or 'images'. Do not say sorry ever." % what_to_idenfify
         print(prompt)
         # prompt = "Describe the image"
         
@@ -230,7 +233,7 @@ def follow_person(p):
 @contexts.context(["gpsr"])
 def guide_person(p):
     """Ask a human to follow the robot. `goto_location()` and `ask_for_person()` must have previously been called, in that order. You must go to a location
-    immediately after this. You should only call this function if 'guide' or 'accompany' specifically has been said."""
+    immediately after this. You should only call this function if the verb 'guide' or 'take' or 'escort' is in the prompt."""
     publish_what_im_doing("guide_person()")
 
     p.exec_action('speak', 'Please,_follow_me!')
@@ -249,7 +252,7 @@ def answer_quiz(p):
     Moreover, `ask_for_person()` should have been the last function called.
     """
     listening_pub = rospy.Publisher("/stt/listening", WhisperListening, queue_size=1)
-    intent_publisher = rospy.Publisher("/planner_intention", String, queue_size=1)
+    intent_publisher = rospy.Publisher("/planner_intention", String, queue_size=1, latch = True)
     rospy.set_param("/stt/use_ollama", True)
 
     intent_publisher.publish("quiz")
@@ -257,9 +260,12 @@ def answer_quiz(p):
     time.sleep(0.5)
     listening_pub.publish(listening=True)
 
+    # this is not the correct way to do ollama stuff, therefore, this can only
+    # be called once otherwise it'll just repeat the previous answer
+    # TODO: fix this shit!
     try:
         info_output = rospy.wait_for_message(
-            "ollama_output", String, timeout=20
+            "ollama_output", String, timeout=30
         ).data
         engine_say(p, info_output)
     except:
@@ -294,6 +300,10 @@ if __name__ == "__main__":
     p = PNPCmd()
     p.begin()
 
-    answer_quiz(p)
+    # answer_quiz(p)
+    # identify_objects(p, what_to_idenfify="number of foods")
+    time.sleep(5)
+    identify_people(p, "number of people sitting down")
+    # report_information(p)
     
     p.end()

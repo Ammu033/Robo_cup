@@ -21,7 +21,6 @@ import re
 sys.path.insert(1, os.path.join(os.path.dirname(__file__), "..", "..", "lcastor_actions"))
 import gotoRoom
 
-ollama_api_url = rospy.get_param("/gpsr/ollama_api_url", "127.0.0.1:11434")
 # ollama_api_url = rospy.get_param("/gpsr/ollama_api_url", "192.168.69.253:11434")
 ollama_decomposition_model = rospy.get_param("/gpsr/ollama_decomposition_model", 'llama3')
 # ollama_decomposition_model = rospy.get_param("/gpsr/ollama_decomposition_model", "deepseek-coder:6.7b")
@@ -201,6 +200,7 @@ class GPSRNode:
             if stderr == "" and not "!! Exception" in stdout:
                 # all good, the plan was executable and run without errors
                 needs_planning = False
+
 
         return OllamaCallResponse(
             ollama_output["total_duration"],
