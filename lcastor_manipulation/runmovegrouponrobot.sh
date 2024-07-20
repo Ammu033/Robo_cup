@@ -1,0 +1,1 @@
+roslaunch tiago_moveit_config move_group.launch end_effector:=pal-gripper ft_sensor:=False laser_model:=hokuyo camera_model:=orbbec-astra base_type:=pmb2
