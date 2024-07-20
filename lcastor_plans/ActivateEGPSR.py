@@ -11,10 +11,6 @@ except:
     print("Please set PNP_HOME environment variable to PetriNetPlans folder.")
     sys.exit(1)
 
-sys.path.insert(1, os.path.join(os.path.dirname(__file__), "..", "lcastor_actions"))
-import gotoRoom
-from gotoRoom import ROOM_DICT_B
-
 import time
 import pnp_cmd_ros
 from pnp_cmd_ros import *
@@ -25,15 +21,36 @@ import math
 import tf
 from geometry_msgs.msg import PointStamped , PoseWithCovarianceStamped
 
-DES_DIST = 1.2
-l = None
-rotation_angle = None
-person_point = None
-robot_pose = None
-goal_msg = None
-client = None
-goal_tolerance_client = None
-gotopersonDone = False
+ROOM_DICT_B = { 
+    "hallwaycabinet" : [-2.93, -4.47, 0.0, 0.0, 0.99, -0.08],
+    "hallway" : [-1.41, -2.64, 0.0, 0.0, 0.95, -0.30],
+    "entrance" : [-1.41, -2.64, 0.0, 0.0, 0.95, -0.30],
+    "desk" : [-2.79, -0.46, 0.0, 0.0, -0.78, 0.61],
+    "office" : [-0.96, -1.21, 0.0, 0.0, 0.85, 0.52],
+    "studio" : [-0.96, -1.21, 0.0, 0.0, 0.85, 0.52],
+    "shelf" : [-3.03, 1.55, 0.0, 0.0, 0.99, 0.03],
+    "coathanger" : [-1.73, -2.89, 0.0, 0.0, 0.89, 0.44],
+    "exit" : [-0.99, 1.61, 0.0, 0.0, 0.67, 0.73],
+    "TVtable" : [1.01, -4.53, 0.0, 0.0, 0.99, -0.05],
+    "loungechair" : [1.64, -4.85, 0.0, 0.0, -0.09, 0.99],
+    "lamp" : [3.26, -5.12, 0.0, 0.0, -0.12, 0.99],
+    "couch" : [3.6, -2.60, 0.0, 0.0, -0.35, 0.93],
+    "coffetable" : [2.45, -3.20, 0.0, 0.0, -0.55, 0.83],
+    "lounge" : [2.72, -1.96, 0.0, 0.0, -0.67, 0.73],
+    "livingroom" : [2.72, -1.96, 0.0, 0.0, -0.67, 0.73],
+    "trashcan" : [0.58, -1.16, 0.0, 0.0, 0.98, -0.17],
+    "kitchen" : [3.34, -1.76, 0.0, 0.0, 0.84, 0.54],
+    "kitchencabinet" : [0.62, 2.29, 0.0, 0.0, 0.99, 0.03],
+    "dinnertable" : [1.44, 1.28, 0.0, 0.0, -0.02, 0.99],
+    "dishwasher" : [3.67, 0.73, 0.0, 0.0, 0.04, 0.99],
+    "kitchencounter" : [3.80, 1.98, 0.0, 0.0, 0.-0.0, 0.99],
+    "inspectionpoint" : [0.19, -2.69, 0.0, 0.0, -0.48, 0.87],
+    "findTrashEntrance" : [-0.61, 5.89, 0.0, 0.0, 0.05, 0.99],
+    "findTrashOffice" : [0.30, 4.63, 0.0 , 0.0, 0.91, -0.41],
+    "findTrashKitchen1" : [-3.18, 7.15, 0.0, 0.0, 0.97, -0.24],
+    "findTrashKitchen2" : [-5.74, 10.44, 0.0, 0.0, -0.82, 0.57],
+    "findTrashLivingRoom" : [-5.74, 10.40, 0.0, 0.0, -0.07, 0.99],
+}
 
 LOCATIONS = list(ROOM_DICT_B.keys())
 
@@ -50,6 +67,7 @@ POSSIBLE_TRASH_AREAS = [
     'findTrashKitchen1',
     'findTrashKitchen2',
     'findTrashLivingRoom',
+    'inspectionpoint',
 ]
 
 OBJECT_CATEGORY = {
@@ -116,11 +134,7 @@ class EGPSR:
         self.energy = 4000
         self.dynamic_energy = False
         self.no_speech_thresh = 0.2
-        self.current_goal_location = LOCATIONS[0]
-        self.previous_goal_location = None
-        self.person_spotted = True
-        self.continue_looking = True
-        self.on_quest = False
+        self.time_open_gripper = 4 
 
         rospy.set_param("/stt/use_ollama", False)
         rospy.set_param("/stt/speech_recogn_pause_time", self.pause)
@@ -141,7 +155,6 @@ class EGPSR:
             p.exec_action('speak', 'please_say,_im_ready,_when_you_want_to_start')
             time.sleep(1)
         if situation == READY_FOR_QUEST:
-            if self.on_quest:
                 rospy.logerr('Cannot request for a new quest/cmd while already doing one')
             if tries == 0: 
                 p.exec_action('speak', 'Hi_how_can_I_help_you_today')
@@ -168,7 +181,6 @@ class EGPSR:
             print("GPSR failed: ", str(e))
             p.exec_action('speak', 'Sorry,_the_tasks_might_have_been_difficult_to_understand')
         rospy.loginfo("Successfully sent, generating GPSR, stopping listening.")
-        self.on_quest = True
 
     def open_door(self) -> None:
         self.p.exec_action("moveHead", "0.0_0.0")
@@ -265,12 +277,13 @@ class EGPSR:
                     robot_pose_data.pose.pose.orientation.w
                 )
         m = tf.transformations.quaternion_matrix(q)
-        robot_pose.x = robot_pose_data.pose.pose.position.x
-        robot_pose.y = robot_pose_data.pose.pose.position.y
-        robot_pose.theta = tf.transformations.euler_from_matrix(m)[2]
+        robot_pose_x = robot_pose_data.pose.pose.position.x
+        robot_pose_y = robot_pose_data.pose.pose.position.y
+        robot_pose_theta = tf.transformations.euler_from_matrix(m)[2]
+
         # Compute distance in cartesian space between obj and robot
         obj_pos = np.array([object_poses.point.x , object_poses.point.y])
-        robot_pos = np.array([robot_pose.x , robot_pose.y])
+        robot_pos = np.array([robot_pose_x , robot_pose_y])
         vector_to_obj = obj_pos - robot_pos
         distance_to_obj = math.sqrt(vector_to_obj[0]**2 + vector_to_obj[1]**2)
         # Normalize the vector to the desired distance
@@ -279,11 +292,26 @@ class EGPSR:
         goal_orientation = math.atan2(normalized_vector[1], normalized_vector[0])
         # Calculate the goal position based on the desired distance
         goal_position = obj_pos - DES_DIST * normalized_vector
-        p.execAction('goto', str(goal_position[0]) + "_" + str(goal_position[1]) + '_' + str(goal_orientation))
+        self.p.exec_action('goto', str(goal_position[0]) + "_" + str(goal_position[1]) + '_' + str(goal_orientation))
+        self.p.exec_action('speak', 'Please_help_me_pick_up_the_trash,_Place_it_into_my_gripper')
+        self.p.exec_action("gripperAction", "open")
+        time.sleep(self.time_open_gripper)
+        self.p.exec_action("gripperAction", "close")
+        time.sleep(3)
+        self.p.exec_action('speech', 'thank_you')
+        self.p.exec_action("gotoRoom", "r_trashcan")
+
+        self.p.exec_action('speak', 'Please_help_me_removing_the_trash_from_my_hand')
+        self.p.exec_action("gripperAction", "open")
+        time.sleep(self.time_open_gripper)
+        self.p.exec_action("gripperAction", "close")
+        time.sleep(3)
+        self.p.exec_action('speech', 'thank_you')
+
+
 
     def phase_look_for_incorrectly_placed_objects(self):
         head_tilt = '0.0_-0.8'
-        torso_height = '0.0'
         for location in CATRGORY_LOCATION.keys():
             try: 
                 self.p.exec_action('gotoRoom', 'r_'+location)
@@ -319,6 +347,12 @@ class EGPSR:
             detect_service_call.wait_for_service(timeout=3.0) # wait for service to be available
             detected_objects = detect_service_call(req)
             print(detected_objects)
+            move_to_correct_location = False
+            try: 
+                if detected_objects and (len(detected_objects) == 1):
+                    move_to_correct_location = True
+            except Exception as e:
+                rospy.logerr(e)
 
             for object_msg in detected_objects:
                 object = object_msg.data
@@ -326,7 +360,7 @@ class EGPSR:
                 if correct_location == 'unknown':
                    continue 
                 if correct_location != location: 
-                    self.object_in_wrong_location(object)
+                    self.object_in_wrong_location(object, location, move_to_correct_location)
                 else:
                     rospy.loginfo('Seems like there are no objects to move here')
         except rospy.ServiceException as e:
@@ -334,9 +368,26 @@ class EGPSR:
         except Exception as e:
             rospy.logerr(e)
 
-    def object_in_wrong_location(self, object):
-        self.p.exec_action('speak', object+'_is_incorrectly_placed,_it_should_be_in_'+ self.object_location(object))
+    def object_in_wrong_location(self, object, location, move = False):
+        self.p.exec_action('speak', object+'_is_incorrectly_placed,_it_should_be_in_'+location)
+
+        if move:
         # for more points, do we want to try grabbing the objects?
+            self.p.exec_action('speak', 'please_help_place_'+object+'in_my_hand')
+            self.p.exec_action("gripperAction", "open")
+            time.sleep(self.time_open_gripper)
+            self.p.exec_action("gripperAction", "close")
+            time.sleep(1)
+            self.p.exec_action('speak', 'thank_you')
+            time.sleep(3)
+            self.p.exec_action("gotoRoom", "r_"+location)
+            time.sleep(3)
+            self.p.exec_action('speak', 'please_help_remove_'+object+'in_my_hand')
+            self.p.exec_action("gripperAction", "open")
+            time.sleep(self.time_open_gripper)
+            self.p.exec_action("gripperAction", "close")
+            self.p.exec_action('speak', 'thank_you')
+
     
     def start(self):
         # 1. Wait for the door open
@@ -345,7 +396,7 @@ class EGPSR:
         self.p.exec_action('moveHead', '0.0_0.0')
         self.p.exec_action('moveTorso', '0.0_0.0')
 
-        self.phase_look_for_people(max_people = 2)
+        self.phase_look_for_incorrectly_placed_objects()
          
         self.p.exec_action('moveHead', '0.0_0.0')
         self.p.exec_action('moveTorso', '0.0_0.0')
@@ -355,12 +406,11 @@ class EGPSR:
         self.p.exec_action('moveHead', '0.0_0.0')
         self.p.exec_action('moveTorso', '0.0_0.0')
 
-        self.phase_look_for_incorrectly_placed_objects()
+        self.phase_look_for_people(max_people = 2)
 
 if __name__ == "__main__":
     p = PNPCmd()
     p.begin()
     gpsr = EGPSR(p)
     gpsr.start()
-    # gpsr.obtain_quest_from_person()
     p.end()
