@@ -157,10 +157,10 @@ class EGPSR:
         rospy.loginfo("Successfully sent, generating GPSR, stopping listening.")
         self.on_quest = True
 
-    def object_location(self, object):
-        try:
-            if object in OBJECT_CATEGORY.keys()
-
+    # def object_location(self, object):
+    #     try:
+    #         if object in OBJECT_CATEGORY.keys()
+    #
     def open_door(self) -> None:
         self.p.exec_action("moveHead", "0.0_0.0")
         self.p.exec_action("speak", "Can_you_please_open_the_door_for_me_?")
