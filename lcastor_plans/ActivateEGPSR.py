@@ -83,14 +83,14 @@ OBJECT_CATEGORY = {
 }
 
 CATRGORY_LOCATION = {
-    'desk',	'decorations'
-    'shelf',	'cleaning_supplies'
-    'TVtable',	'toys'
-    'coffetable',	'fruits'
-    'kitchencabinet',	'drinks'
-    'dinnertable',	'snacks'
-    'dishwasher',	'dishes'
-    'kitchencounter',	'food'
+    'desk': 'decorations',
+    'shelf': 'cleaning_supplies',
+    'TVtable': 'toys',
+    'coffetable': 'fruits',
+    'kitchencabinet': 'drinks',
+    'dinnertable': 'snacks',
+    'dishwasher': 'dishes',
+    'kitchencounter': 'food',
 }
 
 # whisper situations
@@ -226,13 +226,6 @@ class EGPSR:
             rospy.logerr(e)
         
 
-    def scan_location_trash_alt(self, location):
-        # find all trash 
-        # send a request back to ollama to capture the image now to check for trash
-        # this would return speech saying what trash was foind in the image, thats as far as it goes
-        raise NotImplemented
-    
-
     def send_to_trash(self, object_poses):
         # object poses in the map frame 
         # ricardo francesco (sarah will give a pose stamp)
@@ -267,15 +260,14 @@ class EGPSR:
         # raise NotImplemented
 
     def phase_look_for_incorrectly_placed_objects(self):
-        head_tilt = '0.0_0.0' #TODO: we need a better head tilt
-        torso_height = '0.0' #TODO:
-        # 1. Go to possible object locations
-        for location in POSSIBLE_OBJECT_AREAS:
+        head_tilt = '0.0_-0.8'
+        torso_height = '0.0'
+        for location in CATRGORY_LOCATION.keys():
             self.p.exec_action('gotoRoom', 'r_'+location)
             self.p.exec_action('speak', 'checking_'+location+'_for_misplaced_items')
             self.p.exec_action('moveHead', head_tilt)
             self.scan_location_objects(location)
-        raise NotImplemented
+            self.p.exec_action('moveHead', '0.0_0.0')
    
 
     def scan_location_objects(self, location):
@@ -291,6 +283,8 @@ class EGPSR:
             for object in detected_objects:
                 if self.object_location(object) != location: 
                     self.object_in_wrong_location(object)
+                else:
+                    rospy.loginfo('Seems like there are no objects to move here')
         except rospy.ServiceException as e:
             rospy.logerr(e)
 
