@@ -15,6 +15,20 @@ import pnp_cmd_ros
 from pnp_cmd_ros import *
 from std_msgs.msg import Bool, String
 import rospy
+import numpy as np
+import math
+import tf
+from geometry_msgs.msg import PointStamped , PoseWithCovarianceStamped
+
+DES_DIST = 1.2
+l = None
+rotation_angle = None
+person_point = None
+robot_pose = None
+goal_msg = None
+client = None
+goal_tolerance_client = None
+gotopersonDone = False
 
 LOCATIONS = list(ROOM_DICT_B.keys())
 
@@ -209,7 +223,32 @@ class EGPSR:
         #TODO: sarah - it's late I'm not that sure to be honest
         # basically we want to spot the trash and then either speak 
         # or try to pick it up and take it to the bin
-        raise NotImplemented
+        global goal_msg, robot_pose, person_point
+        # Obtain the current robot pose
+        robot_pose_data  = rospy.wait_for_message('/robot_pose' , PoseWithCovarianceStamped )
+        q = (
+                    robot_pose_data.pose.pose.orientation.x,
+                    robot_pose_data.pose.pose.orientation.y,
+                    robot_pose_data.pose.pose.orientation.z,
+                    robot_pose_data.pose.pose.orientation.w
+                )
+        m = tf.transformations.quaternion_matrix(q)
+        robot_pose.x = robot_pose_data.pose.pose.position.x
+        robot_pose.y = robot_pose_data.pose.pose.position.y
+        robot_pose.theta = tf.transformations.euler_from_matrix(m)[2]
+        # Compute distance in cartesian space between obj and robot
+        obj_pos = np.array([object_poses.point.x , object_poses.point.y])
+        robot_pos = np.array([robot_pose.x , robot_pose.y])
+        vector_to_obj = obj_pos - robot_pos
+        distance_to_obj = math.sqrt(vector_to_obj[0]**2 + vector_to_obj[1]**2)
+        # Normalize the vector to the desired distance
+        normalized_vector = vector_to_obj / distance_to_obj
+        # Calculate the orientation needed to reach the obj
+        goal_orientation = math.atan2(normalized_vector[1], normalized_vector[0])
+        # Calculate the goal position based on the desired distance
+        goal_position = obj_pos - DES_DIST * normalized_vector
+        p.execAction('goto', str(goal_position[0]) + "_" + str(goal_position[1]) + '_' + str(goal_orientation))
+        # raise NotImplemented
 
     def phase_look_for_incorrectly_placed_objects(self):
         head_tilt = '0.0_0.0' #TODO: we need a better head tilt
