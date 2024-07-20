@@ -1,6 +1,8 @@
 import os import sys
 from ollamamessages.msg import WhisperTranscription, WhisperListening
 from ollamamessages.srv import OllamaCall
+from lcastor_grasping.srv import ObjectList, ObjectListRequest, ObjectListResponse
+from lcastor_grasping.srv import ObjectFloorPose, ObjectFloorPoseRequest, ObjectFloorPoseResponse
 from AskConfirmation import AskConfirmation
 
 try:
@@ -38,7 +40,7 @@ POSSIBLE_PEOPLE_AREAS ['fill','sensible','locations','...']
 POSSIBLE_OBJECT_AREAS = ['coffetable', 'table', '...']
 POSSIBLE_TRASH_AREAS = ['trash_loc_1', 'trash_loc_2', '...']
 
-OBJECT_LOCATIONS = {
+OBJECT_CATEGORY = {
     "soap":  "cleaning_supplies",
     "dishwasher_tab":  "cleaning_supplies",
     "washcloth":  "cleaning_supplies",
@@ -80,6 +82,16 @@ OBJECT_LOCATIONS = {
     "knife":  "dishes",
 }
 
+CATRGORY_LOCATION = {
+    'desk',	'decorations'
+    'shelf',	'cleaning_supplies'
+    'TVtable',	'toys'
+    'coffetable',	'fruits'
+    'kitchencabinet',	'drinks'
+    'dinnertable',	'snacks'
+    'dishwasher',	'dishes'
+    'kitchencounter',	'food'
+}
 
 # whisper situations
 WAITING = 0
@@ -145,13 +157,9 @@ class EGPSR:
         rospy.loginfo("Successfully sent, generating GPSR, stopping listening.")
         self.on_quest = True
 
-    # # @property
-    # def get_new_location(self):
-    #     idx_loc = ROOM_LOCATION_CYCLE.index(self.current_goal_location)
-    #     new_idx = idx_loc + 1
-    #     if new_idx > len(ROOM_LOCATION_CYCLE):
-    #         new_idx = 0
-    #     ROOM_LOCATION_CYCLE[new_idx]
+    def object_location(self, object):
+        try:
+            if object in OBJECT_CATEGORY.keys()
 
     def open_door(self) -> None:
         self.p.exec_action("moveHead", "0.0_0.0")
@@ -199,11 +207,13 @@ class EGPSR:
 
     def scan_location_trash(self):
         # find all trash 
-        # TODO: Niko to find the trash in the image frame -> returns a list trash -> array
-        # cut off objects above a certain z height 
+        trash_poses = ObjectFloorPoseResponse()
+        req = ObjectFloorPoseRequest()
+        req.z_cutoff = 0.5
+
         detect_service_call = rospy.ServiceProxy("object_floor_pose", ObjectFloorPose)
         try:
-            trash = detect_service_call()
+            trash = detect_service_call(req)
             for object in trash:
                 self.send_to_trash(object)
         except rospy.ServiceException as e:
@@ -269,7 +279,7 @@ class EGPSR:
         response = service_call(input = quest_speech)
     
         req = ObjectList()
-        req
+        # req
         detect_service_call = rospy.ServiceProxy("detect_object_list", ObjectList)
             try:
                 trash = detect_service_call()
@@ -315,5 +325,6 @@ if __name__ == "__main__":
     p = PNPCmd()
     p.begin()
     gpsr = EGPSR(p)
-    gpsr.start()
+    # gpsr.start()
+    gpsr.obtain_quest_from_person()
     p.end()
