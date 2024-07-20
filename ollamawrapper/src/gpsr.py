@@ -117,13 +117,15 @@ class GPSRNode:
         The function should not have any decorators. \
         You do not need to def the functions in the context. \
         You do not need to explain your code. \
+        You should never call `p.exec_action()`. \
+        You should not generate any other functions besides the one I just described. \
         We have the following locations in the scene: {locations_in_scene}. \
         You may only use the functions provided to you in the context. Do not use print(str) but use engine_say(str) instead. \
         The engine_say(str) also speaks out loud. You need to call the functions I gave you to complete the task. \
         You should start by saying a repetition of the task: for example 'my task is to...'. \
         You may import and use modules in the standard python library. \
         You do not need to check of an object or location is in the scene. \
-        Today is friday. Your team's name is LCASTOR. Our team is based in the city of Lincoln. \
+        Today is Saturday. Your team's name is LCASTOR. Our team is based in the city of Lincoln. \
         For example, the task 'tell me what is the heaviest object on the sink' could call: \
         goto_location(p, location_name='sink') then identify_objects(p, what_to_idenfify='the heaviest object') \
         then go_back_to_me(p) then report_information(p). Another example is that 'lead Robin from the dinner table to the hallway' \

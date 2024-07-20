@@ -99,7 +99,7 @@ def offer_object(p):
 @exception_handling
 def ask_for_person(p, person_name):
     """Ask for a person with a given name, for example 'Angel' or 'Morgan'.
-    It can also be a descriptive action, e.g. 'person pointing to the right'.
+    It can also be a descriptive action, e.g. 'person pointing to the right'. It can be a description not a name.
     You probably should have called `goto_location()` first.
 
     Args:
@@ -115,7 +115,8 @@ def ask_for_person(p, person_name):
 @exception_handling
 def identify_people(p, what_to_identify):
     """Identifies and counts the number of people in a room doing a given action.
-    For example what_to_identify could be 'standing persons' or 'pointing to the right'
+    For example what_to_identify could be 'standing persons' or 'pointing to the right'.
+    This function should be called if 'pose' is in the prompt.
 
     Args:
         what_to_identify (str): Action to identify
