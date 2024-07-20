@@ -1,4 +1,5 @@
-import os import sys
+import os 
+import sys
 from ollamamessages.msg import WhisperTranscription, WhisperListening
 from ollamamessages.srv import OllamaCall
 from lcastor_grasping.srv import ObjectList, ObjectListRequest, ObjectListResponse
@@ -159,6 +160,8 @@ class EGPSR:
         if situation == READY_FOR_QUEST:
             rospy.logerr('Cannot request for a new quest/cmd while already doing one')
             if tries == 0: 
+                p.exec_action('speak', 'I_detected_a_person,_please_come_to_me.')
+                time.sleep(3)
                 p.exec_action('speak', 'Hi_how_can_I_help_you_today')
             else:
                 p.exec_action('speak', 'sorry,_could_you_repeat_that_more_closely')
@@ -203,6 +206,7 @@ class EGPSR:
         start_time = rospy.Time().now().secs
         found_person = False
         reached_person = False
+        rospy.set_param('/found_person' , False)
         while rospy.Time.now().secs - start_time < 15.0:
             if rospy.get_param('/found_person' , False):
                 found_person = True
@@ -212,10 +216,11 @@ class EGPSR:
                     rospy.get_param('/person_location/y'),
                     rospy.get_param('/person_location/z')] 
         # gotoPerson(guest_location)
-            self.goto_person(guest_location)
+            # self.goto_person(guest_location)
             # p.exec_action('gotoPerson' , str(guest_location[0]) + '_' + str(guest_location[1]) + '_' + str(guest_location[2])   )
-            if rospy.get_param('reached_person' , False) :
-                reached_person = True
+            # if rospy.get_param('reached_person' , False) :
+                # reached_person = True
+        reached_person = True # FIXME: bypassing code above
         return reached_person and found_person
         # TODO: Hari
         # raise NotImplemented
@@ -272,6 +277,7 @@ class EGPSR:
         goal_orientation = math.atan2(normalized_vector[1], normalized_vector[0])
 
         # Calculate the goal position based on the desired distance
+        DES_DIST = 1.2
         goal_position = person_pos - DES_DIST * normalized_vector
 
         # return goal_position, goal_orientation    
@@ -299,6 +305,7 @@ class EGPSR:
         ''' THERE SHOULD ONLY BE 2 PEOPLE WITH TASKS'''
         # 1. go sensible people locations (outer while loop or 2 people found)
         try: 
+            max_people = 2 # this killed us
             remember_location = []
             total_quests = 0
             for location in POSSIBLE_PEOPLE_AREAS:
@@ -317,7 +324,7 @@ class EGPSR:
         for location in POSSIBLE_TRASH_AREAS:
             try:
                 self.p.exec_action('gotoRoom', 'r_'+location)
-                self.p.exec_action('speak', 'checking_'+location+'_for_misplaced_items')
+                self.p.exec_action('speak', 'checking_'+location+'_for_trash')
                 self.p.exec_action('moveHead', '0.0_-0.75')
                 self.p.exec_action('moveTorso', '0.35')
                 self.scan_location_trash()
@@ -464,6 +471,7 @@ class EGPSR:
             self.p.exec_action("gotoRoom", "r_"+location)
             time.sleep(3)
             self.p.exec_action('speak', 'please_help_remove_'+object+'in_my_hand')
+            time.sleep(3)
             self.p.exec_action("gripperAction", "open")
             time.sleep(self.time_open_gripper)
             self.p.exec_action("gripperAction", "close")
@@ -475,17 +483,18 @@ class EGPSR:
         self.open_door()
         
         self.p.exec_action('moveHead', '0.0_0.0')
-        self.p.exec_action('moveTorso', '0.0_0.0')
-
-        self.phase_look_for_incorrectly_placed_objects()
-         
-        self.p.exec_action('moveHead', '0.0_0.0')
-        self.p.exec_action('moveTorso', '0.0_0.0')
+        self.p.exec_action('moveTorso', '0.15')
 
         self.phase_look_for_trash()
          
         self.p.exec_action('moveHead', '0.0_0.0')
-        self.p.exec_action('moveTorso', '0.0_0.0')
+        self.p.exec_action('moveTorso', '0.15')
+
+        self.phase_look_for_incorrectly_placed_objects()
+         
+        self.p.exec_action('moveHead', '0.0_0.0')
+        self.p.exec_action('moveTorso', '0.25')
+
 
         self.phase_look_for_people(max_people = 2)
 
