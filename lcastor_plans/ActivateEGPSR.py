@@ -203,30 +203,35 @@ class EGPSR:
                 reached_person = True
         return reached_person and found_person
 
-    def phase_look_for_people(self) -> None:
+    def phase_look_for_people(self, max_people) -> None:
         ''' THERE SHOULD ONLY BE 2 PEOPLE WITH TASKS'''
         # 1. go sensible people locations (outer while loop or 2 people found)
-        remember_location = []
-        total_quests = 0
-        for location in POSSIBLE_PEOPLE_AREAS:
-            if total_quests >=2:
-                # 2. scan the locations for people waving
-                spotted = self.find_waving_people()
-                # 3. if person spotted, go speak to them and execute GPSR
-                if spotted and (location not in remember_location):
-                    remember_location.append(location)
-                    self.obtain_quest_from_person()
-                    total_quests += 1
+        try: 
+            remember_location = []
+            total_quests = 0
+            for location in POSSIBLE_PEOPLE_AREAS:
+                if total_quests <= max_people:
+                    # 2. scan the locations for people waving
+                    spotted = self.find_waving_people()
+                    # 3. if person spotted, go speak to them and execute GPSR
+                    if spotted and (location not in remember_location):
+                        remember_location.append(location)
+                        self.obtain_quest_from_person()
+                        total_quests += 1
+        except Exception as e:
+            rospy.logerr(e)
 
     def phase_look_for_trash(self):
-        torso_height = '0.0' #TODO: set
-        head_tilt = '0.0_-0.4' #TODO: we need a better head tilt
         for location in POSSIBLE_TRASH_AREAS:
-            self.p.exec_action('gotoRoom', 'r_'+location)
-            self.p.exec_action('speak', 'checking_'+location+'_for_misplaced_items')
-            self.p.exec_action('moveHead', head_tilt)
-            self.scan_location_trash()
-        raise NotImplemented
+            try:
+                self.p.exec_action('gotoRoom', 'r_'+location)
+                self.p.exec_action('speak', 'checking_'+location+'_for_misplaced_items')
+                self.p.exec_action('moveHead', '0.0_-0.75')
+                self.p.exec_action('moveTorso', '0.35')
+                self.scan_location_trash()
+            except Exception as e:
+                self.p.exec_action('moveHead', '0.0_0.0')
+                rospy.logerr(e)
 
     def scan_location_trash(self):
         try:
@@ -280,11 +285,16 @@ class EGPSR:
         head_tilt = '0.0_-0.8'
         torso_height = '0.0'
         for location in CATRGORY_LOCATION.keys():
-            self.p.exec_action('gotoRoom', 'r_'+location)
-            self.p.exec_action('speak', 'checking_'+location+'_for_misplaced_items')
-            self.p.exec_action('moveHead', head_tilt)
-            self.scan_location_objects(location)
-            self.p.exec_action('moveHead', '0.0_0.0')
+            try: 
+                self.p.exec_action('gotoRoom', 'r_'+location)
+                self.p.exec_action('speak', 'checking_'+location+'_for_misplaced_items')
+                self.p.exec_action('moveHead', head_tilt)
+                self.scan_location_objects(location)
+                self.p.exec_action('moveHead', '0.0_0.0')
+            except Exception as e:
+                rospy.logerr(e)
+                rospy.loginfo(location +' failed, moving onto the next location' )
+
 
     def object_location(self, object):
         location = 'unknown'
@@ -331,17 +341,21 @@ class EGPSR:
     def start(self):
         # 1. Wait for the door open
         self.open_door()
-    
-        # Phase 1 - get quests from poeple 
-        self.phase_look_for_people()
+        
+        self.p.exec_action('moveHead', '0.0_0.0')
+        self.p.exec_action('moveTorso', '0.0_0.0')
 
-        # Phase 2 - scan the ground to look for trash
+        self.phase_look_for_people(max_people = 2)
+         
+        self.p.exec_action('moveHead', '0.0_0.0')
+        self.p.exec_action('moveTorso', '0.0_0.0')
 
+        self.phase_look_for_trash()
+         
+        self.p.exec_action('moveHead', '0.0_0.0')
+        self.p.exec_action('moveTorso', '0.0_0.0')
 
-        # Phase 3 - scan the scannable locations for incorrectly placed items
-
-
-
+        self.phase_look_for_incorrectly_placed_objects()
 
 if __name__ == "__main__":
     p = PNPCmd()
