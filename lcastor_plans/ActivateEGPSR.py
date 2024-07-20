@@ -217,17 +217,23 @@ class EGPSR:
         raise NotImplemented
 
     def scan_location_trash(self):
-        # find all trash 
-        trash_poses = ObjectFloorPoseResponse()
-        req = ObjectFloorPoseRequest()
-        req.z_cutoff = 0.5
-
-        detect_service_call = rospy.ServiceProxy("object_floor_pose", ObjectFloorPose)
+       
         try:
+            # find all trash 
+            req = ObjectFloorPoseRequest()
+            req.z_cutoff = 0.5
+
+            detect_service_call = rospy.ServiceProxy("get_object_floor_poses", ObjectFloorPose)
+            detect_service_call.wait_for_service(timeout=3.0) # wait for service to be available
+
             trash = detect_service_call(req)
+
             for object in trash:
                 self.send_to_trash(object)
+
         except rospy.ServiceException as e:
+            rospy.logerr(e)
+        except Exception as e:
             rospy.logerr(e)
         
 
@@ -276,22 +282,25 @@ class EGPSR:
                 category = OBJECT_CATEGORY[object]
                 location = CATRGORY_LOCATION[category]
         except Exception as e:
-            rospy.logerr('issue getting object locations:')
+            rospy.logerr(e)
             location = 'unknown'
         return location
 
 
     def scan_location_objects(self, location):
-
-        # find all objects
-        detect_service_call = rospy.ServiceProxy("/get_object_list", OllamaCall)
-        response = service_call(input = quest_speech)
-        req = ObjectList()
-        detect_service_call = rospy.ServiceProxy("detect_object_list", ObjectList)
+        detected_objects = None
 
         try:
-            detected_objects = detect_service_call()
-            for object in detected_objects:
+            # find all objects
+            req = ObjectListRequest()
+
+            detect_service_call = rospy.ServiceProxy("/get_object_list", ObjectList)
+            detect_service_call.wait_for_service(timeout=3.0) # wait for service to be available
+            detected_objects = detect_service_call(req)
+            print(detected_objects)
+
+            for object_msg in detected_objects:
+                object = object_msg.data
                 correct_location = self.object_location(object)
                 if correct_location == 'unknown':
                    continue 
@@ -300,6 +309,8 @@ class EGPSR:
                 else:
                     rospy.loginfo('Seems like there are no objects to move here')
         except rospy.ServiceException as e:
+            rospy.logerr(e)
+        except Exception as e:
             rospy.logerr(e)
 
     def object_in_wrong_location(self, object):
@@ -325,6 +336,6 @@ if __name__ == "__main__":
     p = PNPCmd()
     p.begin()
     gpsr = EGPSR(p)
-    # gpsr.start()
-    gpsr.obtain_quest_from_person()
+    gpsr.start()
+    # gpsr.obtain_quest_from_person()
     p.end()
