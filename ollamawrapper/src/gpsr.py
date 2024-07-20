@@ -147,7 +147,8 @@ class GPSRNode:
                 
 
 
-            client = ollama.Client(host = "http://%s" % ollama_api_url)
+            client = ollama.Client(host = "http://%s" % rospy.get_param("/gpsr/ollama_api_url", "127.0.0.1:11434"))
+            rospy.loginfo("Using ollama HTTP API at %s" % rospy.get_param("/gpsr/ollama_api_url"))
             # print(client.list())
             ollama_output = client.generate(
                 model = ollama_decomposition_model, 
