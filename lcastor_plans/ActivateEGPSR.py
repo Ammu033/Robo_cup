@@ -1,5 +1,4 @@
-import os
-import sys
+import os import sys
 from ollamamessages.msg import WhisperTranscription, WhisperListening
 from ollamamessages.srv import OllamaCall
 from AskConfirmation import AskConfirmation
@@ -25,10 +24,46 @@ POSSIBLE_PEOPLE_AREAS ['fill','sensible','locations','...']
 POSSIBLE_OBJECT_AREAS = ['coffetable', 'table', '...']
 POSSIBLE_TRASH_AREAS = ['trash_loc_1', 'trash_loc_2', '...']
 
-#TODO: these object locations need to be identified and placed here - francesco?
 OBJECT_LOCATIONS = {
-    'apple': 'kitchen',
-    'remote': 'living_room'
+    "soap":  "cleaning_supplies",
+    "dishwasher_tab":  "cleaning_supplies",
+    "washcloth":  "cleaning_supplies",
+    "sponge":  "cleaning_supplies",
+    "cola":  "drinks",
+    "ice_tea":  "drinks",
+    "water":  "drinks",
+    "milk":  "drinks",
+    "big_coke":  "drinks",
+    "fanta":  "drinks",
+    "dubbelfris":  "drinks",
+    "cornflakes":  "food",
+    "pea_soup":  "food",
+    "curry":  "food",
+    "pancake_mix":  "food",
+    "hagelslag":  "food",
+    "sausages":  "food",
+    "mayonaise":  "food",
+    "candle":  "decorations",
+    "pear":  "fruits",
+    "plum":  "fruits",
+    "peach":  "fruits",
+    "lemon":  "fruits",
+    "orange":  "fruits",
+    "strawberry":  "fruits",
+    "banana":  "fruits",
+    "apple":  "fruits",
+    "stroopwafel":  "snacks",
+    "candy":  "snacks",
+    "liquorice":  "snacks",
+    "crisps":  "snacks",
+    "pringles":  "snacks",
+    "tictac":  "snacks",
+    "spoon":  "dishes",
+    "plate":  "dishes",
+    "cup":  "dishes",
+    "fork":  "dishes",
+    "bowl":  "dishes",
+    "knife":  "dishes",
 }
 
 
@@ -139,6 +174,7 @@ class EGPSR:
                     total_quests += 1
 
     def phase_look_for_trash(self):
+        torso_height = '0.0' #TODO: set
         head_tilt = '0.0_0.0' #TODO: we need a better head tilt
         for location in POSSIBLE_TRASH_AREAS:
             self.p.exec_action('gotoRoom', 'r_'+location)
@@ -147,13 +183,18 @@ class EGPSR:
             self.scan_location_trash()
         raise NotImplemented
 
-    def scan_location_trash(self, location):
+    def scan_location_trash(self):
         # find all trash 
         # TODO: Niko to find the trash in the image frame -> returns a list trash -> array
-        trash = ['found', 'trash'] # <- example of the outputs from the scene
-        for object in trash:
-            self.send_to_trash(object)
-        raise NotImplemented
+        # cut off objects above a certain z height 
+        detect_service_call = rospy.ServiceProxy("object_floor_pose", ObjectFloorPose)
+        try:
+            trash = detect_service_call()
+            for object in trash:
+                self.send_to_trash(object)
+        except rospy.ServiceException as e:
+            rospy.logerr(e)
+        
 
     def scan_location_trash_alt(self, location):
         # find all trash 
@@ -162,7 +203,9 @@ class EGPSR:
         raise NotImplemented
     
 
-    def send_to_trash(self, object):
+    def send_to_trash(self, object_poses):
+        # object poses in the map frame 
+        # ricardo francesco (sarah will give a pose stamp)
         #TODO: sarah - it's late I'm not that sure to be honest
         # basically we want to spot the trash and then either speak 
         # or try to pick it up and take it to the bin
@@ -170,6 +213,7 @@ class EGPSR:
 
     def phase_look_for_incorrectly_placed_objects(self):
         head_tilt = '0.0_0.0' #TODO: we need a better head tilt
+        torso_height = '0.0' #TODO:
         # 1. Go to possible object locations
         for location in POSSIBLE_OBJECT_AREAS:
             self.p.exec_action('gotoRoom', 'r_'+location)
@@ -177,11 +221,27 @@ class EGPSR:
             self.p.exec_action('moveHead', head_tilt)
             self.scan_location_objects(location)
         raise NotImplemented
-    
+   
+
     def scan_location_objects(self, location):
         # find all objects
         # TODO: Niko to find the objects in the image frame -> returns a list objects -> array
+        detect_service_call = rospy.ServiceProxy("/get_object_list", OllamaCall)
+        response = service_call(input = quest_speech)
+    
+        req = ObjectList()
+        req
+        detect_service_call = rospy.ServiceProxy("detect_object_list", ObjectList)
+            try:
+                trash = detect_service_call()
+                for object in trash:
+                    self.send_to_trash(object)
+            except rospy.ServiceException as e:
+                rospy.logerr(e)
+     
         objects = ['found', 'objects'] # <- example of the outputs from the scene
+        objects = 
+
         for object in objects:
             if OBJECT_LOCATIONS[object] != location:
                 self.object_in_wrong_location(object)
@@ -189,15 +249,13 @@ class EGPSR:
 
     def scan_location_objects_alt(self, location):
         # find all objects in the wrong place 
-        # this would return speech saying what objects were found in the image, thats as far as it goes
+        # this would return speech saying what objects were foind in the image, thats as far as it goes
         raise NotImplemented
     
 
     def object_in_wrong_location(self, object):
-        # TODO: do something (grasping attempts?) 
-        # TODO: Niko maybe to identify the object in the image frame
-        # check if they are 
         self.p.exec_action('speak', object+'_is_incorrectly_placed,_it_should_be_in_'+ OBJECT_LOCATIONS[object])
+        # for more points, do we want to try grabbing the objects?
     
     def start(self):
         # 1. Wait for the door open
