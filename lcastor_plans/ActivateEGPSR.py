@@ -495,6 +495,10 @@ class EGPSR:
         self.p.exec_action('moveHead', '0.0_0.0')
         self.p.exec_action('moveTorso', '0.25')
 
+        self.phase_look_for_trash()
+         
+        self.p.exec_action('moveHead', '0.0_0.0')
+        self.p.exec_action('moveTorso', '0.0_0.0')
 
         self.phase_look_for_people(max_people = 2)
 

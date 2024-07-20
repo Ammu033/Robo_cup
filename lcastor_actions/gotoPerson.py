@@ -29,7 +29,7 @@ class gotoPerson(AbstractAction):
         if len(self.params) < 1:
             rospy.logwarn("Wrong use of action, pass the coordinates the robots needs to reach in /map frame as X_Y_Theta")
         else :
-            
+            self.l = tf.TransformListener()
             self.client = actionlib.SimpleActionClient('/move_base', MoveBaseAction)
             rospy.loginfo("Connecting to /move_base AS...")
             self.client.wait_for_server()
@@ -42,9 +42,8 @@ class gotoPerson(AbstractAction):
             person_point.point.x = self.params[0]
             person_point.point.y = self.params[1]
             person_point.point.z = self.params[2]
-            # rospy.logerr('WE ARE INSIDE THE ACTION')
             # print(person_position_wrt_camera)
-            human_wrt_map = self.l.transformPoint('map' , person_point )
+            human_wrt_map = self.l.transformPoint('map' , person_point)
             robot_pose_data  = rospy.wait_for_message('/robot_pose' , PoseWithCovarianceStamped )
             q = (
                         robot_pose_data.pose.pose.orientation.x,
