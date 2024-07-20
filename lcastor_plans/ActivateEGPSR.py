@@ -169,6 +169,22 @@ class EGPSR:
         Return:
             bool: if person spotted and we have arrived at their location
         '''
+        start_time = rospy.Time().now().secs
+        found_person = False
+        reached_person = False
+        while rospy.Time.now().secs - start_time < 15.0:
+            if rospy.get_param('/found_person' , False):
+                found_person = True
+                break
+        if found_person :
+            guest_location = [rospy.get_param('/person_location/x'),
+                    rospy.get_param('/person_location/y'),
+                    rospy.get_param('/person_location/z')] 
+        # gotoPerson(guest_location)
+            p.exec_action('gotoPerson' , str(guest_location[0]) + '_' + str(guest_location[1]) + '_' + str(guest_location[2])   )
+            if rospy.get_param('reached_person' , False) :
+                reached_person = True
+        return reached_person and found_person
         #TODO: Hari
         raise NotImplemented
 
