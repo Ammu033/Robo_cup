@@ -35,9 +35,7 @@ gotopersonDone = False
 LOCATIONS = list(ROOM_DICT_B.keys())
 
 #TODO: these locations needs to be set and configured for this task - ricardo
-ROOM_LOCATION_CYCLE = ['core_locs1','...']
 POSSIBLE_PEOPLE_AREAS ['fill','sensible','locations','...']
-POSSIBLE_OBJECT_AREAS = ['coffetable', 'table', '...']
 POSSIBLE_TRASH_AREAS = ['trash_loc_1', 'trash_loc_2', '...']
 
 OBJECT_CATEGORY = {
@@ -132,7 +130,7 @@ class EGPSR:
             if self.on_quest:
                 rospy.logerr('Cannot request for a new quest/cmd while already doing one')
             if tries == 0: 
-                p.exec_action('speak', 'I_am_ready_for_my_quest')
+                p.exec_action('speak', 'Hi_how_can_I_help_you_today')
             else:
                 p.exec_action('speak', 'sorry,_could_you_repeat_that_more_closely')
 
@@ -145,6 +143,7 @@ class EGPSR:
         return False, whisper_response.text   
 
     def obtain_quest_from_person(self):
+        time.sleep(3)
         success, quest_speech = self.call_whisper(READY_FOR_QUEST)
         try:
             service_call = rospy.ServiceProxy("/gpsr/task_decomposition", OllamaCall)
@@ -156,16 +155,6 @@ class EGPSR:
             p.exec_action('speak', 'Sorry,_the_tasks_might_have_been_difficult_to_understand')
         rospy.loginfo("Successfully sent, generating GPSR, stopping listening.")
         self.on_quest = True
-
-    def object_location(self, object):
-        try:
-            if object in OBJECT_CATEGORY.keys():
-                category = OBJECT_CATEGORY[object]
-                location = CATRGORY_LOCATION[category]
-        except Exception as e:
-            rospy.logerr('issue getting object locations')
-            location = 'unknown'
-        return location
 
     def open_door(self) -> None:
         self.p.exec_action("moveHead", "0.0_0.0")
@@ -203,7 +192,7 @@ class EGPSR:
 
     def phase_look_for_trash(self):
         torso_height = '0.0' #TODO: set
-        head_tilt = '0.0_0.0' #TODO: we need a better head tilt
+        head_tilt = '0.0_-0.4' #TODO: we need a better head tilt
         for location in POSSIBLE_TRASH_AREAS:
             self.p.exec_action('gotoRoom', 'r_'+location)
             self.p.exec_action('speak', 'checking_'+location+'_for_misplaced_items')
@@ -228,10 +217,6 @@ class EGPSR:
 
     def send_to_trash(self, object_poses):
         # object poses in the map frame 
-        # ricardo francesco (sarah will give a pose stamp)
-        #TODO: sarah - it's late I'm not that sure to be honest
-        # basically we want to spot the trash and then either speak 
-        # or try to pick it up and take it to the bin
         global goal_msg, robot_pose, person_point
         # Obtain the current robot pose
         robot_pose_data  = rospy.wait_for_message('/robot_pose' , PoseWithCovarianceStamped )
@@ -257,7 +242,6 @@ class EGPSR:
         # Calculate the goal position based on the desired distance
         goal_position = obj_pos - DES_DIST * normalized_vector
         p.execAction('goto', str(goal_position[0]) + "_" + str(goal_position[1]) + '_' + str(goal_orientation))
-        # raise NotImplemented
 
     def phase_look_for_incorrectly_placed_objects(self):
         head_tilt = '0.0_-0.8'
@@ -268,20 +252,34 @@ class EGPSR:
             self.p.exec_action('moveHead', head_tilt)
             self.scan_location_objects(location)
             self.p.exec_action('moveHead', '0.0_0.0')
-   
+
+    def object_location(self, object):
+        location = 'unknown'
+        try:
+            if object in OBJECT_CATEGORY.keys():
+                category = OBJECT_CATEGORY[object]
+                location = CATRGORY_LOCATION[category]
+        except Exception as e:
+            rospy.logerr('issue getting object locations:')
+            location = 'unknown'
+        return location
+
 
     def scan_location_objects(self, location):
+
         # find all objects
         detect_service_call = rospy.ServiceProxy("/get_object_list", OllamaCall)
         response = service_call(input = quest_speech)
-    
         req = ObjectList()
         detect_service_call = rospy.ServiceProxy("detect_object_list", ObjectList)
 
         try:
             detected_objects = detect_service_call()
             for object in detected_objects:
-                if self.object_location(object) != location: 
+                correct_location = self.object_location(object)
+                if correct_location == 'unknown':
+                   continue 
+                if correct_location != location: 
                     self.object_in_wrong_location(object)
                 else:
                     rospy.loginfo('Seems like there are no objects to move here')
