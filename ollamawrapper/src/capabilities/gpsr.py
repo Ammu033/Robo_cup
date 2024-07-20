@@ -34,9 +34,12 @@ ollama_multimodal_model = rospy.get_param("/gpsr/ollama_multimodal_model", 'llav
 def exception_handling(func):
     def wrapper(*args, **kwargs):
         try:
+            print("[EXECUTION LOG] Executing action \"{}\"".format(func.__name__))
+            print("[EXECUTION LOG] stdout from execution will follow:")
             func(*args, **kwargs)
+            print("[EXECUTION LOG] Action \"{}\" executed successfully.".format(func.__name__))
         except Exception as e:
-            rospy.logerr("Exception {} occurred during execution of {}".format(e, func.__name__))
+            print("[EXECUTION LOG] !! Exception \"{}\" occurred during execution of \"{}\"".format(e, func.__name__))
     return wrapper
 
 def publish_what_im_doing(what_im_doing):
