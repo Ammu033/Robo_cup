@@ -332,6 +332,6 @@ if __name__ == "__main__":
     p = PNPCmd()
     p.begin()
     gpsr = EGPSR(p)
-    # gpsr.start()
-    gpsr.obtain_quest_from_person()
+    gpsr.start()
+    # gpsr.obtain_quest_from_person()
     p.end()
