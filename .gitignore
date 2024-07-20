@@ -360,7 +360,7 @@ MigrationBackup/
 *.jar
 *.bag
 *.mp4
-*.jpg
+# *.jpg
 *.zip
 *.npy
 # Byte-compiled / optimized / DLL files

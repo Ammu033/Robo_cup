@@ -42,6 +42,11 @@ ROOM_DICT_B = {
     "dishwasher" : [3.67, 0.73, 0.0, 0.0, 0.04, 0.99],
     "kitchencounter" : [3.80, 1.98, 0.0, 0.0, 0.-0.0, 0.99],
     "inspectionpoint" : [0.19, -2.69, 0.0, 0.0, -0.48, 0.87],
+    "findTrashEntrance" : [-0.61, 5.89, 0.0, 0.0, 0.05, 0.99],
+    "findTrashOffice" : [0.30, 4.63, 0.0 , 0.0, 0.91, -0.41],
+    "findTrashKitchen1" : [-3.18, 7.15, 0.0, 0.0, 0.97, -0.24],
+    "findTrashKitchen2" : [-5.74, 10.44, 0.0, 0.0, -0.82, 0.57],
+    "findTrashLivingRoom" : [-5.74, 10.40, 0.0, 0.0, -0.07, 0.99],
 }
 
 ROOM_DICT_C = { 
@@ -68,6 +73,11 @@ ROOM_DICT_C = {
     "dishwasher" : [-3.39, 8.10, 0.0, 0.0, 0.77, 0.63],
     "kitchencounter" : [-4.69, 8.18, 0.0, 0.0, 0.78, 0.62],
     "inspectionpoint" : [0.05, 5.02, 0.0, 0.0, 0.74, 0.66],
+    "findTrashEntrance" : [0.01, 3.74, 0.0, 0.0, -0.25, 0.97],
+    "findTrashOffice" : [-0.95, 3.69, 0.0 , 0.0, 0.98, -0.21],
+    "findTrashKitchen1" : [-1.64, 5.28, 0.0, 0.0, 0.99, -0.02],
+    "findTrashKitchen2" : [-0.99, 8.89, 0.0, 0.0, 0.99, -0.11],
+    "findTrashLivingRoom" : [-0.99, 8.93, 0.0, 0.0, -0.42, 0.91],                  
 }
 
 ROOM_DICT = {

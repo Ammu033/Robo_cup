@@ -34,9 +34,12 @@ ollama_multimodal_model = rospy.get_param("/gpsr/ollama_multimodal_model", 'llav
 def exception_handling(func):
     def wrapper(*args, **kwargs):
         try:
+            print("[EXECUTION LOG] Executing action \"{}\"".format(func.__name__))
+            print("[EXECUTION LOG] stdout from execution will follow:")
             func(*args, **kwargs)
+            print("[EXECUTION LOG] Action \"{}\" executed successfully.".format(func.__name__))
         except Exception as e:
-            rospy.logerr("Exception {} occurred during execution of {}".format(e, func.__name__))
+            print("[EXECUTION LOG] !! Exception \"{}\" occurred during execution of \"{}\"".format(e, func.__name__))
     return wrapper
 
 def publish_what_im_doing(what_im_doing):
@@ -65,7 +68,7 @@ def go_back_to_me(p):
 
 @contexts.context(["gpsr"])
 @exception_handling
-def grasp_object(p, object_name = None):
+def grasp_object(p, object_name):
     """Grasps a given object, for example 'fruit' or 'bowl'
 
     Args:
@@ -99,7 +102,7 @@ def offer_object(p):
 @exception_handling
 def ask_for_person(p, person_name):
     """Ask for a person with a given name, for example 'Angel' or 'Morgan'.
-    It can also be a descriptive action, e.g. 'person pointing to the right'.
+    It can also be a descriptive action, e.g. 'person pointing to the right'. It can be a description not a name.
     You probably should have called `goto_location()` first.
 
     Args:
@@ -115,12 +118,14 @@ def ask_for_person(p, person_name):
 @exception_handling
 def identify_people(p, what_to_identify):
     """Identifies and counts the number of people in a room doing a given action.
-    For example what_to_identify could be 'standing persons' or 'pointing to the right'
+    For example what_to_identify could be 'standing persons' or 'pointing to the right'.
+    This function should be called if 'pose' is in the prompt.
 
     Args:
         what_to_identify (str): Action to identify
     """
     publish_what_im_doing("identify_people(what_to_idenfify='%s')" % what_to_identify)
+    engine_say(p, "I am identifying people who are %s" % what_to_identify)
 
     bridge = CvBridge()
     im = rospy.wait_for_message(
@@ -161,6 +166,7 @@ def identify_objects(p, what_to_idenfify):
         what_to_idenfify (str): Something to identify
     """
     publish_what_im_doing("identify_object(what_to_idenfify='%s')" % what_to_idenfify)
+    engine_say(p, "I am identifying %s" % what_to_idenfify)
 
     p.exec_action('moveHead', '0.0_-0.8')
     
@@ -227,10 +233,10 @@ def follow_person(p):
 @contexts.context(["gpsr"])
 def guide_person(p):
     """Ask a human to follow the robot. `goto_location()` and `ask_for_person()` must have previously been called, in that order. You must go to a location
-    immediately after this. You should only call this function if 'guide' or 'accompany' specifically has been said."""
+    immediately after this. You should only call this function if the verb 'guide' or 'take' or 'escort' is in the prompt."""
     publish_what_im_doing("guide_person()")
 
-    p.exec_action('speak', 'Please,_follow_me!')
+    engine_say(p, "Please, follow me")
 
 @contexts.context(["gpsr"])
 @exception_handling
