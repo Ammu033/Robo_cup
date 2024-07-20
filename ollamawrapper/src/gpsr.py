@@ -91,92 +91,116 @@ class GPSRNode:
         return s
 
     def handle_decomposition_call(self, req):
-        human_str = req.input
-        rospy.loginfo("Recieved task decomposition string: '%s'" % human_str)
+        parsed_func = None
+        needs_planning = True
+        while needs_planning:
+            human_str = req.input
+            if parsed_func is not None:
+                rospy.logwarn("Previous attempt failed, replanning...")
 
-        func_name = "do_func"
-        # locations_in_scene = list(gotoRoom.ROOM_DICT.keys())
-        if rospy.get_param("/arena") == "arena_b":
-            locations_in_scene = list(gotoRoom.ROOM_DICT_B.keys())
-        else:
-            locations_in_scene = list(gotoRoom.ROOM_DICT_C.keys())
+            rospy.loginfo("Received task decomposition string: '%s'" % human_str)
+            
 
-        objects_in_scene = ["toy", "sugar", "food"]
-        rospy.loginfo("Locations in scene: %s" % str(locations_in_scene))
+            func_name = "do_func"
+            # locations_in_scene = list(gotoRoom.ROOM_DICT.keys())
+            if rospy.get_param("/arena") == "arena_b":
+                locations_in_scene = list(gotoRoom.ROOM_DICT_B.keys())
+            else:
+                locations_in_scene = list(gotoRoom.ROOM_DICT_C.keys())
 
-        # print(self.gpsr_commands())
-        source_functions = "\n".join(self.gpsr_commands())
+            objects_in_scene = ["toy", "sugar", "food"]
+            rospy.loginfo("Locations in scene: %s" % str(locations_in_scene))
 
-        prompt = \
-        f"You are the AI controlling a robot. You have access to the following functions: ```{source_functions}```.\
-        Given a locations list containing the locations in the scene as a list of string location names, \
-        and a list of objects in the scene as a list of string object names, \
-        You get a user request the robot to do: '{human_str}'. Create a function for completing the task. \
-        Always set the `p` parameter to the variable `p`, and assume it is already defined. \
-        `p` does not have any methods. You should never call any methods of `p`. \
-        The function signature must be: {func_name}(p, locations: list)->str. You cannot write anything outside the function. \
-        The function should not have any decorators. \
-        You do not need to def the functions in the context. \
-        You do not need to explain your code. \
-        We have the following locations in the scene: {locations_in_scene}. \
-        You may only use the functions provided to you in the context. Do not use print(str) but use engine_say(str) instead. \
-        The engine_say(str) also speaks out loud. You need to call the functions I gave you to complete the task. \
-        You should start by saying a repetition of the task: for example 'my task is to...'. \
-        You may import and use modules in the standard python library. \
-        You do not need to check of an object or location is in the scene. \
-        Today is friday. Your team's name is LCASTOR. Our team is based in the city of Lincoln. \
-        For example, the task 'tell me what is the heaviest object on the sink' could call: \
-        goto_location(p, location_name='sink') then identify_objects(p, what_to_idenfify='the heaviest object') \
-        then go_back_to_me(p) then report_information(p). Another example is that 'lead Robin from the dinner table to the hallway' \
-        could call `goto_location(p, location_name='sink')` then `ask_for_person(p, person_name='Robin'), then` \
-        `guide_person(p)` and then finally `goto_location(p, location_name='hallway')` \
-        After you finish your task you should always come back to me."
+            # print(self.gpsr_commands())
+            source_functions = "\n".join(self.gpsr_commands())
 
-        client = ollama.Client(host = "http://%s" % ollama_api_url)
-        # print(client.list())
-        ollama_output = client.generate(
-            model = ollama_decomposition_model, 
-            prompt = prompt, 
-            keep_alive = "0m",
-            options = {"stop": ["```\n\n"]}
-        )
-        rospy.loginfo("Raw ollama response: =====\n%s\n=====" % ollama_output["response"])
+            prompt = \
+            f"You are the AI controlling a robot. You have access to the following functions: ```{source_functions}```.\
+            Given a locations list containing the locations in the scene as a list of string location names, \
+            and a list of objects in the scene as a list of string object names, \
+            You get a user request the robot to do: '{human_str}'. Create a function for completing the task. \
+            Always set the `p` parameter to the variable `p`, and assume it is already defined. \
+            `p` does not have any methods. You should never call any methods of `p`. \
+            The function signature must be: {func_name}(p, locations: list)->str. You cannot write anything outside the function. \
+            The function should not have any decorators. \
+            You do not need to def the functions in the context. \
+            You do not need to explain your code. \
+            We have the following locations in the scene: {locations_in_scene}. \
+            You may only use the functions provided to you in the context. Do not use print(str) but use engine_say(str) instead. \
+            The engine_say(str) also speaks out loud. You need to call the functions I gave you to complete the task. \
+            You should start by saying a repetition of the task: for example 'my task is to...'. \
+            You may import and use modules in the standard python library. \
+            You do not need to check of an object or location is in the scene. \
+            Today is friday. Your team's name is LCASTOR. Our team is based in the city of Lincoln. \
+            For example, the task 'tell me what is the heaviest object on the sink' could call: \
+            goto_location(p, location_name='sink') then identify_objects(p, what_to_idenfify='the heaviest object') \
+            then go_back_to_me(p) then report_information(p). Another example is that 'lead Robin from the dinner table to the hallway' \
+            could call `goto_location(p, location_name='sink')` then `ask_for_person(p, person_name='Robin'), then` \
+            `guide_person(p)` and then finally `goto_location(p, location_name='hallway')` \
+            After you finish your task you should always come back to me."
 
-        parsed_func = self.parse_ollama_call(ollama_output["response"])
+            # if we aleady a parsed function is means we need to replan and we need to refine a previous plan
+            if parsed_func is not None:
+                prompt += \
+                f"You have already generated a function for this request, but it failed and needs to be refined. \
+                The function you generated earlier is: '{parsed_func}'. \
+                The execution log from the previous attempt is: '{stdout}' '{stderr}' "
+                
 
-        # print("To exec: ===\n%s\n===" % parsed_func)
 
-        environment = jinja2.Environment(loader = jinja2.FileSystemLoader(os.path.dirname(__file__)))
-        template = environment.get_template("gpsr_runner.py.jinja2")
+            client = ollama.Client(host = "http://%s" % ollama_api_url)
+            # print(client.list())
+            ollama_output = client.generate(
+                model = ollama_decomposition_model, 
+                prompt = prompt, 
+                keep_alive = "0m",
+                options = {"stop": ["```\n\n"]}
+            )
+            rospy.loginfo("Raw ollama response: =====\n%s\n=====" % ollama_output["response"])
 
-        with tempfile.NamedTemporaryFile(suffix = ".py", mode = "w", delete = False) as f:
-            f.write(template.render(
-                cwd = os.path.dirname(__file__), 
-                main_func = parsed_func, 
-                func_call = "%s(p = p, locations = %s)" % (func_name, str(locations_in_scene))
-            ))
-            filename = f.name
-        rospy.loginfo(str(filename))
+            parsed_func = self.parse_ollama_call(ollama_output["response"])
 
-        with open(filename, "r") as f:
-            rospy.loginfo("******* %s consists of the following: *******\n\n%s\n****************************************" % (filename, f.read()))
-        # subprocess.run(["tmux", "new-session", "-s", "gpsr_runner", "-d", "'", "python3", filename, "'"])
+            # print("To exec: ===\n%s\n===" % parsed_func)
 
-        try:
-            proc = subprocess.Popen(["python3", filename], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-            while True:
-                line = proc.stdout.readline()
-                if not line:
-                    break
-                rospy.loginfo("[GPSR Runner] %s" % line.rstrip().decode())
-            while True:
-                line = proc.stderr.readline()
-                if not line:
-                    break
-                rospy.logwarn("[GPSR Runner] %s" % line.rstrip().decode())
-        except KeyboardInterrupt:
-            proc.terminate()
-            rospy.loginfo("Proc terminated")
+            environment = jinja2.Environment(loader = jinja2.FileSystemLoader(os.path.dirname(__file__)))
+            template = environment.get_template("gpsr_runner.py.jinja2")
+
+            with tempfile.NamedTemporaryFile(suffix = ".py", mode = "w", delete = False) as f:
+                f.write(template.render(
+                    cwd = os.path.dirname(__file__), 
+                    main_func = parsed_func, 
+                    func_call = "%s(p = p, locations = %s)" % (func_name, str(locations_in_scene))
+                ))
+                filename = f.name
+            rospy.loginfo(str(filename))
+
+            with open(filename, "r") as f:
+                rospy.loginfo("******* %s consists of the following: *******\n\n%s\n****************************************" % (filename, f.read()))
+            # subprocess.run(["tmux", "new-session", "-s", "gpsr_runner", "-d", "'", "python3", filename, "'"])
+
+            stdout = ""
+            stderr = ""
+            try:
+                proc = subprocess.Popen(["python3", filename], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+                while True:
+                    line = proc.stdout.readline()
+                    if not line:
+                        break
+                    stdout += line.decode()
+                    rospy.loginfo("[stdout] %s" % line.rstrip().decode())
+                while True:
+                    line = proc.stderr.readline()
+                    if not line:
+                        break
+                    stderr += line.decode()
+                    rospy.logwarn("[stderr] %s" % line.rstrip().decode())
+            except KeyboardInterrupt:
+                proc.terminate()
+                rospy.loginfo("Proc terminated")
+
+            if stderr == "" and not "!! Exception" in stdout:
+                # all good, the plan was executable and run without errors
+                needs_planning = False
 
         return OllamaCallResponse(
             ollama_output["total_duration"],
