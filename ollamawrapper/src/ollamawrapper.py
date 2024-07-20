@@ -161,8 +161,8 @@ def handle_ollama_call(req):
 
     time_taken = time.time() - start_time
     rospy.loginfo("Had %d attempts and took %.1f seconds" % (attempt_no + 1, time_taken))
-    with open(os.path.join(os.path.dirname(__file__), "..", "ollama_benchmarks.csv"), "a") as f:
-        f.write("%s,%.1f,%d,%s,%s,%d\n" % (platform.node(), time_taken, attempt_no + 1, ollama_intention, str(not ultimately_failed), len(req.input)))
+    # with open(os.path.join(os.path.dirname(__file__), "..", "ollama_benchmarks.csv"), "a") as f:
+    #     f.write("%s,%.1f,%d,%s,%s,%d\n" % (platform.node(), time_taken, attempt_no + 1, ollama_intention, str(not ultimately_failed), len(req.input)))
 
     # print(o.keys())
     return OllamaCallResponse(

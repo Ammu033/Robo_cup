@@ -1,0 +1,14 @@
+run on devel
+
+source ~/.bashrc
+tmule -c $(rospack find lcastor_bringup)/tmule/lcastor_robot.yaml -W 3 launch & roslaunch lcastor_grasping robocup24.launch &
+
+python src/LCASTOR/lcastor_plans/StoreGrocery.py
+python src/LCASTOR/lcastor_plans/ServeBreakfast.py
+
+
+
+run on sam6d
+
+source ~/.bashrc
+rqt_image_view & python ros_runner.py &
