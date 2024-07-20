@@ -236,7 +236,7 @@ def guide_person(p):
     immediately after this. You should only call this function if the verb 'guide' or 'take' or 'escort' is in the prompt."""
     publish_what_im_doing("guide_person()")
 
-    p.exec_action('speak', 'Please,_follow_me!')
+    engine_say(p, "Please, follow me")
 
 @contexts.context(["gpsr"])
 @exception_handling

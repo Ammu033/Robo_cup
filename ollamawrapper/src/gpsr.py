@@ -92,7 +92,12 @@ class GPSRNode:
     def handle_decomposition_call(self, req):
         parsed_func = None
         needs_planning = True
+        retries = 0
         while needs_planning:
+            if retries >= 3:
+                rospy.logwarn("Too many retries, I gave up.")
+                break
+            retries += 1
             human_str = req.input
             if parsed_func is not None:
                 rospy.logwarn("Previous attempt failed, replanning...")
@@ -122,8 +127,10 @@ class GPSRNode:
             `p` does not have any methods. You should never call any methods of `p`. \
             The function signature must be: {func_name}(p, locations: list)->str. You cannot write anything outside the function. \
             The function should not have any decorators. \
+            Do not define any other functions than the one I have described. \
             You do not need to def the functions in the context. \
             You do not need to explain your code. \
+            Do not ever call p.exec_action() in your function. \
             We have the following locations in the scene: {locations_in_scene}. \
             You may only use the functions provided to you in the context. Do not use print(str) but use engine_say(str) instead. \
             The engine_say(str) also speaks out loud. You need to call the functions I gave you to complete the task. \
