@@ -1,6 +1,8 @@
 import os import sys
 from ollamamessages.msg import WhisperTranscription, WhisperListening
 from ollamamessages.srv import OllamaCall
+from lcastor_grasping.srv import ObjectList, ObjectListRequest, ObjectListResponse
+from lcastor_grasping.srv import ObjectFloorPose, ObjectFloorPoseRequest, ObjectFloorPoseResponse
 from AskConfirmation import AskConfirmation
 
 try:
@@ -33,12 +35,10 @@ gotopersonDone = False
 LOCATIONS = list(ROOM_DICT_B.keys())
 
 #TODO: these locations needs to be set and configured for this task - ricardo
-ROOM_LOCATION_CYCLE = ['core_locs1','...']
 POSSIBLE_PEOPLE_AREAS ['fill','sensible','locations','...']
-POSSIBLE_OBJECT_AREAS = ['coffetable', 'table', '...']
 POSSIBLE_TRASH_AREAS = ['trash_loc_1', 'trash_loc_2', '...']
 
-OBJECT_LOCATIONS = {
+OBJECT_CATEGORY = {
     "soap":  "cleaning_supplies",
     "dishwasher_tab":  "cleaning_supplies",
     "washcloth":  "cleaning_supplies",
@@ -80,6 +80,16 @@ OBJECT_LOCATIONS = {
     "knife":  "dishes",
 }
 
+CATRGORY_LOCATION = {
+    'desk': 'decorations',
+    'shelf': 'cleaning_supplies',
+    'TVtable': 'toys',
+    'coffetable': 'fruits',
+    'kitchencabinet': 'drinks',
+    'dinnertable': 'snacks',
+    'dishwasher': 'dishes',
+    'kitchencounter': 'food',
+}
 
 # whisper situations
 WAITING = 0
@@ -120,7 +130,7 @@ class EGPSR:
             if self.on_quest:
                 rospy.logerr('Cannot request for a new quest/cmd while already doing one')
             if tries == 0: 
-                p.exec_action('speak', 'I_am_ready_for_my_quest')
+                p.exec_action('speak', 'Hi_how_can_I_help_you_today')
             else:
                 p.exec_action('speak', 'sorry,_could_you_repeat_that_more_closely')
 
@@ -133,6 +143,7 @@ class EGPSR:
         return False, whisper_response.text   
 
     def obtain_quest_from_person(self):
+        time.sleep(3)
         success, quest_speech = self.call_whisper(READY_FOR_QUEST)
         try:
             service_call = rospy.ServiceProxy("/gpsr/task_decomposition", OllamaCall)
@@ -144,14 +155,6 @@ class EGPSR:
             p.exec_action('speak', 'Sorry,_the_tasks_might_have_been_difficult_to_understand')
         rospy.loginfo("Successfully sent, generating GPSR, stopping listening.")
         self.on_quest = True
-
-    # # @property
-    # def get_new_location(self):
-    #     idx_loc = ROOM_LOCATION_CYCLE.index(self.current_goal_location)
-    #     new_idx = idx_loc + 1
-    #     if new_idx > len(ROOM_LOCATION_CYCLE):
-    #         new_idx = 0
-    #     ROOM_LOCATION_CYCLE[new_idx]
 
     def open_door(self) -> None:
         self.p.exec_action("moveHead", "0.0_0.0")
@@ -205,7 +208,7 @@ class EGPSR:
 
     def phase_look_for_trash(self):
         torso_height = '0.0' #TODO: set
-        head_tilt = '0.0_0.0' #TODO: we need a better head tilt
+        head_tilt = '0.0_-0.4' #TODO: we need a better head tilt
         for location in POSSIBLE_TRASH_AREAS:
             self.p.exec_action('gotoRoom', 'r_'+location)
             self.p.exec_action('speak', 'checking_'+location+'_for_misplaced_items')
@@ -215,30 +218,21 @@ class EGPSR:
 
     def scan_location_trash(self):
         # find all trash 
-        # TODO: Niko to find the trash in the image frame -> returns a list trash -> array
-        # cut off objects above a certain z height 
+        trash_poses = ObjectFloorPoseResponse()
+        req = ObjectFloorPoseRequest()
+        req.z_cutoff = 0.5
+
         detect_service_call = rospy.ServiceProxy("object_floor_pose", ObjectFloorPose)
         try:
-            trash = detect_service_call()
+            trash = detect_service_call(req)
             for object in trash:
                 self.send_to_trash(object)
         except rospy.ServiceException as e:
             rospy.logerr(e)
         
 
-    def scan_location_trash_alt(self, location):
-        # find all trash 
-        # send a request back to ollama to capture the image now to check for trash
-        # this would return speech saying what trash was foind in the image, thats as far as it goes
-        raise NotImplemented
-    
-
     def send_to_trash(self, object_poses):
         # object poses in the map frame 
-        # ricardo francesco (sarah will give a pose stamp)
-        #TODO: sarah - it's late I'm not that sure to be honest
-        # basically we want to spot the trash and then either speak 
-        # or try to pick it up and take it to the bin
         global goal_msg, robot_pose, person_point
         # Obtain the current robot pose
         robot_pose_data  = rospy.wait_for_message('/robot_pose' , PoseWithCovarianceStamped )
@@ -264,52 +258,52 @@ class EGPSR:
         # Calculate the goal position based on the desired distance
         goal_position = obj_pos - DES_DIST * normalized_vector
         p.execAction('goto', str(goal_position[0]) + "_" + str(goal_position[1]) + '_' + str(goal_orientation))
-        # raise NotImplemented
 
     def phase_look_for_incorrectly_placed_objects(self):
-        head_tilt = '0.0_0.0' #TODO: we need a better head tilt
-        torso_height = '0.0' #TODO:
-        # 1. Go to possible object locations
-        for location in POSSIBLE_OBJECT_AREAS:
+        head_tilt = '0.0_-0.8'
+        torso_height = '0.0'
+        for location in CATRGORY_LOCATION.keys():
             self.p.exec_action('gotoRoom', 'r_'+location)
             self.p.exec_action('speak', 'checking_'+location+'_for_misplaced_items')
             self.p.exec_action('moveHead', head_tilt)
             self.scan_location_objects(location)
-        raise NotImplemented
-   
+            self.p.exec_action('moveHead', '0.0_0.0')
+
+    def object_location(self, object):
+        location = 'unknown'
+        try:
+            if object in OBJECT_CATEGORY.keys():
+                category = OBJECT_CATEGORY[object]
+                location = CATRGORY_LOCATION[category]
+        except Exception as e:
+            rospy.logerr('issue getting object locations:')
+            location = 'unknown'
+        return location
+
 
     def scan_location_objects(self, location):
+
         # find all objects
-        # TODO: Niko to find the objects in the image frame -> returns a list objects -> array
         detect_service_call = rospy.ServiceProxy("/get_object_list", OllamaCall)
         response = service_call(input = quest_speech)
-    
         req = ObjectList()
-        req
         detect_service_call = rospy.ServiceProxy("detect_object_list", ObjectList)
-            try:
-                trash = detect_service_call()
-                for object in trash:
-                    self.send_to_trash(object)
-            except rospy.ServiceException as e:
-                rospy.logerr(e)
-     
-        objects = ['found', 'objects'] # <- example of the outputs from the scene
-        objects = 
 
-        for object in objects:
-            if OBJECT_LOCATIONS[object] != location:
-                self.object_in_wrong_location(object)
-        raise NotImplemented
-
-    def scan_location_objects_alt(self, location):
-        # find all objects in the wrong place 
-        # this would return speech saying what objects were foind in the image, thats as far as it goes
-        raise NotImplemented
-    
+        try:
+            detected_objects = detect_service_call()
+            for object in detected_objects:
+                correct_location = self.object_location(object)
+                if correct_location == 'unknown':
+                   continue 
+                if correct_location != location: 
+                    self.object_in_wrong_location(object)
+                else:
+                    rospy.loginfo('Seems like there are no objects to move here')
+        except rospy.ServiceException as e:
+            rospy.logerr(e)
 
     def object_in_wrong_location(self, object):
-        self.p.exec_action('speak', object+'_is_incorrectly_placed,_it_should_be_in_'+ OBJECT_LOCATIONS[object])
+        self.p.exec_action('speak', object+'_is_incorrectly_placed,_it_should_be_in_'+ self.object_location(object))
         # for more points, do we want to try grabbing the objects?
     
     def start(self):
@@ -331,5 +325,6 @@ if __name__ == "__main__":
     p = PNPCmd()
     p.begin()
     gpsr = EGPSR(p)
-    gpsr.start()
+    # gpsr.start()
+    gpsr.obtain_quest_from_person()
     p.end()

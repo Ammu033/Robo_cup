@@ -134,7 +134,7 @@ def identify_people(p, what_to_identify):
         prompt = "You are the perception part of a mobile helper robot. Tell me about the '%s' about the people in this image. \
         You should only refer to this and not to anything else in the scene. You should reply as shortly as possible. \
         Do not refer to the image at all, pretend it is your eyes instead. \
-        Do not say that you are a chatbot or an AI assistant." % what_to_identify
+        Do not say that you are a chatbot or an AI assistant. Do not mention 'image' or 'images'." % what_to_identify
         print(prompt)
         # prompt = "Describe the image"
         
@@ -162,7 +162,7 @@ def identify_objects(p, what_to_idenfify):
     """
     publish_what_im_doing("identify_object(what_to_idenfify='%s')" % what_to_idenfify)
 
-    p.exec_action('moveHead', '0.0_-0.5')
+    p.exec_action('moveHead', '0.0_-0.8')
     
     bridge = CvBridge()
     im = rospy.wait_for_message(
@@ -176,7 +176,7 @@ def identify_objects(p, what_to_idenfify):
         prompt = "You are the perception part of a mobile helper robot. Tell me about the '%s' in this image. \
         You should only refer to this and not to anything else in the scene. You should reply as shortly as possible. \
         Do not refer to the image at all, pretend it is your eyes instead: for example, 'I can't see any toys'. \
-        Do not say that you are a chatbot or an AI assistant." % what_to_idenfify
+        Do not say that you are a chatbot or an AI assistant. Do not mention 'image' or 'images'. Do not say sorry ever." % what_to_idenfify
         print(prompt)
         # prompt = "Describe the image"
         
@@ -246,7 +246,7 @@ def answer_quiz(p):
     Moreover, `ask_for_person()` should have been the last function called.
     """
     listening_pub = rospy.Publisher("/stt/listening", WhisperListening, queue_size=1)
-    intent_publisher = rospy.Publisher("/planner_intention", String, queue_size=1)
+    intent_publisher = rospy.Publisher("/planner_intention", String, queue_size=1, latch = True)
     rospy.set_param("/stt/use_ollama", True)
 
     intent_publisher.publish("quiz")
@@ -254,9 +254,12 @@ def answer_quiz(p):
     time.sleep(0.5)
     listening_pub.publish(listening=True)
 
+    # this is not the correct way to do ollama stuff, therefore, this can only
+    # be called once otherwise it'll just repeat the previous answer
+    # TODO: fix this shit!
     try:
         info_output = rospy.wait_for_message(
-            "ollama_output", String, timeout=20
+            "ollama_output", String, timeout=30
         ).data
         engine_say(p, info_output)
     except:
@@ -291,6 +294,10 @@ if __name__ == "__main__":
     p = PNPCmd()
     p.begin()
 
-    answer_quiz(p)
+    # answer_quiz(p)
+    # identify_objects(p, what_to_idenfify="number of foods")
+    time.sleep(5)
+    identify_people(p, "number of people sitting down")
+    # report_information(p)
     
     p.end()
