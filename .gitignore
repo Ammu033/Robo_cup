@@ -419,3 +419,4 @@ docs/_build/
 */ollama_benchmarks.csv
 
 !tasks.csv
+ollamawrapper/contexts/*

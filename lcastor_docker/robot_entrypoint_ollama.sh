@@ -8,7 +8,7 @@ set -e
 # setup environment
 source "$HOME/.bashrc"
 
-chmod 777 /home/lcastor/ros_ws/src/LCASTOR/ollamawrapper/ollama_benchmarks.csv
+chmod 777 -R /home/lcastor/ros_ws/src/LCASTOR/ollamawrapper/contexts/
 
 echo " "
 echo "###"

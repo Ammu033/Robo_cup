@@ -162,6 +162,7 @@ include_directories(
 catkin_install_python(PROGRAMS
   src/ollamawrapper.py
   src/gpsr.py
+  src/gpsr_rag.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

@@ -7,3 +7,6 @@
 [submodule "lcastor_isaac_sim/ycb-tools"]
 	path = lcastor_isaac_sim/ycb-tools
 	url = https://github.com/sea-bass/ycb-tools
+[submodule "ollamawrapper/scripts/Eindhoven2024"]
+	path = ollamawrapper/scripts/Eindhoven2024
+	url = git@github.com:RoboCupAtHome/Eindhoven2024.git

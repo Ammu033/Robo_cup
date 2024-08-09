@@ -19,7 +19,7 @@ source "$HOME/.bashrc"
 #echo "Setting default source: ";
 #pactl set-default-source VirtualMic
 
-chmod 777 /home/lcastor/ros_ws/src/LCASTOR/ollamawrapper/ollama_benchmarks.csv
+chmod 777 -R /home/lcastor/ros_ws/src/LCASTOR/ollamawrapper/contexts/
 
 echo " "
 echo "###"

@@ -1,0 +1,5 @@
+string input
+---
+string rawoutput
+string parsedoutput
+float64 timetaken

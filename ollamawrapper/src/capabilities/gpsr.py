@@ -89,9 +89,8 @@ def grasp_object(p, object_name):
 @contexts.context(["gpsr"])
 @exception_handling
 def offer_object(p):
-    """Grasps the object currently being held. This means that `grasp_object()`
-    must have previously been called. Moreover it might be a good idea to go back to you,
-    or another person, before doing this."""
+    """Grasps the object currently being held. This means that `grasp_object()`,
+    and go_back_to_me() must have been previously called."""
     publish_what_im_doing("offer_object()")
 
     p.exec_action('speak', 'Here_is_the_item_you_have_requested,_please_take_it_from_my_hand.')

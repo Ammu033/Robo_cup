@@ -1,5 +1,5 @@
 ---
-session: gpsr
+session: ollama
 init_cmd: |
   #exec /bin/bash
   cd @TMULE_CONFIG_DIR@ || true
@@ -32,13 +32,16 @@ windows:
 #  - sleep 2; if $USE_WHISPER ; then roslaunch robocup_nlu stt.launch ; fi
 - name: launch
   panes:
-  - sleep 2 && bash /home/lcastor/ros_ws/src/LCASTOR/ollamawrapper/start_ollama.sh 
-- name: ollama
+  - sleep 2 && bash /home/lcastor/ros_ws/src/LCASTOR/ollamawrapper/scripts/start_ollama.sh
+- name: vectorembeddings
   panes:
-  - sleep 5 && TMUX='' tmux attach -t ollama
+  - cd /home/lcastor/ros_ws/src/LCASTOR/ollamawrapper/scripts && time python3 make_vector_embeddings.py && tmux send-keys -t ollama:4.0 C-z 'rosrun ollamawrapper gpsr_rag.py' Enter && bash
+- name: functioncalling
+  panes:
+  - sleep 5 && TMUX='' tmux attach -t functioncalling
 - name: gpsr
   panes:
-  - rosrun ollamawrapper gpsr.py
-  - cd /home/lcastor/ros_ws/src/LCASTOR/ollamawrapper && bash
+  - echo -e 'Waiting for vector embeddings to be made...' && bash
+  - cd /home/lcastor/ros_ws/src/LCASTOR/ollamawrapper/scripts && bash
 #############################################################################################
 
