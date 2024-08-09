@@ -91,7 +91,7 @@ class yolo_trial:
                             cosine_angle = np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc))
                             angle = np.degrees(np.arccos(cosine_angle))
                             # print(angle)
-                            if angle > 30 and angle < 130:
+                            if angle > 30 : #and angle < 130:
                                 gesture_detected = True
                     elif keypoints[7][1] < keypoints[5][1]:
                         h = np.array([keypoints[7][0], keypoints[7][1]])
@@ -104,7 +104,7 @@ class yolo_trial:
                             cosine_angle = np.dot(gh, gf) / (np.linalg.norm(gh) * np.linalg.norm(gf))
                             angle = np.degrees(np.arccos(cosine_angle))
                             # print(angle)
-                            if angle > 30 and angle < 130:
+                            if angle > 30 : #and angle < 130:
                                 gesture_detected =True
                     
                     # print(gesture_detected)

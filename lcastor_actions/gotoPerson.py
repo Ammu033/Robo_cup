@@ -17,7 +17,11 @@ from geometry_msgs.msg import PointStamped , PoseWithCovarianceStamped , Pose2D
 import numpy as np
 
 
-class goto(AbstractAction):
+class gotoPerson(AbstractAction):
+
+    def __init__(self, goalhandler, params):
+        super().__init__(goalhandler, params)
+        self.l = tf.TransformListener()
     
     def _start_action(self):
         self.gotopersonDone = False
@@ -33,6 +37,7 @@ class goto(AbstractAction):
             robot_pose = Pose2D()
             person_point = PointStamped()
             person_point.header.frame_id = 'xtion_depth_optical_frame'
+            # person_point.header.stamp = rospy.Time().now()
             goal_msg = MoveBaseGoal()
             person_point.point.x = self.params[0]
             person_point.point.y = self.params[1]
@@ -88,4 +93,17 @@ class goto(AbstractAction):
         print(result.status)
         rospy.set_param('/reached_person' , result.status)
         self.gotopersonDone = True
+
+    def _stop_action(self):
+        self.client.cancel_all_goals()
+        self.params.append("interrupted")
+        rospy.loginfo('STOPPED goto action')
+    @classmethod
+    def is_goal_reached(cls, params):
+        #TODO also make the necessary changes to make sure this returns True when the navigation has reached the goal
+
+        reached = False
+        if len(params) > 0 and params[-1] == "done":
+            reached = True
+        return reached
                 

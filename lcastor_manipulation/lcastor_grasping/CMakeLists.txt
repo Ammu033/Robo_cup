@@ -61,6 +61,8 @@ add_service_files(
   FILES
   RelToAbsolute.srv
   ApproachObject.srv
+  ObjectList.srv
+  ObjectFloorPose.srv
 )
 
 ## Generate actions in the 'action' folder

@@ -78,6 +78,13 @@ def restaurant(p):
 
 def goto_person(person_position_wrt_camera ):
     global goal_msg, robot_pose, person_point
+    l = tf.TransformListener() 
+    rotation_angle = 0.0
+    person_point = PointStamped()
+    person_point.header.frame_id = 'xtion_depth_optical_frame'
+    robot_pose = Pose2D()
+    goal_msg = MoveBaseGoal()
+    client = actionlib.SimpleActionClient('/move_base' , MoveBaseAction)
     person_point.point.x = person_position_wrt_camera[0]
     person_point.point.y = person_position_wrt_camera[1]
     person_point.point.z = person_position_wrt_camera[2]
@@ -129,8 +136,9 @@ def goto_person(person_position_wrt_camera ):
         if gotopersonDone:
             break
 
-def on_goto_done(_,__):
+def on_goto_done(goalState,result):
     global gotopersonDone
+    print(result)
     print('Go To Command Successfully Sent')
     gotopersonDone = True
 

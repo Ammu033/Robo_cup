@@ -1,4 +1,5 @@
-import os import sys
+import os 
+import sys
 from ollamamessages.msg import WhisperTranscription, WhisperListening
 from ollamamessages.srv import OllamaCall
 from lcastor_grasping.srv import ObjectList, ObjectListRequest, ObjectListResponse
@@ -10,6 +11,8 @@ try:
 except:
     print("Please set PNP_HOME environment variable to PetriNetPlans folder.")
     sys.exit(1)
+# sys.path.insert(1, os.path.join(os.path.dir(__file__), "..", "..", "lcastor_actions"))
+# import gotoRoom
 
 import time
 import pnp_cmd_ros
@@ -142,7 +145,7 @@ class EGPSR:
         rospy.set_param("/stt/speech_recogn_dyn_energy_flag", self.dynamic_energy)
         rospy.set_param("/stt/speech_confidence_thresh", self.no_speech_thresh)
         rospy.loginfo(f'GPSR PARAMS - Pause: {self.pause}, Energy: {self.energy}, Dynamic Energy: {self.dynamic_energy}, No Speech Threshold: {self.no_speech_thresh}')
-        self.listening_pub = rospy.Publisher("/stt/listening", WhisperListening, queue_size=1)
+        # self.listening_pub = rospy.Publisher("/stt/listening", WhisperListening, queue_size=1)
 
     def call_whisper(self, situation: int, tries=0):
         '''
@@ -155,8 +158,10 @@ class EGPSR:
             p.exec_action('speak', 'please_say,_im_ready,_when_you_want_to_start')
             time.sleep(1)
         if situation == READY_FOR_QUEST:
-                rospy.logerr('Cannot request for a new quest/cmd while already doing one')
+            rospy.logerr('Cannot request for a new quest/cmd while already doing one')
             if tries == 0: 
+                p.exec_action('speak', 'I_detected_a_person,_please_come_to_me.')
+                time.sleep(3)
                 p.exec_action('speak', 'Hi_how_can_I_help_you_today')
             else:
                 p.exec_action('speak', 'sorry,_could_you_repeat_that_more_closely')
@@ -201,6 +206,7 @@ class EGPSR:
         start_time = rospy.Time().now().secs
         found_person = False
         reached_person = False
+        rospy.set_param('/found_person' , False)
         while rospy.Time.now().secs - start_time < 15.0:
             if rospy.get_param('/found_person' , False):
                 found_person = True
@@ -210,15 +216,96 @@ class EGPSR:
                     rospy.get_param('/person_location/y'),
                     rospy.get_param('/person_location/z')] 
         # gotoPerson(guest_location)
-            p.exec_action('gotoPerson' , str(guest_location[0]) + '_' + str(guest_location[1]) + '_' + str(guest_location[2])   )
-            if rospy.get_param('reached_person' , False) :
-                reached_person = True
+            # self.goto_person(guest_location)
+            # p.exec_action('gotoPerson' , str(guest_location[0]) + '_' + str(guest_location[1]) + '_' + str(guest_location[2])   )
+            # if rospy.get_param('reached_person' , False) :
+                # reached_person = True
+        reached_person = True # FIXME: bypassing code above
         return reached_person and found_person
+        # TODO: Hari
+        # raise NotImplemented
 
-    def phase_look_for_people(self, max_people) -> None:
+    def goto_person(self, person_position_wrt_camera ):
+        global goal_msg, robot_pose, person_point
+        tf_buffer = tf2_ros.Buffer()
+        tf_listener = tf2_ros.TransformListener(tf_buffer)
+        #l = tf.TransformListener() 
+        rospy.sleep(1.0)
+        
+        transform = tf_buffer.lookup_transform('map', 'xtion_depth_optical_frame', rospy.Time(0), rospy.Duration(1.0))
+        
+        
+        rotation_angle = 0.0
+        person_point = PointStamped()
+        person_point.header.stamp = rospy.Time.now()
+        person_point.header.frame_id = 'xtion_depth_optical_frame'
+        robot_pose = Pose2D()
+        goal_msg = MoveBaseGoal()
+        client = actionlib.SimpleActionClient('/move_base' , MoveBaseAction)
+        person_point.point.x = person_position_wrt_camera[0]
+        person_point.point.y = person_position_wrt_camera[1]
+        person_point.point.z = person_position_wrt_camera[2]
+        print(person_position_wrt_camera)
+        human_wrt_map = tf_buffer.transform(person_point,target_frame='map')
+        #human_wrt_map = l.transformPoint(target_frame='map', ps=person_point)
+        robot_pose_data  = rospy.wait_for_message('/robot_pose' , PoseWithCovarianceStamped )
+        q = (
+                    robot_pose_data.pose.pose.orientation.x,
+                    robot_pose_data.pose.pose.orientation.y,
+                    robot_pose_data.pose.pose.orientation.z,
+                    robot_pose_data.pose.pose.orientation.w
+                )
+
+        m = tf.transformations.quaternion_matrix(q)
+
+        robot_pose.x = robot_pose_data.pose.pose.position.x
+        robot_pose.y = robot_pose_data.pose.pose.position.y
+        robot_pose.theta = tf.transformations.euler_from_matrix(m)[2]
+        person_pos = np.array([human_wrt_map.point.x , human_wrt_map.point.y])
+        print(person_pos)
+        robot_pos = np.array([robot_pose.x , robot_pose.y])
+        # print(person_pos)
+        vector_to_person = person_pos - robot_pos
+
+        # Calculate the distance from the robot to the person
+        distance_to_person = math.sqrt(vector_to_person[0]**2 + vector_to_person[1]**2)
+
+        # Normalize the vector to the desired distance
+        normalized_vector = vector_to_person / distance_to_person
+
+        # Calculate the orientation needed to reach the person
+        goal_orientation = math.atan2(normalized_vector[1], normalized_vector[0])
+
+        # Calculate the goal position based on the desired distance
+        DES_DIST = 1.2
+        goal_position = person_pos - DES_DIST * normalized_vector
+
+        # return goal_position, goal_orientation    
+        goal_msg.target_pose.header.stamp = rospy.Time.now()
+        goal_msg.target_pose.header.frame_id = "map"
+        goal_msg.target_pose.pose.position.x = goal_position[0]
+        goal_msg.target_pose.pose.position.y = goal_position[1]
+        print(goal_position)
+        goal_msg.target_pose.pose.orientation.z = math.sin(goal_orientation/2)
+        goal_msg.target_pose.pose.orientation.w = math.cos(goal_orientation/2)
+        # config = goal_tolerance_client.update_configuration(people_config)
+        # time.sleep(1.0)
+        client.send_goal(goal_msg , done_cb=self.on_goto_done)
+        while True:
+            if gotopersonDone:
+                break
+    
+    def on_goto_done(self, goalState,result):
+        global gotopersonDone
+        print(result)
+        print('Go To Command Successfully Sent')
+        rospy.set_param('reached_person' , True)
+        gotopersonDone = True
+    def phase_look_for_people(self) -> None:
         ''' THERE SHOULD ONLY BE 2 PEOPLE WITH TASKS'''
         # 1. go sensible people locations (outer while loop or 2 people found)
         try: 
+            max_people = 2 # this killed us
             remember_location = []
             total_quests = 0
             for location in POSSIBLE_PEOPLE_AREAS:
@@ -237,7 +324,7 @@ class EGPSR:
         for location in POSSIBLE_TRASH_AREAS:
             try:
                 self.p.exec_action('gotoRoom', 'r_'+location)
-                self.p.exec_action('speak', 'checking_'+location+'_for_misplaced_items')
+                self.p.exec_action('speak', 'checking_'+location+'_for_trash')
                 self.p.exec_action('moveHead', '0.0_-0.75')
                 self.p.exec_action('moveTorso', '0.35')
                 self.scan_location_trash()
@@ -266,6 +353,7 @@ class EGPSR:
         
 
     def send_to_trash(self, object_poses):
+        DES_DIST = 1.2
         # object poses in the map frame 
         global goal_msg, robot_pose, person_point
         # Obtain the current robot pose
@@ -383,6 +471,7 @@ class EGPSR:
             self.p.exec_action("gotoRoom", "r_"+location)
             time.sleep(3)
             self.p.exec_action('speak', 'please_help_remove_'+object+'in_my_hand')
+            time.sleep(3)
             self.p.exec_action("gripperAction", "open")
             time.sleep(self.time_open_gripper)
             self.p.exec_action("gripperAction", "close")
@@ -394,12 +483,17 @@ class EGPSR:
         self.open_door()
         
         self.p.exec_action('moveHead', '0.0_0.0')
-        self.p.exec_action('moveTorso', '0.0_0.0')
+        self.p.exec_action('moveTorso', '0.15')
+
+        self.phase_look_for_trash()
+         
+        self.p.exec_action('moveHead', '0.0_0.0')
+        self.p.exec_action('moveTorso', '0.15')
 
         self.phase_look_for_incorrectly_placed_objects()
          
         self.p.exec_action('moveHead', '0.0_0.0')
-        self.p.exec_action('moveTorso', '0.0_0.0')
+        self.p.exec_action('moveTorso', '0.25')
 
         self.phase_look_for_trash()
          
@@ -413,4 +507,6 @@ if __name__ == "__main__":
     p.begin()
     gpsr = EGPSR(p)
     gpsr.start()
+    # gpsr.obtain_quest_from_person()
+    # gpsr.find_waving_people()
     p.end()
