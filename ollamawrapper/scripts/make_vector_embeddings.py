@@ -34,6 +34,8 @@ def main():
         "%s/names/names.md" % BASE_INFO_PATH,
         "%s/questions/questions.md" % BASE_INFO_PATH,
         "%s/maps/room_names.md" % BASE_INFO_PATH,
+        # "%s/objects/objects.md" % BASE_INFO_PATH,
+        # "%s/maps/location_names.md" % BASE_INFO_PATH
     ]
 
     parser = MarkdownReader()
@@ -54,7 +56,7 @@ def main():
     documents += reader.load_data(query=q)
     documents += reader.load_data(query="SELECT location_name AS all_locations FROM locations;")
 
-    documents += [DocstringWalker().parse_module("gpsr", "../src/capabilities/gpsr.py")]
+    documents += [DocstringWalker().parse_module("gpsr", "../src/capabilities/rag_gpsr.py")]
 
     db = chromadb.PersistentClient(path=EMBEDDINGS_PATH)
     chroma_collection = db.get_or_create_collection(BASE_INFO_PATH)

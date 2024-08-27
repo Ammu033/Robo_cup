@@ -29,7 +29,7 @@ import ast
 import os
 import re
 
-DEFAULT_OLLAMA_URL = "http://192.168.69.34:11434"
+DEFAULT_OLLAMA_URL = "http://192.168.69.54:11434"
 DEFAULT_OLLAMA_MODEL = "llama3.1"
 
 sys.path.insert(1, os.path.join(os.path.dirname(__file__), "..", "..", "lcastor_actions"))
@@ -90,23 +90,67 @@ class GPSRRagNode:
         If you are asked to go to a location or room that doesn't exist, say so. \
         You do not need to def the functions in the context. \
         You do not need to explain your code. \
-        You never need to call the publish_what_im_doing() function. \
         You may only use the functions provided to you in the context. Do not use print(str) but use engine_say(p, str) instead. \
         The engine_say(p, str) also speaks out loud. You need to call the functions I gave you to complete the task. \
         You may not write any code other than with the functions that have been defined. \
+        You may not define any variables. \
         For example, the task 'tell me what is the heaviest object on the sink' could call: \
-        goto_location(p, location_name='sink') then identify_objects(p, what_to_idenfify='the heaviest object') \
+        identify_objects(p, object_location='sink', what_to_idenfify='the heaviest object') \
         then go_back_to_me(p) then report_information(p). Another example is that 'lead Robin from the dinner table to the hallway' \
-        could call `goto_location(p, location_name='sink')` then `ask_for_person(p, person_name='Robin'), then` \
-        `guide_person(p)` and then finally `goto_location(p, location_name='hallway')`" % req.input
-      
-        response = self.query_engine.query(prompt).response
-        print(response)
+        could call `goto_location(p, location_name='dinner table')` then \
+        `guide_person(p, to_location='hallway', person_name='Robin')`" % req.input
+
+        while True:     
+            func_str_raw = self.query_engine.query(prompt).response
+            valid, invalid_message = self.validate_func(func_str_raw)
+            if valid:
+                break
+            else:
+                rospy.loginfo("Retrying due to reason '%s'" % invalid_message)
+                prompt += "\n" + invalid_message
+
+
+        print(func_str_raw)    
         return GPSRRAGCallResponse(
-            response,
+            func_str_raw,
             "",
             time.time() - starttime
         )
+    
+    def validate_func(self, func_str):
+        asked_for_person = False
+
+        if "for " in func_str:
+            return False, "You are not allowed to use for loops."
+        if "while " in func_str:
+            return False, "You are not allowed to use while loops."
+        if "if " in func_str:
+            return False, "You are not allowed to use if statements."
+        if " = " in func_str:
+            return False, "You are not allowed to define any variables."
+        
+        try:
+            body = ast.parse(func_str).body[0].body
+        except IndexError:
+            return False, "The function was not declared properly."
+
+        for expression in body:
+            if type(expression.value) is ast.Call:
+                func_name = expression.value.func.id
+                print("Called '%s()'" % func_name)  
+                
+                if func_name == "ask_for_person":
+                    asked_for_person = True
+
+                if func_name == "offer_object_to_person":
+                    for k in expression.value.keywords:
+                        if k.arg == "person_name" and k.value.value.lower() in ["me", "the human", "you", "human"]:
+                            return False, "Instead of calling `offer_object_to_person()` with 'me' as a parameter you should use the function `offer_object_to_me()`."
+
+                if func_name == "answer_quiz" and not asked_for_person:
+                    return False, "You need to call `ask_for_person()` before answering a quiz."
+        
+        return True, True
 
 if __name__ == "__main__":
     rospy.init_node("gpsr_rag_node")

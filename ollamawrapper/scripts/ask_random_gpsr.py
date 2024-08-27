@@ -1,4 +1,4 @@
-from ollamamessages.srv import OllamaCall, OllamaCallResponse
+from ollamamessages.srv import GPSRRAGCall, GPSRRAGCallResponse
 import rospy
 import random
 import sys
@@ -19,6 +19,6 @@ except IndexError:
     task = random.choice(basictasks)
 
 print("Sending task '%s'" % task)
-service_call = rospy.ServiceProxy("/gpsr/task_decomposition", OllamaCall)
+service_call = rospy.ServiceProxy("/gpsr/rag/task_decomposition", GPSRRAGCall)
 response = service_call(input = task)
 print(response)
