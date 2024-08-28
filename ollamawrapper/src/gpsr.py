@@ -21,8 +21,8 @@ import re
 sys.path.insert(1, os.path.join(os.path.dirname(__file__), "..", "..", "lcastor_actions"))
 import gotoRoom
 
-# ollama_api_url = rospy.get_param("/gpsr/ollama_api_url", "192.168.69.253:11434")
-ollama_decomposition_model = rospy.get_param("/gpsr/ollama_decomposition_model", 'llama3')
+ollama_api_url = rospy.get_param("/gpsr/ollama_api_url", "192.168.69.75:11434")
+ollama_decomposition_model = rospy.get_param("/gpsr/ollama_decomposition_model", 'llama3.1')
 # ollama_decomposition_model = rospy.get_param("/gpsr/ollama_decomposition_model", "deepseek-coder:6.7b")
 
 import capabilities
@@ -166,48 +166,50 @@ class GPSRNode:
             rospy.loginfo("Raw ollama response: =====\n%s\n=====" % ollama_output["response"])
 
             parsed_func = self.parse_ollama_call(ollama_output["response"])
+            print(parsed_func)
+            break
 
-            # print("To exec: ===\n%s\n===" % parsed_func)
+            # # print("To exec: ===\n%s\n===" % parsed_func)
 
-            environment = jinja2.Environment(loader = jinja2.FileSystemLoader(os.path.dirname(__file__)))
-            template = environment.get_template("gpsr_runner.py.jinja2")
+            # environment = jinja2.Environment(loader = jinja2.FileSystemLoader(os.path.dirname(__file__)))
+            # template = environment.get_template("gpsr_runner.py.jinja2")
 
-            with tempfile.NamedTemporaryFile(suffix = ".py", mode = "w", delete = False) as f:
-                f.write(template.render(
-                    cwd = os.path.dirname(__file__), 
-                    main_func = parsed_func, 
-                    func_call = "%s(p = p, locations = %s)" % (func_name, str(locations_in_scene))
-                ))
-                filename = f.name
-            rospy.loginfo(str(filename))
+            # with tempfile.NamedTemporaryFile(suffix = ".py", mode = "w", delete = False) as f:
+            #     f.write(template.render(
+            #         cwd = os.path.dirname(__file__), 
+            #         main_func = parsed_func, 
+            #         func_call = "%s(p = p, locations = %s)" % (func_name, str(locations_in_scene))
+            #     ))
+            #     filename = f.name
+            # rospy.loginfo(str(filename))
 
-            with open(filename, "r") as f:
-                rospy.loginfo("******* %s consists of the following: *******\n\n%s\n****************************************" % (filename, f.read()))
-            # subprocess.run(["tmux", "new-session", "-s", "gpsr_runner", "-d", "'", "python3", filename, "'"])
+            # with open(filename, "r") as f:
+            #     rospy.loginfo("******* %s consists of the following: *******\n\n%s\n****************************************" % (filename, f.read()))
+            # # subprocess.run(["tmux", "new-session", "-s", "gpsr_runner", "-d", "'", "python3", filename, "'"])
 
-            stdout = ""
-            stderr = ""
-            try:
-                proc = subprocess.Popen(["python3", filename], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-                while True:
-                    line = proc.stdout.readline()
-                    if not line:
-                        break
-                    stdout += line.decode()
-                    rospy.loginfo("[stdout] %s" % line.rstrip().decode())
-                while True:
-                    line = proc.stderr.readline()
-                    if not line:
-                        break
-                    stderr += line.decode()
-                    rospy.logwarn("[stderr] %s" % line.rstrip().decode())
-            except KeyboardInterrupt:
-                proc.terminate()
-                rospy.loginfo("Proc terminated")
+            # stdout = ""
+            # stderr = ""
+            # try:
+            #     proc = subprocess.Popen(["python3", filename], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+            #     while True:
+            #         line = proc.stdout.readline()
+            #         if not line:
+            #             break
+            #         stdout += line.decode()
+            #         rospy.loginfo("[stdout] %s" % line.rstrip().decode())
+            #     while True:
+            #         line = proc.stderr.readline()
+            #         if not line:
+            #             break
+            #         stderr += line.decode()
+            #         rospy.logwarn("[stderr] %s" % line.rstrip().decode())
+            # except KeyboardInterrupt:
+            #     proc.terminate()
+            #     rospy.loginfo("Proc terminated")
 
-            if stderr == "" and not "!! Exception" in stdout:
-                # all good, the plan was executable and run without errors
-                needs_planning = False
+            # if stderr == "" and not "!! Exception" in stdout:
+            #     # all good, the plan was executable and run without errors
+            #     needs_planning = False
 
 
         return OllamaCallResponse(
