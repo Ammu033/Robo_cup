@@ -16,7 +16,7 @@ import sys
 
 
 Settings.embed_model = EMBEDDINGS_MODEL
-Settings.llm = Ollama(base_url="http://192.168.69.34:11434", model="llama3", request_timeout=150.0)
+Settings.llm = Ollama(base_url="http://192.168.69.54:11434", model="llama3.1", request_timeout=150.0)
 
 db = chromadb.PersistentClient(path=EMBEDDINGS_PATH)
 chroma_collection = db.get_or_create_collection(BASE_INFO_PATH)
@@ -29,7 +29,7 @@ index = VectorStoreIndex.from_vector_store(
 )
 
 query_engine = index.as_query_engine()
-response = query_engine.query(sys.argv[1]).response
+response = query_engine.query(input("Input text-based RAG query: ")).response
 print(response)
 
 with open("../contexts/rag_query_output.txt", "w") as f:

@@ -109,11 +109,49 @@ class GPSRRagNode:
                 rospy.loginfo("Retrying due to reason '%s'" % invalid_message)
                 prompt += "\n" + invalid_message
 
+        s = "=== The generated plan is the following: ==="
+        print(s)
+        print(func_str_raw)
+        print("=" * len(s)) 
 
-        print(func_str_raw)    
+        environment = jinja2.Environment(loader = jinja2.FileSystemLoader(os.path.dirname(__file__)))
+        template = environment.get_template("gpsr_runner.py.jinja2")
+        with tempfile.NamedTemporaryFile(suffix = ".py", mode = "w", delete = False) as f:
+            f.write(template.render(
+                cwd = os.path.join(os.path.dirname(__file__), "capabilities"), 
+                main_func = func_str_raw, 
+                func_call = "do_func(p = p)")
+            )
+            filename = f.name
+            rospy.loginfo(str(filename))
+
+        stdout = ""
+        stderr = ""
+        try:
+            proc = subprocess.Popen(["python3", filename], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+            while True:
+                line = proc.stdout.readline()
+                if not line:
+                    break
+                stdout += line.decode()
+                rospy.loginfo("[stdout] %s" % line.rstrip().decode())
+            while True:
+                line = proc.stderr.readline()
+                if not line:
+                    break
+                stderr += line.decode()
+                rospy.logwarn("[stderr] %s" % line.rstrip().decode())
+        except KeyboardInterrupt:
+            proc.terminate()
+            rospy.loginfo("Proc terminated")
+
+        if stderr == "" and not "!! Exception" in stdout:
+            # all good, the plan was executable and run without errors
+            rospy.loginfo("Global plan succeeded")
+   
         return GPSRRAGCallResponse(
             func_str_raw,
-            "",
+            filename,
             time.time() - starttime
         )
     
