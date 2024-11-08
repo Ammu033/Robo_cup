@@ -29,7 +29,7 @@ import ast
 import os
 import re
 
-DEFAULT_OLLAMA_URL = "http://192.168.69.54:11434"
+DEFAULT_OLLAMA_URL = "http://127.0.0.1:11434"
 DEFAULT_OLLAMA_MODEL = "llama3.1"
 
 sys.path.insert(1, os.path.join(os.path.dirname(__file__), "..", "..", "lcastor_actions"))
@@ -169,8 +169,8 @@ class GPSRRagNode:
         
         try:
             body = ast.parse(func_str).body[0].body
-        except IndexError:
-            return False, "The function was not declared properly."
+        except (IndexError, AttributeError):
+            return False, "The function was not declared properly. Remember, The function signature must be: do_func(p)->None"
 
         for expression in body:
             if type(expression.value) is ast.Call:

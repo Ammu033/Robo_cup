@@ -184,7 +184,7 @@ def report_information(p):
     """Report back a previous identification task. This therefore means that `identify_objects()`
     must previously have been called. You must go back to you (the inspection point) before calling this function.
     """
-
+    go_back_to_me(p)
     time.sleep(1)
     report = rospy.get_param("/gpsr/saved_information", "I am not sure.")
     # p.exec_action('speak', 'I_have_identified_{}'.format(report.replace(" ", "_")))
@@ -303,11 +303,11 @@ if __name__ == "__main__":
     # identify_people(p, "number of people sitting down")
     # report_information(p)
 
-    # goto_location(p, input("Where would you like to go? "))
+    goto_location(p, input("Where would you like to go? "))
 
-    identify_objects(p, object_location='dinner table', what_to_idenfify='the lightest object')
-    go_back_to_me(p)
-    report_information(p)
+    # identify_objects(p, object_location='dinner table', what_to_idenfify='the lightest object')
+    # go_back_to_me(p)
+    # report_information(p)
 
     # engine_say(p, "Placeholder")
     # grasp_object(p, "kitchen counter", "bowl")

@@ -16,7 +16,7 @@ import sys
 
 
 Settings.embed_model = EMBEDDINGS_MODEL
-Settings.llm = Ollama(base_url="http://192.168.69.54:11434", model="llama3.1", request_timeout=150.0)
+Settings.llm = Ollama(base_url="http://127.0.0.1:11434", model="llama3.1", request_timeout=150.0)
 
 db = chromadb.PersistentClient(path=EMBEDDINGS_PATH)
 chroma_collection = db.get_or_create_collection(BASE_INFO_PATH)

@@ -10,7 +10,7 @@ import cv2
 import sys
 import os
 
-ollama_api_url = rospy.get_param("/gpsr/rag/ollama_api_url", "192.168.69.54:11434")
+ollama_api_url = rospy.get_param("/gpsr/rag/ollama_api_url", "127.0.0.1:11434")
 ollama_multimodal_model = rospy.get_param("/gpsr/rag/ollama_multimodal_model", 'llava:7b')
 
 # could use the python logger module but idgaf
