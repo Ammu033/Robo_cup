@@ -29,8 +29,14 @@ index = VectorStoreIndex.from_vector_store(
 )
 
 query_engine = index.as_query_engine()
-response = query_engine.query(input("Input text-based RAG query: ")).response
+if len(sys.argv) == 1:
+    query = input("Input text-based RAG query: ")
+else:
+    query = sys.argv[1]
+
+response = query_engine.query(query)
+
 print(response)
 
-with open("../contexts/rag_query_output.txt", "w") as f:
-    f.write(response)
+# with open("../contexts/rag_query_output.txt", "w") as f:
+#     f.write(response)

@@ -280,6 +280,16 @@ def engine_say(p, to_say):
     with open(os.path.join(os.path.dirname(__file__), "..", "..", "contexts", "speech.log"), "a") as f:
         f.write(to_say.replace(" ", "_") + "\n")
 
+def say_task_impossible(p, reason):
+    """
+    This function is called when a requested task is impossible, for example when it is requested to go to a room
+    that isn't in the scene, or to pick up an item that isn't on the given location.
+
+    Args:
+        reason (str): The reason why the task cannot be completed, for example "There are no bananas on the coffee table" when it is requested to bring a banana from the coffee when there are no bananas on the coffee table.
+    """
+    engine_say(p, "I cannot do this requested task because " + reason)
+
 if __name__ == "__main__":
     import sys
     import os

@@ -100,6 +100,14 @@ class GPSRRagNode:
         could call `goto_location(p, location_name='dinner table')` then \
         `guide_person(p, to_location='hallway', person_name='Robin')`" % req.input
 
+        prompt += \
+        "\nYou must check if a task is possible to complete, for instance by checking if objects and rooms that are requested \
+        are really in the scene. If a task is impossible, you should call the function `say_task_impossible(p, reason)` \
+        with the reason why the task is impossible under the `reason` parameter. For example, if it is requested to move to the 'bedroom', \
+        but the room 'bedroom' is not in the scene, you should call  `say_task_impossible(p, reason='there is no bedroom room in the scene')`. \
+        Or if a laptop is requested from the kitchen counter, but there are no laptops on the kitchen counter in the list of items, \
+        `say_task_impossible(p, reason='there are no laptops in the list of items in the scene')`"
+
         while True:     
             func_str_raw = self.query_engine.query(prompt).response
             valid, invalid_message = self.validate_func(func_str_raw)
@@ -125,29 +133,32 @@ class GPSRRagNode:
             filename = f.name
             rospy.loginfo(str(filename))
 
-        stdout = ""
-        stderr = ""
-        try:
-            proc = subprocess.Popen(["python3", filename], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-            while True:
-                line = proc.stdout.readline()
-                if not line:
-                    break
-                stdout += line.decode()
-                rospy.loginfo("[stdout] %s" % line.rstrip().decode())
-            while True:
-                line = proc.stderr.readline()
-                if not line:
-                    break
-                stderr += line.decode()
-                rospy.logwarn("[stderr] %s" % line.rstrip().decode())
-        except KeyboardInterrupt:
-            proc.terminate()
-            rospy.loginfo("Proc terminated")
+        if rospy.get_param("/gpsr/rag/dry_run", False) == False:
+            rospy.loginfo("******Dry run set to %s. So not actually running the plan.******" % rospy.get_param("/gpsr/rag/dry_run", False))
+        else:
+            stdout = ""
+            stderr = ""
+            try:
+                proc = subprocess.Popen(["python3", filename], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+                while True:
+                    line = proc.stdout.readline()
+                    if not line:
+                        break
+                    stdout += line.decode()
+                    rospy.loginfo("[stdout] %s" % line.rstrip().decode())
+                while True:
+                    line = proc.stderr.readline()
+                    if not line:
+                        break
+                    stderr += line.decode()
+                    rospy.logwarn("[stderr] %s" % line.rstrip().decode())
+            except KeyboardInterrupt:
+                proc.terminate()
+                rospy.loginfo("Proc terminated")
 
-        if stderr == "" and not "!! Exception" in stdout:
-            # all good, the plan was executable and run without errors
-            rospy.loginfo("Global plan succeeded")
+            if stderr == "" and not "!! Exception" in stdout:
+                # all good, the plan was executable and run without errors
+                rospy.loginfo("Global plan succeeded")
    
         return GPSRRAGCallResponse(
             func_str_raw,

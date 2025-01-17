@@ -8,6 +8,7 @@ set -e
 # setup environment
 source "$HOME/.bashrc"
 
+mkdir -p /home/lcastor/ros_ws/src/LCASTOR/ollamawrapper/contexts/
 chmod 777 -R /home/lcastor/ros_ws/src/LCASTOR/ollamawrapper/contexts/
 
 echo " "
