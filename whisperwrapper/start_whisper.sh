@@ -4,6 +4,8 @@ echo 'robocup' | sudo -S docker compose -f ~/noetic-llama/docker-compose.yaml up
 curl http://localhost:11434/api/pull -d '{"name": "nexusraven:13b-v2-q2_K"}'
 curl http://localhost:11434/api/pull -d '{"name": "llama3.1"}'
 curl http://localhost:11434/api/pull -d '{"name": "llava:7b"}'
+curl http://localhost:11434/api/pull -d '{"name": "deepseek-r1:8b"}'
+curl http://localhost:11434/api/pull -d '{"name": "deepseek-r1:14b"}'
 
 tmux new-session -s whisper -d  "cd ~/noetic-llama/whisper_ws && catkin_make && source devel/setup.bash && bash"
 
