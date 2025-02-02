@@ -31,6 +31,7 @@ import re
 
 DEFAULT_OLLAMA_URL = "http://127.0.0.1:11434"
 DEFAULT_OLLAMA_MODEL = "llama3.1"
+# DEFAULT_OLLAMA_MODEL = "deepseek-r1:8b"
 
 sys.path.insert(1, os.path.join(os.path.dirname(__file__), "..", "..", "lcastor_actions"))
 import gotoRoom
@@ -87,7 +88,7 @@ class GPSRRagNode:
         You need to use the functions with which you have been provided to do this. \
         The first parameter of these functions should always be `p`. You don't need to worry about its definition. \
         You can only go to locations with which you have been provided. \
-        If you are asked to go to a location or room that doesn't exist, say so. \
+        If the location of a place to go to is not specified, use your knowledge base to work out where that item is. \
         You do not need to def the functions in the context. \
         You do not need to explain your code. \
         You may only use the functions provided to you in the context. Do not use print(str) but use engine_say(p, str) instead. \
@@ -100,22 +101,35 @@ class GPSRRagNode:
         could call `goto_location(p, location_name='dinner table')` then \
         `guide_person(p, to_location='hallway', person_name='Robin')`" % req.input
 
+        if "deepseek" in rospy.get_param("/gpsr/rag/ollama_decomposition_model", DEFAULT_OLLAMA_MODEL):
+            prompt += "Wrap your code in ``` blocks."
+
         prompt += \
         "\nYou must check if a task is possible to complete, for instance by checking if objects and rooms that are requested \
-        are really in the scene. If a task is impossible, you should call the function `say_task_impossible(p, reason)` \
+        are really in the scene. If a task is impossible, or 'impossible' is in the prompt, you should call the function `say_task_impossible(p, reason)` \
         with the reason why the task is impossible under the `reason` parameter. For example, if it is requested to move to the 'bedroom', \
-        but the room 'bedroom' is not in the scene, you should call  `say_task_impossible(p, reason='there is no bedroom room in the scene')`. \
-        Or if a laptop is requested from the kitchen counter, but there are no laptops on the kitchen counter in the list of items, \
-        `say_task_impossible(p, reason='there are no laptops in the list of items in the scene')`"
+        but the room 'bedroom' is not in the scene, you should call  `say_task_impossible(p, reason='there is no bedroom room in the scene')`."
 
+        prompt += "\n" + self.pre_prompt(req.input)
+
+        reasoning = None
         while True:     
             func_str_raw = self.query_engine.query(prompt).response
+            if "deepseek" in rospy.get_param("/gpsr/rag/ollama_decomposition_model", DEFAULT_OLLAMA_MODEL):
+                func_str_raw, reasoning = self.parse_deepseek_output(func_str_raw)
+            
             valid, invalid_message = self.validate_func(func_str_raw)
             if valid:
                 break
             else:
                 rospy.loginfo("Retrying due to reason '%s'" % invalid_message)
                 prompt += "\n" + invalid_message
+
+        if reasoning is not None:
+            s = "=== Deepseek reasoning: ==="
+            print(s)
+            print(reasoning)
+            print("=" * len(s))
 
         s = "=== The generated plan is the following: ==="
         print(s)
@@ -133,7 +147,7 @@ class GPSRRagNode:
             filename = f.name
             rospy.loginfo(str(filename))
 
-        if rospy.get_param("/gpsr/rag/dry_run", False) == False:
+        if rospy.get_param("/gpsr/rag/dry_run", False) == True:
             rospy.loginfo("******Dry run set to %s. So not actually running the plan.******" % rospy.get_param("/gpsr/rag/dry_run", False))
         else:
             stdout = ""
@@ -165,6 +179,28 @@ class GPSRRagNode:
             filename,
             time.time() - starttime
         )
+    
+    def parse_deepseek_output(self, raw_deepseek_str):
+        # yes this parser is shitty as it looks
+        for s in raw_deepseek_str.split("```"):
+            if s.startswith("python"):
+                func_str = s[7:]
+
+        print(raw_deepseek_str.split("</think>")[0][10:])
+
+        return func_str, raw_deepseek_str.split("</think>")[0][10:]
+    
+    def pre_prompt(self, task):
+        prompt = "in the task '%s', what are the object locations? \
+        If the object or location isn't in the scene, or an item is requested from a location where it isn't located, \
+        print out the string 'impossible' with a reason. Ignore all of the above if the task doesn't mention any objects. \
+        Humans don't count as objects. Do not reply with a single word, use a full sentence." % task
+        pre = self.query_engine.query(prompt).response
+        s = "==== Pre-prompt: ===="
+        print(s)
+        print(pre)
+        print("=" * len(s))
+        return pre
     
     def validate_func(self, func_str):
         asked_for_person = False
@@ -198,6 +234,14 @@ class GPSRRagNode:
 
                 if func_name == "answer_quiz" and not asked_for_person:
                     return False, "You need to call `ask_for_person()` before answering a quiz."
+                
+                for k in expression.value.keywords:
+                    if type(k.value.value) is not str:
+                        return False, "All arguments can only be strings."
+                    if k.value.value == "":
+                        return False, "Blank strings are not allowed as arguments."
+                    
+                #TODO: check the number of args (or their names) matches the skill function definitions
         
         return True, True
 
