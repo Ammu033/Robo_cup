@@ -105,10 +105,10 @@ class GPSRRagNode:
             prompt += "Wrap your code in ``` blocks."
 
         prompt += \
-        "\nYou must check if a task is possible to complete, for instance by checking if objects and rooms that are requested \
-        are really in the scene. If a task is impossible, or 'impossible' is in the prompt, you should call the function `say_task_impossible(p, reason)` \
-        with the reason why the task is impossible under the `reason` parameter. For example, if it is requested to move to the 'bedroom', \
-        but the room 'bedroom' is not in the scene, you should call  `say_task_impossible(p, reason='there is no bedroom room in the scene')`."
+        "\nYou must check if a task is possible to complete, for instance by checking if objects are actually in the given locations. \
+        If a task is impossible, or 'impossible' is in the prompt, you should call the function `say_task_impossible(p, reason)` \
+        with the reason why the task is impossible under the `reason` parameter. For example, if it is requested to move to fetch a battery from the bed, \
+        but really the battery is on the bathtub, you should call  `say_task_impossible(p, reason='there isnt a battery on the bed.')`."
 
         prompt += "\n" + self.pre_prompt(req.input)
 
@@ -191,10 +191,18 @@ class GPSRRagNode:
         return func_str, raw_deepseek_str.split("</think>")[0][10:]
     
     def pre_prompt(self, task):
-        prompt = "in the task '%s', what are the object locations? \
-        If the object or location isn't in the scene, or an item is requested from a location where it isn't located, \
-        print out the string 'impossible' with a reason. Ignore all of the above if the task doesn't mention any objects. \
-        Humans don't count as objects. Do not reply with a single word, use a full sentence." % task
+        prompt = "In the task '%s', \
+        if the task is to bring an object to a person, \
+        You should check if the locations are right- for instance, if the task is to 'bring me a battery from the bed', \
+        and you know the battery is actually in the sink, you should return 'impossible because the battery is actually in the sink'. \
+        If you know an object isn't in the scene at all, you should return, for example, 'impossible because that object isn't in the scene'. \
+        If a location isn't mentioned, state the location of that object, \
+        in a full sentence, for example, if the task is 'get me a kiwi', and you know that kiwis are fruit and fruit are located \
+        on the bathtub, you should return 'the kiwi is definately really located on the bathtub.' \
+        People and humans do not count as objects. Don't worry about them. \
+        If you are sure there isn't an object in the scene at all, just say so: e.g. 'impossible because there are no laptops in the scene'. \
+        If it isn't a delivery task, you can ignore all of the above and just return 'hello'. \
+        Your entire output should be a single sentence only." % task
         pre = self.query_engine.query(prompt).response
         s = "==== Pre-prompt: ===="
         print(s)
@@ -218,28 +226,40 @@ class GPSRRagNode:
             body = ast.parse(func_str).body[0].body
         except (IndexError, AttributeError):
             return False, "The function was not declared properly. Remember, The function signature must be: do_func(p)->None"
+        
+        # try:
+        #     if rospy.get_param("/arena") == "arena_b":
+        #         locations_in_scene = list(gotoRoom.ROOM_DICT_B.keys())
+        #     else:
+        #         locations_in_scene = list(gotoRoom.ROOM_DICT_C.keys())
+        # except:
+        #     rospy.logerror("You need to set a value for /arena")
+
+        locations_in_scene = set(gotoRoom.ROOM_DICT_B.keys()).union(set(gotoRoom.ROOM_DICT_C.keys()))
 
         for expression in body:
             if type(expression.value) is ast.Call:
                 func_name = expression.value.func.id
-                print("Called '%s()'" % func_name)  
+                # print("Called '%s()'" % func_name)  
                 
                 if func_name == "ask_for_person":
                     asked_for_person = True
 
-                if func_name == "offer_object_to_person":
-                    for k in expression.value.keywords:
-                        if k.arg == "person_name" and k.value.value.lower() in ["me", "the human", "you", "human"]:
-                            return False, "Instead of calling `offer_object_to_person()` with 'me' as a parameter you should use the function `offer_object_to_me()`."
-
-                if func_name == "answer_quiz" and not asked_for_person:
-                    return False, "You need to call `ask_for_person()` before answering a quiz."
-                
                 for k in expression.value.keywords:
                     if type(k.value.value) is not str:
                         return False, "All arguments can only be strings."
                     if k.value.value == "":
                         return False, "Blank strings are not allowed as arguments."
+                    
+                    if func_name == "offer_object_to_person":
+                        if k.arg == "person_name" and k.value.value.lower() in ["me", "the human", "you", "human"]:
+                            return False, "Instead of calling `offer_object_to_person()` with 'me' as a parameter you should use the function `offer_object_to_me()`."
+                    
+                    # if "location" in k.arg and k.value.value.lower() not in locations_in_scene:
+                    #     return False, "'%s' is not a valid location. The valid locations are: %s" % (k.value.value, ", ".join(["'%s'" % l for l in list(locations_in_scene)]))
+
+                if func_name == "answer_quiz" and not asked_for_person:
+                    return False, "You need to call `ask_for_person()` before answering a quiz."
                     
                 #TODO: check the number of args (or their names) matches the skill function definitions
         
