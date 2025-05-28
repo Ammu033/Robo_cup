@@ -2,15 +2,11 @@
 
 from ollamamessages.msg import WhisperTranscription, WhisperListening
 from ollamamessages.srv import OllamaCall, OllamaCallResponse
-from std_msgs.msg import String
 
 import speech_recognition as sr
-import threading
 import tempfile
 import requests
 import rospy 
-import time
-import json
 import os
 
 PAUSE = 0.8
@@ -59,6 +55,7 @@ class WhisperWrapper:
                     "http://%s/asr?output=json" % rospy.get_param("/stt/whisper_api_url", WHISPER_API_URL),
                     files = {"audio_file": open(audio_path, "rb")}
                 )
+                print(req)
                 os.remove(audio_path)
                 o = req.json()
                 if o["text"] != "":

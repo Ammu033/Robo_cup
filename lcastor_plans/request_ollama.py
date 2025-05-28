@@ -22,8 +22,11 @@ MAX_TRIES = 2
 
 def speech_for_whisper(p, listening_pub, plan_intent_pub, publish_info, speech_texts):
     listening_pub.publish(listening=False)
-    for speech in speech_texts:
-        p.exec_action("speak", speech)
+    if isinstance(speech_texts, str):
+        p.exec_action("speak", speech_texts)
+    elif isinstance(speech_texts, list):
+        for speech in speech_texts:
+            p.exec_action("speak", speech)
     plan_intent_pub.publish(publish_info)
     time.sleep(1)
     listening_pub.publish(listening=True)
@@ -36,6 +39,7 @@ def request_ollama(
         publish_info,
         speech_text,
         default_info,
+        cannot_hear_text = "please_repeat_that",
         tries = MAX_TRIES,
         timeout = OVERALL_TIMEOUT,
         response_timeout = RESPONSE_TIMEOUT,
@@ -64,7 +68,7 @@ def request_ollama(
 
     while check:
         if rospy.get_time() - initial_start_time > timeout:
-            speech_for_whisper(p, listening_pub, plan_intent_pub, publish_info, [f"I_did_not_understand_you.I_will_set_your_{info}_to_{default_info}."])
+            start_time = speech_for_whisper(p, listening_pub, plan_intent_pub, publish_info, [f"I_did_not_understand_you.I_will_set_your_{info}_to_{default_info}."])
             check = False
             message_failed = True
             continue
@@ -105,7 +109,7 @@ def request_ollama(
                     tries += 1
                     continue
         else:
-            start_time = speech_for_whisper(p, listening_pub, plan_intent_pub, publish_info, ["Please_repeat_louder."])
+            start_time = speech_for_whisper(p, listening_pub, plan_intent_pub, publish_info, [cannot_hear_text])
             continue
 
     # turning off listening after the response are complete

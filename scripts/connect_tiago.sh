@@ -5,8 +5,7 @@
 
 
 TIAGO_NUM=$1
-ETH=1
-#ETH=$2 # NEED TO REPLACE
+ETH=$2 # NEED TO REPLACE
 #echo $TIAGO_NUM
 
 # Change ROS Master

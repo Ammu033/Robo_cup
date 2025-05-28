@@ -59,9 +59,10 @@ def getfunctioncapabilities():
 
     for modulename, module in inspect.getmembers(capabilities):
                                         #  \/ horrible
-        if modulename in ["sys", "time"]:
+        print(modulename)
+        if modulename in ["sys", "time", "math"]:
             continue
-
+        
         if inspect.ismodule(module) and 'capabilities' in inspect.getfile(module):
             for functionname, function in inspect.getmembers(module):
                 if inspect.isfunction(function):

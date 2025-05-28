@@ -42,7 +42,9 @@ def test(p):
     # p.exec_action("moveTorso", "0.20")
     # p.exec_action("moveTorso", "0.05")
 
-    p.exec_action("armAction", "offer")
+    # p.exec_action("armAction", "offer")
+
+    p.exec_action("speak", "Hello!")
 
 
 if __name__ == "__main__":
