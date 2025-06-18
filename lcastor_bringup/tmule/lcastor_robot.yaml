@@ -28,7 +28,7 @@ init_cmd: |
   export_default TIAGO_TYPE "titanium"
 
   # world arguments
-  #export_default WORLD "small_office"
+  #export_default WORLD "TEST_INB3235"
   #export_default GZ_GUI "true"
 
   # navigation specific arguments

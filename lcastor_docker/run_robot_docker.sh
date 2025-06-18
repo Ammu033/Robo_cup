@@ -15,7 +15,6 @@ docker run --privileged --network host \
            --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
            -v $(pwd)/../:/home/lcastor/ros_ws/src/LCASTOR \
            -v /dev/dri:/dev/dri \
-           -v /dev/*:/dev/* \
            --rm \
            --entrypoint /home/lcastor/ros_ws/src/LCASTOR/lcastor_docker/robot_entrypoint.sh \
            -it ${image_name}  \

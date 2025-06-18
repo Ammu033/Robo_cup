@@ -12,6 +12,9 @@ find_package(catkin REQUIRED COMPONENTS
   people_msgs
   tf
   rospy
+  actionlib
+  move_base_msgs
+  
 )
 
 ## System dependencies are found with CMake's conventions
@@ -162,6 +165,8 @@ include_directories(
 # in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
   scripts/person_following.py
+  scripts/go_to_this.py
+  scripts/by_voice.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

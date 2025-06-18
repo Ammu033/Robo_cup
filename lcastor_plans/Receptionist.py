@@ -44,8 +44,8 @@ def Receptionist(p):
     get_host_name = rospy.get_param('/host/name')
     get_host_drink = rospy.get_param('/host/drink')
 
-    while not rospy.get_param('modelLoaded'): 
-        time.sleep(0.01)
+    #while not rospy.get_param('modelLoaded'): 
+       # time.sleep(0.01)
 
     p.exec_action('gotoRoom' , 'r_' + start_loc) #TODO PUT BACK
     time.sleep(2)
