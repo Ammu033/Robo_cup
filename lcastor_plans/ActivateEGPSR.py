@@ -3,8 +3,9 @@ import sys
 from ollamamessages.msg import WhisperTranscription, WhisperListening
 from ollamamessages.srv import OllamaCall
 from lcastor_grasping.srv import ObjectList, ObjectListRequest, ObjectListResponse
-from lcastor_grasping.srv import ObjectFloorPose, ObjectFloorPoseRequest, ObjectFloorPoseResponse
+from tiago_auto.srv import ObjectFloorPose, ObjectFloorPoseRequest, ObjectFloorPoseResponse
 from AskConfirmation import AskConfirmation
+import subprocess 
 
 try:
     sys.path.insert(0, os.environ["PNP_HOME"] + '/scripts')
@@ -58,20 +59,13 @@ ROOM_DICT_B = {
 LOCATIONS = list(ROOM_DICT_B.keys())
 
 POSSIBLE_PEOPLE_AREAS = [
-    'findTrashEntrance',
-    'findTrashOffice',
-    'findTrashKitchen2',
-    'findTrashLivingRoom',
+    "room_1",
+    "room_2",
+    "room_3",
+    "room_4",
 ]
 
-POSSIBLE_TRASH_AREAS = [
-    'findTrashEntrance', 
-    'findTrashOffice', 
-    'findTrashKitchen1',
-    'findTrashKitchen2',
-    'findTrashLivingRoom',
-    'inspectionpoint',
-]
+
 
 OBJECT_CATEGORY = {
     "soap":  "cleaning_supplies",
@@ -319,18 +313,50 @@ class EGPSR:
                         total_quests += 1
         except Exception as e:
             rospy.logerr(e)
+            
+    def goto_room_subprocess(self, room_name):
+        """
+        Navigate to room using subprocess call
+        """
+        try:
+            rospy.loginfo(f"Navigating to room: {room_name}")
+            result = subprocess.run([
+                'rosrun', 'tiago_auto', 'goto_.py', 'room', room_name
+            ], check=True, capture_output=True, text=True, timeout=120)
+            
+            rospy.loginfo(f"Successfully reached room: {room_name}")
+            return True
+            
+        except subprocess.CalledProcessError as e:
+            rospy.logerr(f"Navigation to {room_name} failed: {e}")
+            return False
+        except subprocess.TimeoutExpired:
+            rospy.logerr(f"Navigation to {room_name} timed out")
+            return False
+    
+    def goto_coordinates_subprocess(self, x, y, theta):
+        """
+        Navigate to specific coordinates using subprocess call
+        """
+        try:
+            rospy.loginfo(f"Navigating to coordinates: x={x}, y={y}, theta={theta}")
+            result = subprocess.run([
+                'rosrun', 'tiago_auto', 'goto_.py', 'coordinates', 
+                str(x), str(y), str(theta)
+            ], check=True, capture_output=True, text=True, timeout=120)
+            
+            rospy.loginfo(f"Successfully reached coordinates")
+            return True
+            
+        except subprocess.CalledProcessError as e:
+            rospy.logerr(f"Navigation to coordinates failed: {e}")
+            return False
+        except subprocess.TimeoutExpired:
+            rospy.logerr(f"Navigation to coordinates timed out")
+            return False
 
-    def phase_look_for_trash(self):
-        for location in POSSIBLE_TRASH_AREAS:
-            try:
-                self.p.exec_action('gotoRoom', 'r_'+location)
-                self.p.exec_action('speak', 'checking_'+location+'_for_trash')
-                self.p.exec_action('moveHead', '0.0_-0.75')
-                self.p.exec_action('moveTorso', '0.35')
-                self.scan_location_trash()
-            except Exception as e:
-                self.p.exec_action('moveHead', '0.0_0.0')
-                rospy.logerr(e)
+   
+   
 
     def scan_location_trash(self):
         try:
@@ -341,76 +367,114 @@ class EGPSR:
             detect_service_call = rospy.ServiceProxy("get_object_floor_poses", ObjectFloorPose)
             detect_service_call.wait_for_service(timeout=3.0) # wait for service to be available
 
-            trash = detect_service_call(req)
-
-            for object in trash:
-                self.send_to_trash(object)
+            trash_response = detect_service_call(req)
+            
+            if not trash_response.floor_poses:
+                rospy.loginfo("No trash detected at this location")
+                return
+            
+            # Iterate through detected trash objects
+            for floor_pose in trash_response.floor_poses:
+                rospy.loginfo(f"Found trash at position ({floor_pose.x:.2f}, {floor_pose.y:.2f}, {floor_pose.z:.2f})")
+                
+                # Send robot to pick up this trash
+                self.send_to_trash(floor_pose)
 
         except rospy.ServiceException as e:
-            rospy.logerr(e)
+            rospy.logerr(f"Service call failed: {e}")
         except Exception as e:
-            rospy.logerr(e)
+            rospy.logerr(f"Error in scan_location_trash: {e}")
+
+
+    def send_to_trash(self, object_pose):
+        """
+        Modified send_to_trash method using subprocess navigation
+        """
+        DES_DIST = 0.8
         
+        try:
+            # Obtain the current robot pose
+            robot_pose_data = rospy.wait_for_message('/robot_pose', PoseWithCovarianceStamped, timeout=2.0)
+            q = (
+                robot_pose_data.pose.pose.orientation.x,
+                robot_pose_data.pose.pose.orientation.y,
+                robot_pose_data.pose.pose.orientation.z,
+                robot_pose_data.pose.pose.orientation.w
+            )
+            m = tf.transformations.quaternion_matrix(q)
+            robot_pose_x = robot_pose_data.pose.pose.position.x
+            robot_pose_y = robot_pose_data.pose.pose.position.y
 
-    def send_to_trash(self, object_poses):
-        DES_DIST = 1.2
-        # object poses in the map frame 
-        global goal_msg, robot_pose, person_point
-        # Obtain the current robot pose
-        robot_pose_data  = rospy.wait_for_message('/robot_pose' , PoseWithCovarianceStamped )
-        q = (
-                    robot_pose_data.pose.pose.orientation.x,
-                    robot_pose_data.pose.pose.orientation.y,
-                    robot_pose_data.pose.pose.orientation.z,
-                    robot_pose_data.pose.pose.orientation.w
-                )
-        m = tf.transformations.quaternion_matrix(q)
-        robot_pose_x = robot_pose_data.pose.pose.position.x
-        robot_pose_y = robot_pose_data.pose.pose.position.y
-        robot_pose_theta = tf.transformations.euler_from_matrix(m)[2]
-
-        # Compute distance in cartesian space between obj and robot
-        obj_pos = np.array([object_poses.point.x , object_poses.point.y])
-        robot_pos = np.array([robot_pose_x , robot_pose_y])
-        vector_to_obj = obj_pos - robot_pos
-        distance_to_obj = math.sqrt(vector_to_obj[0]**2 + vector_to_obj[1]**2)
-        # Normalize the vector to the desired distance
-        normalized_vector = vector_to_obj / distance_to_obj
-        # Calculate the orientation needed to reach the obj
-        goal_orientation = math.atan2(normalized_vector[1], normalized_vector[0])
-        # Calculate the goal position based on the desired distance
-        goal_position = obj_pos - DES_DIST * normalized_vector
-        self.p.exec_action('goto', str(goal_position[0]) + "_" + str(goal_position[1]) + '_' + str(goal_orientation))
-        self.p.exec_action('speak', 'Please_help_me_pick_up_the_trash,_Place_it_into_my_gripper')
-        self.p.exec_action("gripperAction", "open")
-        time.sleep(self.time_open_gripper)
-        self.p.exec_action("gripperAction", "close")
-        time.sleep(3)
-        self.p.exec_action('speech', 'thank_you')
-        self.p.exec_action("gotoRoom", "r_trashcan")
-
-        self.p.exec_action('speak', 'Please_help_me_removing_the_trash_from_my_hand')
-        self.p.exec_action("gripperAction", "open")
-        time.sleep(self.time_open_gripper)
-        self.p.exec_action("gripperAction", "close")
-        time.sleep(3)
-        self.p.exec_action('speech', 'thank_you')
-
+            # Compute goal position
+            obj_pos = np.array([object_pose.x, object_pose.y])
+            robot_pos = np.array([robot_pose_x, robot_pose_y])
+            vector_to_obj = obj_pos - robot_pos
+            distance_to_obj = math.sqrt(vector_to_obj[0]**2 + vector_to_obj[1]**2)
+            
+            if distance_to_obj == 0:
+                rospy.logwarn("Object is at robot position, skipping")
+                return
+                
+            normalized_vector = vector_to_obj / distance_to_obj
+            goal_orientation = math.atan2(normalized_vector[1], normalized_vector[0])
+            goal_position = obj_pos - DES_DIST * normalized_vector
+            
+            # Navigate to the object using subprocess
+            if not self.goto_coordinates_subprocess(goal_position[0], goal_position[1], goal_orientation):
+                rospy.logerr("Failed to navigate to trash object")
+                return
+            
+            # Ask for help to pick up trash
+            self.p.exec_action('speak', 'I_found_trash_here._Please_help_me_pick_it_up_and_place_it_in_my_gripper')
+            self.p.exec_action("gripperAction", "open")
+            time.sleep(self.time_open_gripper)
+            self.p.exec_action("gripperAction", "close")
+            time.sleep(3)
+            self.p.exec_action('speak', 'thank_you')
+            
+            # Go to trash can using subprocess
+            if not self.goto_room_subprocess("trashcan"):
+                rospy.logerr("Failed to navigate to trash can")
+                return
+            
+            # Ask for help to dispose trash
+            self.p.exec_action('speak', 'Please_help_me_remove_the_trash_from_my_gripper')
+            self.p.exec_action("gripperAction", "open")
+            time.sleep(self.time_open_gripper)
+            self.p.exec_action("gripperAction", "close")
+            time.sleep(3)
+            self.p.exec_action('speak', 'thank_you')
+            
+        except Exception as e:
+            rospy.logerr(f"Error in send_to_trash: {e}")
 
 
-    def phase_look_for_incorrectly_placed_objects(self):
-        head_tilt = '0.0_-0.8'
-        for location in CATRGORY_LOCATION.keys():
-            try: 
-                self.p.exec_action('gotoRoom', 'r_'+location)
-                self.p.exec_action('speak', 'checking_'+location+'_for_misplaced_items')
-                self.p.exec_action('moveHead', head_tilt)
-                self.scan_location_objects(location)
-                self.p.exec_action('moveHead', '0.0_0.0')
+
+    def phase_look_for_trash(self):
+        """
+        Modified trash searching phase using subprocess navigation
+        """
+        POSSIBLE_TRASH_AREAS = [
+            "room_4", 
+            "room_2",
+            "room_3",
+            "room_1",
+        ]
+        
+        for location in POSSIBLE_TRASH_AREAS:
+            try:
+                # Navigate using subprocess
+                if not self.goto_room_subprocess(location):
+                    rospy.logerr(f"Failed to navigate to {location}")
+                    continue
+                    
+                self.p.exec_action('moveHead', '0.0_-0.75')
+                self.p.exec_action('moveTorso', '0.35')
+                self.scan_location_trash()
+                
             except Exception as e:
+                self.p.exec_action('moveHead', '0.0_0.0')
                 rospy.logerr(e)
-                rospy.loginfo(location +' failed, moving onto the next location' )
-
 
     def object_location(self, object):
         location = 'unknown'
