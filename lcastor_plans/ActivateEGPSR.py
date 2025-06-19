@@ -6,6 +6,9 @@ from lcastor_grasping.srv import ObjectList, ObjectListRequest, ObjectListRespon
 from tiago_auto.srv import ObjectFloorPose, ObjectFloorPoseRequest, ObjectFloorPoseResponse
 from AskConfirmation import AskConfirmation
 import subprocess 
+import threading
+import time
+import queue
 
 try:
     sys.path.insert(0, os.environ["PNP_HOME"] + '/scripts')
@@ -24,39 +27,6 @@ import numpy as np
 import math
 import tf
 from geometry_msgs.msg import PointStamped , PoseWithCovarianceStamped
-
-ROOM_DICT_B = { 
-    "hallwaycabinet" : [-2.93, -4.47, 0.0, 0.0, 0.99, -0.08],
-    "hallway" : [-1.41, -2.64, 0.0, 0.0, 0.95, -0.30],
-    "entrance" : [-1.41, -2.64, 0.0, 0.0, 0.95, -0.30],
-    "desk" : [-2.79, -0.46, 0.0, 0.0, -0.78, 0.61],
-    "office" : [-0.96, -1.21, 0.0, 0.0, 0.85, 0.52],
-    "studio" : [-0.96, -1.21, 0.0, 0.0, 0.85, 0.52],
-    "shelf" : [-3.03, 1.55, 0.0, 0.0, 0.99, 0.03],
-    "coathanger" : [-1.73, -2.89, 0.0, 0.0, 0.89, 0.44],
-    "exit" : [-0.99, 1.61, 0.0, 0.0, 0.67, 0.73],
-    "TVtable" : [1.01, -4.53, 0.0, 0.0, 0.99, -0.05],
-    "loungechair" : [1.64, -4.85, 0.0, 0.0, -0.09, 0.99],
-    "lamp" : [3.26, -5.12, 0.0, 0.0, -0.12, 0.99],
-    "couch" : [3.6, -2.60, 0.0, 0.0, -0.35, 0.93],
-    "coffetable" : [2.45, -3.20, 0.0, 0.0, -0.55, 0.83],
-    "lounge" : [2.72, -1.96, 0.0, 0.0, -0.67, 0.73],
-    "livingroom" : [2.72, -1.96, 0.0, 0.0, -0.67, 0.73],
-    "trashcan" : [0.58, -1.16, 0.0, 0.0, 0.98, -0.17],
-    "kitchen" : [3.34, -1.76, 0.0, 0.0, 0.84, 0.54],
-    "kitchencabinet" : [0.62, 2.29, 0.0, 0.0, 0.99, 0.03],
-    "dinnertable" : [1.44, 1.28, 0.0, 0.0, -0.02, 0.99],
-    "dishwasher" : [3.67, 0.73, 0.0, 0.0, 0.04, 0.99],
-    "kitchencounter" : [3.80, 1.98, 0.0, 0.0, 0.-0.0, 0.99],
-    "inspectionpoint" : [0.19, -2.69, 0.0, 0.0, -0.48, 0.87],
-    "findTrashEntrance" : [-0.61, 5.89, 0.0, 0.0, 0.05, 0.99],
-    "findTrashOffice" : [0.30, 4.63, 0.0 , 0.0, 0.91, -0.41],
-    "findTrashKitchen1" : [-3.18, 7.15, 0.0, 0.0, 0.97, -0.24],
-    "findTrashKitchen2" : [-5.74, 10.44, 0.0, 0.0, -0.82, 0.57],
-    "findTrashLivingRoom" : [-5.74, 10.40, 0.0, 0.0, -0.07, 0.99],
-}
-
-LOCATIONS = list(ROOM_DICT_B.keys())
 
 POSSIBLE_PEOPLE_AREAS = [
     "room_1",
@@ -132,6 +102,15 @@ class EGPSR:
         self.dynamic_energy = False
         self.no_speech_thresh = 0.2
         self.time_open_gripper = 4 
+        self.continuous_scanning = False
+        self.scanning_thread = None
+        self.current_destination = None
+        self.planned_locations = []
+        self.location_index = 0
+        self.navigation_interrupted = False
+        self.trash_detected_event = threading.Event()
+        self.current_trash_location = None
+        self.trash_lock = threading.Lock()
 
         rospy.set_param("/stt/use_ollama", False)
         rospy.set_param("/stt/speech_recogn_pause_time", self.pause)
@@ -295,6 +274,7 @@ class EGPSR:
         print('Go To Command Successfully Sent')
         rospy.set_param('reached_person' , True)
         gotopersonDone = True
+        
     def phase_look_for_people(self) -> None:
         ''' THERE SHOULD ONLY BE 2 PEOPLE WITH TASKS'''
         # 1. go sensible people locations (outer while loop or 2 people found)
@@ -312,8 +292,356 @@ class EGPSR:
                         self.obtain_quest_from_person()
                         total_quests += 1
         except Exception as e:
-            rospy.logerr(e)
+            rospy.logerr(e)           
+
+
+    def phase_look_for_trash_with_interrupts(self):
+
+        POSSIBLE_TRASH_AREAS = [
+            "room_4", 
+            "room_2",
+            "room_3", 
+            "room_1",
+        ]
+        
+        self.planned_locations = POSSIBLE_TRASH_AREAS.copy()
+        self.location_index = 0
+        
+        # Start interrupt-based scanning
+        self.start_interrupt_trash_scanning()
+        
+        try:
+            # Visit each planned location
+            while self.location_index < len(self.planned_locations):
+                location = self.planned_locations[self.location_index]
+                
+                rospy.loginfo(f"Phase: Going to {location} (Location {self.location_index + 1}/{len(self.planned_locations)})")
+                
+                # Navigate with interrupt monitoring
+                self.navigate_to_location_with_interrupts(location)
+                
+                # Do detailed scan at destination
+                rospy.loginfo(f"Arrived at {location}, performing detailed scan...")
+                self.p.exec_action('moveHead', '0.0_-0.75')
+                self.p.exec_action('moveTorso', '0.35')
+                
+                # Scan for any remaining trash at this location
+                self.scan_location_trash()
+                
+                # Move to next location
+                self.location_index += 1
+                
+                # Brief pause between locations
+                time.sleep(2)
             
+            rospy.loginfo("Completed all planned trash collection locations")
+            
+        except Exception as e:
+            rospy.logerr(f"Error in interrupt-based trash phase: {e}")
+        finally:
+            # Stop interrupt scanning
+            self.stop_interrupt_trash_scanning()
+    
+    def start_interrupt_trash_scanning(self):
+      
+        self.continuous_scanning = True
+        self.scanning_thread = threading.Thread(target=self.interrupt_trash_scan_worker)
+        self.scanning_thread.daemon = True
+        self.scanning_thread.start()
+        rospy.loginfo("Started interrupt-based trash scanning")
+        
+    def stop_interrupt_trash_scanning(self):
+       
+        self.continuous_scanning = False
+        if self.scanning_thread:
+            self.scanning_thread.join()
+        rospy.loginfo("Stopped interrupt-based trash scanning")
+    
+    def interrupt_trash_scan_worker(self):
+        
+        scan_interval = 1.5  # Scan every 1.5 seconds for responsiveness
+        
+        while self.continuous_scanning:
+            try:
+                # Only scan if we're currently navigating
+                if self.current_destination is not None:
+                    req = ObjectFloorPoseRequest()
+                    req.z_cutoff = 0.5
+                    
+                    detect_service_call = rospy.ServiceProxy("get_object_floor_poses", ObjectFloorPose)
+                    trash_response = detect_service_call(req)
+                    
+                    if trash_response.floor_poses:
+                        # Found trash! Trigger interrupt
+                        closest_trash = self.find_closest_trash(trash_response.floor_poses)
+                        
+                        with self.trash_lock:
+                            self.current_trash_location = closest_trash
+                            self.navigation_interrupted = True
+                            self.trash_detected_event.set()
+                        
+                        rospy.loginfo(f"INTERRUPT: Trash detected at ({closest_trash.x:.2f}, {closest_trash.y:.2f})!")
+                        rospy.loginfo(f"Interrupting navigation to {self.current_destination}")
+                        
+                        # Wait until trash is collected before continuing to scan
+                        while self.navigation_interrupted:
+                            time.sleep(0.5)
+                
+                time.sleep(scan_interval)
+                
+            except Exception as e:
+                rospy.logerr(f"Error in interrupt trash scanning: {e}")
+                time.sleep(scan_interval)
+            
+    def find_closest_trash(self, trash_poses):
+      
+        try:
+            robot_pose_data = rospy.wait_for_message('/robot_pose', PoseWithCovarianceStamped, timeout=1.0)
+            robot_x = robot_pose_data.pose.pose.position.x
+            robot_y = robot_pose_data.pose.pose.position.y
+            
+            closest_trash = None
+            min_distance = float('inf')
+            
+            for trash_pose in trash_poses:
+                distance = math.sqrt((trash_pose.x - robot_x)**2 + (trash_pose.y - robot_y)**2)
+                if distance < min_distance:
+                    min_distance = distance
+                    closest_trash = trash_pose
+            
+            return closest_trash
+            
+        except Exception as e:
+            rospy.logerr(f"Error finding closest trash: {e}")
+            return trash_poses[0] if trash_poses else None
+        
+    def handle_trash_interrupt(self):
+       
+        with self.trash_lock:
+            if self.current_trash_location:
+                rospy.loginfo("Handling trash interrupt...")
+                
+                # Stop current navigation (if possible)
+                self.stop_current_navigation()
+                
+                # Collect the trash
+                rospy.loginfo("Collecting detected trash...")
+                self.collect_trash_immediately(self.current_trash_location)
+                
+                # Go to bin
+                rospy.loginfo("Going to bin to dispose trash...")
+                if not self.goto_room_subprocess("Bin"):
+                    rospy.logerr("Failed to navigate to bin")
+                else:
+                    # Dispose trash at bin
+                    self.dispose_trash_at_bin()
+                
+                # Clear interrupt state
+                self.current_trash_location = None
+                self.navigation_interrupted = False
+                self.trash_detected_event.clear()
+                
+                rospy.loginfo("Trash interrupt handled, resuming original plan...")
+    
+    def stop_current_navigation(self):
+       
+        try:
+            # Send cancel goal to move_base if using actionlib
+            # This is a simplified version - you might need to adapt based on your navigation system
+            rospy.loginfo("Attempting to stop current navigation...")
+            # subprocess.run(['rosnode', 'kill', '/move_base'], check=False)
+            time.sleep(1)  # Brief pause to ensure navigation stops
+        except Exception as e:
+            rospy.logerr(f"Error stopping navigation: {e}")
+    
+    def collect_trash_immediately(self, trash_pose):
+      
+        try:
+            # Get current robot position
+            robot_pose_data = rospy.wait_for_message('/robot_pose', PoseWithCovarianceStamped, timeout=2.0)
+            robot_x = robot_pose_data.pose.pose.position.x
+            robot_y = robot_pose_data.pose.pose.position.y
+            
+            # Calculate vector from robot to trash
+            trash_pos = np.array([trash_pose.x, trash_pose.y])
+            robot_pos = np.array([robot_x, robot_y])
+            vector_to_trash = trash_pos - robot_pos
+            
+            # Calculate orientation to face the trash
+            orientation_to_trash = math.atan2(vector_to_trash[1], vector_to_trash[0])
+            
+            # Calculate approach position (stay a bit away from trash)
+            distance_to_trash = math.sqrt(vector_to_trash[0]**2 + vector_to_trash[1]**2)
+            APPROACH_DISTANCE = 0.8  # meters
+            
+            if distance_to_trash > APPROACH_DISTANCE:
+                # Move closer to trash while facing it
+                normalized_vector = vector_to_trash / distance_to_trash
+                approach_pos = trash_pos - APPROACH_DISTANCE * normalized_vector
+                approach_x, approach_y = approach_pos[0], approach_pos[1]
+            else:
+                # Already close enough, just turn to face it
+                approach_x, approach_y = robot_x, robot_y
+            
+            rospy.loginfo(f"Moving to approach trash at ({approach_x:.2f}, {approach_y:.2f}) facing angle {orientation_to_trash:.2f}")
+            
+            # Navigate to approach position facing the trash
+            if not self.goto_coordinates_subprocess(approach_x, approach_y, orientation_to_trash):
+                rospy.logerr("Failed to navigate to trash approach position")
+                return
+            
+            # Position robot for pickup
+            self.p.exec_action('moveHead', '0.0_-0.75')
+            self.p.exec_action('moveTorso', '0.35')
+            
+            # Collect trash
+            self.p.exec_action('speak', 'I_found_trash._Please_help_me_pick_it_up')
+            self.p.exec_action("gripperAction", "open")
+            time.sleep(self.time_open_gripper)
+            self.p.exec_action("gripperAction", "close")
+            time.sleep(2)
+            self.p.exec_action('speak', 'thank_you')
+            
+        except Exception as e:
+            rospy.logerr(f"Error collecting trash: {e}")
+    
+    def dispose_trash_at_bin(self):
+        
+        try:
+            #self.p.exec_action('speak', 'Please_help_me_dispose_this_trash')
+            self.p.exec_action("gripperAction", "open")
+            time.sleep(self.time_open_gripper)
+            self.p.exec_action("gripperAction", "close")
+            time.sleep(2)
+            #self.p.exec_action('speak', 'thank_you')
+            
+        except Exception as e:
+            rospy.logerr(f"Error disposing trash: {e}")
+    
+    def navigate_to_location_with_interrupts(self, location):
+        
+        self.current_destination = location
+        rospy.loginfo(f"Starting navigation to {location} with interrupt monitoring...")
+        
+        # Start the navigation in a separate thread so we can monitor for interrupts
+        nav_thread = threading.Thread(target=self.navigate_to_location_thread, args=(location,))
+        nav_thread.daemon = True
+        nav_thread.start()
+        
+        # Monitor for trash interrupts
+        while nav_thread.is_alive():
+            if self.trash_detected_event.wait(timeout=1.0):  # Check every second
+                rospy.loginfo("Trash interrupt detected during navigation!")
+                
+                # Handle the interrupt
+                self.handle_trash_interrupt()
+                
+                # Resume navigation to original destination
+                rospy.loginfo(f"Resuming navigation to {location}")
+                nav_thread = threading.Thread(target=self.navigate_to_location_thread, args=(location,))
+                nav_thread.daemon = True
+                nav_thread.start()
+        
+        # Navigation completed
+        self.current_destination = None
+        rospy.loginfo(f"Successfully reached {location}")
+    
+    def navigate_to_location_thread(self, location):
+        """Thread worker for navigation"""
+        try:
+            self.goto_room_subprocess(location)
+        except Exception as e:
+            rospy.logerr(f"Navigation thread error: {e}")
+                
+    def scan_location_trash(self):
+        try:
+            # find all trash 
+            req = ObjectFloorPoseRequest()
+            req.z_cutoff = 0.5
+
+            detect_service_call = rospy.ServiceProxy("get_object_floor_poses", ObjectFloorPose)
+            detect_service_call.wait_for_service(timeout=3.0) # wait for service to be available
+
+            trash_response = detect_service_call(req)
+            
+            if not trash_response.floor_poses:
+                rospy.loginfo("No trash detected at this location")
+                return
+            
+            # Iterate through detected trash objects
+            for floor_pose in trash_response.floor_poses:
+                rospy.loginfo(f"Found trash at position ({floor_pose.x:.2f}, {floor_pose.y:.2f}, {floor_pose.z:.2f})")
+                
+                # Send robot to pick up this trash
+                self.send_to_trash(floor_pose)
+
+        except rospy.ServiceException as e:
+            rospy.logerr(f"Service call failed: {e}")
+        except Exception as e:
+            rospy.logerr(f"Error in scan_location_trash: {e}")
+            
+    def send_to_trash(self, object_pose):
+        """
+        using subprocess navigation
+        """
+        DES_DIST = 0.8
+        
+        try:
+            # Obtain the current robot pose
+            robot_pose_data = rospy.wait_for_message('/robot_pose', PoseWithCovarianceStamped, timeout=2.0)
+            q = (
+                robot_pose_data.pose.pose.orientation.x,
+                robot_pose_data.pose.pose.orientation.y,
+                robot_pose_data.pose.pose.orientation.z,
+                robot_pose_data.pose.pose.orientation.w
+            )
+            m = tf.transformations.quaternion_matrix(q)
+            robot_pose_x = robot_pose_data.pose.pose.position.x
+            robot_pose_y = robot_pose_data.pose.pose.position.y
+
+            # Compute goal position
+            obj_pos = np.array([object_pose.x, object_pose.y])
+            robot_pos = np.array([robot_pose_x, robot_pose_y])
+            vector_to_obj = obj_pos - robot_pos
+            distance_to_obj = math.sqrt(vector_to_obj[0]**2 + vector_to_obj[1]**2)
+            
+            if distance_to_obj == 0.8 :
+                rospy.logwarn("Object is quite close to robot position, skipping")
+                return
+                
+            normalized_vector = vector_to_obj / distance_to_obj
+            goal_orientation = math.atan2(normalized_vector[1], normalized_vector[0])
+            goal_position = obj_pos - DES_DIST * normalized_vector
+            
+            # Navigate to the object using subprocess
+            if not self.goto_coordinates_subprocess(goal_position[0], goal_position[1], goal_orientation):
+                rospy.logerr("Failed to navigate to trash object")
+                return
+            
+            # Ask for help to pick up trash
+            #self.p.exec_action('speak', 'I_found_trash_here._Please_help_me_pick_it_up_and_place_it_in_my_gripper')
+            self.p.exec_action("gripperAction", "open")
+            time.sleep(self.time_open_gripper)
+            self.p.exec_action("gripperAction", "close")
+            time.sleep(3)
+            #self.p.exec_action('speak', 'thank_you')
+            
+            # Go to trash can using subprocess
+            if not self.goto_room_subprocess("Bin"):
+                rospy.logerr("Failed to navigate to trash can")
+                return
+            
+            # Ask for help to dispose trash
+            #self.p.exec_action('speak', 'Please_help_me_remove_the_trash_from_my_gripper')
+            self.p.exec_action("gripperAction", "open")
+            time.sleep(self.time_open_gripper)
+            self.p.exec_action("gripperAction", "close")
+            time.sleep(3)
+            self.p.exec_action('speak', 'thank_you')
+            
+        except Exception as e:
+            rospy.logerr(f"Error in send_to_bin: {e}")
+
     def goto_room_subprocess(self, room_name):
         """
         Navigate to room using subprocess call
@@ -354,127 +682,8 @@ class EGPSR:
         except subprocess.TimeoutExpired:
             rospy.logerr(f"Navigation to coordinates timed out")
             return False
-
-   
    
 
-    def scan_location_trash(self):
-        try:
-            # find all trash 
-            req = ObjectFloorPoseRequest()
-            req.z_cutoff = 0.5
-
-            detect_service_call = rospy.ServiceProxy("get_object_floor_poses", ObjectFloorPose)
-            detect_service_call.wait_for_service(timeout=3.0) # wait for service to be available
-
-            trash_response = detect_service_call(req)
-            
-            if not trash_response.floor_poses:
-                rospy.loginfo("No trash detected at this location")
-                return
-            
-            # Iterate through detected trash objects
-            for floor_pose in trash_response.floor_poses:
-                rospy.loginfo(f"Found trash at position ({floor_pose.x:.2f}, {floor_pose.y:.2f}, {floor_pose.z:.2f})")
-                
-                # Send robot to pick up this trash
-                self.send_to_trash(floor_pose)
-
-        except rospy.ServiceException as e:
-            rospy.logerr(f"Service call failed: {e}")
-        except Exception as e:
-            rospy.logerr(f"Error in scan_location_trash: {e}")
-
-
-    def send_to_trash(self, object_pose):
-        """
-        Modified send_to_trash method using subprocess navigation
-        """
-        DES_DIST = 0.8
-        
-        try:
-            # Obtain the current robot pose
-            robot_pose_data = rospy.wait_for_message('/robot_pose', PoseWithCovarianceStamped, timeout=2.0)
-            q = (
-                robot_pose_data.pose.pose.orientation.x,
-                robot_pose_data.pose.pose.orientation.y,
-                robot_pose_data.pose.pose.orientation.z,
-                robot_pose_data.pose.pose.orientation.w
-            )
-            m = tf.transformations.quaternion_matrix(q)
-            robot_pose_x = robot_pose_data.pose.pose.position.x
-            robot_pose_y = robot_pose_data.pose.pose.position.y
-
-            # Compute goal position
-            obj_pos = np.array([object_pose.x, object_pose.y])
-            robot_pos = np.array([robot_pose_x, robot_pose_y])
-            vector_to_obj = obj_pos - robot_pos
-            distance_to_obj = math.sqrt(vector_to_obj[0]**2 + vector_to_obj[1]**2)
-            
-            if distance_to_obj == 0:
-                rospy.logwarn("Object is at robot position, skipping")
-                return
-                
-            normalized_vector = vector_to_obj / distance_to_obj
-            goal_orientation = math.atan2(normalized_vector[1], normalized_vector[0])
-            goal_position = obj_pos - DES_DIST * normalized_vector
-            
-            # Navigate to the object using subprocess
-            if not self.goto_coordinates_subprocess(goal_position[0], goal_position[1], goal_orientation):
-                rospy.logerr("Failed to navigate to trash object")
-                return
-            
-            # Ask for help to pick up trash
-            self.p.exec_action('speak', 'I_found_trash_here._Please_help_me_pick_it_up_and_place_it_in_my_gripper')
-            self.p.exec_action("gripperAction", "open")
-            time.sleep(self.time_open_gripper)
-            self.p.exec_action("gripperAction", "close")
-            time.sleep(3)
-            self.p.exec_action('speak', 'thank_you')
-            
-            # Go to trash can using subprocess
-            if not self.goto_room_subprocess("trashcan"):
-                rospy.logerr("Failed to navigate to trash can")
-                return
-            
-            # Ask for help to dispose trash
-            self.p.exec_action('speak', 'Please_help_me_remove_the_trash_from_my_gripper')
-            self.p.exec_action("gripperAction", "open")
-            time.sleep(self.time_open_gripper)
-            self.p.exec_action("gripperAction", "close")
-            time.sleep(3)
-            self.p.exec_action('speak', 'thank_you')
-            
-        except Exception as e:
-            rospy.logerr(f"Error in send_to_trash: {e}")
-
-
-
-    def phase_look_for_trash(self):
-        """
-        Modified trash searching phase using subprocess navigation
-        """
-        POSSIBLE_TRASH_AREAS = [
-            "room_4", 
-            "room_2",
-            "room_3",
-            "room_1",
-        ]
-        
-        for location in POSSIBLE_TRASH_AREAS:
-            try:
-                # Navigate using subprocess
-                if not self.goto_room_subprocess(location):
-                    rospy.logerr(f"Failed to navigate to {location}")
-                    continue
-                    
-                self.p.exec_action('moveHead', '0.0_-0.75')
-                self.p.exec_action('moveTorso', '0.35')
-                self.scan_location_trash()
-                
-            except Exception as e:
-                self.p.exec_action('moveHead', '0.0_0.0')
-                rospy.logerr(e)
 
     def object_location(self, object):
         location = 'unknown'
@@ -543,13 +752,12 @@ class EGPSR:
 
     
     def start(self):
-        # 1. Wait for the door open
-        
-        
+        """Modified start method using interrupt-based trash collection"""
         self.p.exec_action('moveHead', '0.0_0.0')
         self.p.exec_action('moveTorso', '0.15')
 
-        self.phase_look_for_trash()
+        # Use interrupt-based trash detection
+        self.phase_look_for_trash_with_interrupts()
          
         self.p.exec_action('moveHead', '0.0_0.0')
         self.p.exec_action('moveTorso', '0.15')
@@ -559,12 +767,13 @@ class EGPSR:
         self.p.exec_action('moveHead', '0.0_0.0')
         self.p.exec_action('moveTorso', '0.25')
 
-        self.phase_look_for_trash()
+        # Second pass for any missed trash
+        self.phase_look_for_trash_with_interrupts()
          
         self.p.exec_action('moveHead', '0.0_0.0')
         self.p.exec_action('moveTorso', '0.0_0.0')
 
-        self.phase_look_for_people(max_people = 2)
+        self.phase_look_for_people()
 
 if __name__ == "__main__":
     p = PNPCmd()
