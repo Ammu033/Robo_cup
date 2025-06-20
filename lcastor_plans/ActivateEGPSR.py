@@ -366,7 +366,7 @@ class EGPSR:
                 # Only scan if we're currently navigating
                 if self.current_destination is not None:
                     req = ObjectFloorPoseRequest()
-                    req.z_cutoff = 0.5
+                    req.z_cutoff = 0.25
                     
                     detect_service_call = rospy.ServiceProxy("get_object_floor_poses", ObjectFloorPose)
                     trash_response = detect_service_call(req)
@@ -557,7 +557,7 @@ class EGPSR:
         try:
             # find all trash 
             req = ObjectFloorPoseRequest()
-            req.z_cutoff = 0.5
+            req.z_cutoff = 0.25
 
             detect_service_call = rospy.ServiceProxy("get_object_floor_poses", ObjectFloorPose)
             detect_service_call.wait_for_service(timeout=3.0) # wait for service to be available
@@ -762,7 +762,7 @@ class EGPSR:
         self.p.exec_action('moveHead', '0.0_0.0')
         self.p.exec_action('moveTorso', '0.15')
 
-        self.phase_look_for_incorrectly_placed_objects()
+        #self.phase_look_for_incorrectly_placed_objects()
          
         self.p.exec_action('moveHead', '0.0_0.0')
         self.p.exec_action('moveTorso', '0.25')
