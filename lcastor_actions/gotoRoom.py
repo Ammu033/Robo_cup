@@ -1,5 +1,6 @@
 import os
 import sys
+import yaml
 
 try:
     sys.path.insert(0, os.environ["PNP_HOME"] + '/actions')
@@ -18,67 +19,58 @@ import copy
 Starts and stops the object detection node
 """
 
-ROOM_DICT_B = { 
-    "hallwaycabinet" : [-2.93, -4.47, 0.0, 0.0, 0.99, -0.08],
-    "hallway" : [-1.41, -2.64, 0.0, 0.0, 0.95, -0.30],
-    "entrance" : [-1.75, -0.25, 0.0, 0.0, -0.10, -0.99],
-    "desk" : [-2.79, -0.46, 0.0, 0.0, -0.78, 0.61],
-    "office" : [-0.96, -1.21, 0.0, 0.0, 0.85, 0.52],
-    "studio" : [-0.96, -1.21, 0.0, 0.0, 0.85, 0.52],
-    "shelf" : [-3.03, 1.55, 0.0, 0.0, 0.99, 0.03],
-    "coathanger" : [-1.73, -2.89, 0.0, 0.0, 0.89, 0.44],
-    "exit" : [-0.99, 1.61, 0.0, 0.0, 0.67, 0.73],
-    "TVtable" : [1.01, -4.53, 0.0, 0.0, 0.99, -0.05],
-    "loungechair" : [1.64, -4.85, 0.0, 0.0, -0.09, 0.99],
-    "lamp" : [3.26, -5.12, 0.0, 0.0, -0.12, 0.99],
-    "couch" : [3.6, -2.60, 0.0, 0.0, -0.35, 0.93],
-    "coffetable" : [2.45, -3.20, 0.0, 0.0, -0.55, 0.83],
-    "lounge" : [2.72, -1.96, 0.0, 0.0, -0.67, 0.73],
-    "livingroom" : [2.72, -1.96, 0.0, 0.0, -0.67, 0.73],
-    "trashcan" : [0.58, -1.16, 0.0, 0.0, 0.98, -0.17],
-    "kitchen" : [3.34, -1.76, 0.0, 0.0, 0.84, 0.54],
-    "kitchencabinet" : [0.62, 2.29, 0.0, 0.0, 0.99, 0.03],
-    "dinnertable" : [1.44, 1.28, 0.0, 0.0, -0.02, 0.99],
-    "dishwasher" : [3.67, 0.73, 0.0, 0.0, 0.04, 0.99],
-    "kitchencounter" : [3.80, 1.98, 0.0, 0.0, 0.-0.0, 0.99],
-    "inspectionpoint" : [0.19, -2.69, 0.0, 0.0, -0.48, 0.87],
-    "findTrashEntrance" : [-0.61, 5.89, 0.0, 0.0, 0.05, 0.99],
-    "findTrashOffice" : [0.30, 4.63, 0.0 , 0.0, 0.91, -0.41],
-    "findTrashKitchen1" : [-3.18, 7.15, 0.0, 0.0, 0.97, -0.24],
-    "findTrashKitchen2" : [-5.74, 10.44, 0.0, 0.0, -0.82, 0.57],
-    "findTrashLivingRoom" : [-5.74, 10.40, 0.0, 0.0, -0.07, 0.99],
-}
+def load_yaml_as_room_dict(yaml_path):
+    """Load YAML file and convert to room dictionary format"""
+    try:
+        rospy.loginfo(f"Attempting to load YAML file: {yaml_path}")
+        
+        # Check if file exists
+        if not os.path.exists(yaml_path):
+            rospy.logerr(f"YAML file does not exist: {yaml_path}")
+            return {}
+            
+        # Check if file is readable
+        if not os.access(yaml_path, os.R_OK):
+            rospy.logerr(f"No read permission for YAML file: {yaml_path}")
+            return {}
+            
+        with open(yaml_path, 'r') as file:
+            yaml_data = yaml.safe_load(file)
+            rospy.loginfo(f"Successfully loaded YAML with {len(yaml_data)} rooms")
+            
+            room_dict = {}
+            for room_name, pose_data in yaml_data.items():
+                pos = pose_data.get('position', {})
+                orient = pose_data.get('orientation', {})
+                # Convert to legacy format [x, y, z, 0.0, qz, qw]
+                room_dict[room_name] = [
+                    pos.get('x', 0.0),
+                    pos.get('y', 0.0), 
+                    pos.get('z', 0.0),
+                    0.0,
+                    orient.get('z', 0.0),
+                    orient.get('w', 1.0)
+                ]
+            rospy.loginfo(f"Converted {len(room_dict)} rooms to legacy format")
+            return room_dict
+            
+    except PermissionError as e:
+        rospy.logerr(f"Permission denied accessing YAML file {yaml_path}: {e}")
+        return {}
+    except FileNotFoundError as e:
+        rospy.logerr(f"YAML file not found {yaml_path}: {e}")
+        return {}
+    except yaml.YAMLError as e:
+        rospy.logerr(f"YAML parsing error in {yaml_path}: {e}")
+        return {}
+    except Exception as e:
+        rospy.logerr(f"Unexpected error loading YAML {yaml_path}: {e}")
+        return {}
 
-ROOM_DICT_C = { 
-    "hallwaycabinet" : [2.62, 2.37, 0.0, 0.0, -0.59, 0.80],
-    "hallway" : [0.05, 5.02, 0.0, 0.0, 0.74, 0.66],
-    "entrance" : [-1.75, -0.25, 0.0, 0.0, -0.10, -0.99],
-    "desk" : [-2.19, 1.67, 0.0, 0.0, -0.04, 0.99],
-    "office" : [-2.42, 3.613, 0.0, 0.0, -0.806, 0.592],
-    "studio" : [-2.42, 3.613, 0.0, 0.0, -0.806, 0.592],
-    "shelf" : [-3.03, 1.60, 0.0, 0.0, -0.69, 0.72],
-    "coathanger" : [0.45, 2.79, 0.0, 0.0, 0.99, 0.07],
-    "exit" : [-4.49, 3.42, 0.0, 0.0, 0.99, -0.03],
-    "TVtable" : [1.75, 6.01, 0.0, 0.0, -0.64, 0.76],
-    "loungechair" : [2.27, 6.86, 0.0, 0.0, 0.68, 0.72],
-    "lamp" : [2.31, 8.44, 0.0, 0.0, 0.68, 0.73],
-    "couch" : [-0.85, 8.13, 0.0, 0.0, 0.17, 0.98],
-    "coffetable" : [0.89, 6.58, 0.0, 0.0, 0.68, 0.728],
-    "livingroom" : [0.89, 6.58, 0.0, 0.0, 0.68, 0.728],
-    "lounge" : [0.89, 6.58, 0.0, 0.0, 0.68, 0.728],
-    "trashcan" : [-1.68, 5.27, 0.0, 0.0, -0.33, 0.94],
-    "kitchencabinet" : [-4.59, 5.25, 0.0, 0.0, -0.71, 0.69],
-    "kitchen" : [-1.142, 7.697, 0.0, 0.0, -0.974, 0.225],
-    "dinnertable" : [-3.14, 5.15, 0.0, 0.0, 0.72, 0.68],
-    "dishwasher" : [-3.39, 8.10, 0.0, 0.0, 0.77, 0.63],
-    "kitchencounter" : [-4.69, 8.18, 0.0, 0.0, 0.78, 0.62],
-    "inspectionpoint" : [0.05, 5.02, 0.0, 0.0, 0.74, 0.66],
-    "findTrashEntrance" : [0.01, 3.74, 0.0, 0.0, -0.25, 0.97],
-    "findTrashOffice" : [-0.95, 3.69, 0.0 , 0.0, 0.98, -0.21],
-    "findTrashKitchen1" : [-1.64, 5.28, 0.0, 0.0, 0.99, -0.02],
-    "findTrashKitchen2" : [-0.99, 8.89, 0.0, 0.0, 0.99, -0.11],
-    "findTrashLivingRoom" : [-0.99, 8.93, 0.0, 0.0, -0.42, 0.91],                  
-}
+# Load from YAML instead of hardcoded
+YAML_PATH = "/home/lcastor/ros_ws/src/LCASTOR/examples/goal.yaml"
+ROOM_DICT_B = load_yaml_as_room_dict(YAML_PATH)
+ROOM_DICT_C = load_yaml_as_room_dict(YAML_PATH)  # Same data for both arenas
 
 ROOM_DICT = {
     "arena_b" : ROOM_DICT_B,
@@ -107,11 +99,18 @@ class gotoRoom(AbstractAction):
         rospy.loginfo('Going to ' + " ".join(self.params) + ' ...')
 
         if "r" in self.params[0]:
-            if self.params[1] in self.room_dict[ROOM]:
-                self.coordinates = self.room_dict[ROOM][self.params[1]]
+            # Extract room name by removing "r_" prefix
+            room_name = self.params[1]  # Remove "r_" prefix
+            
+            rospy.loginfo(f"Looking for room: {room_name}")
+            if room_name in self.room_dict[ROOM]:
+                self.coordinates = self.room_dict[ROOM][room_name]
+                rospy.loginfo(f"Found coordinates for {room_name}")
             else:
+                rospy.logerr(f"Room {room_name} not found. Available rooms: {list(self.room_dict[ROOM].keys())}")
                 rospy.set_param(ROS_PARAM, "Failed")
                 self._stop_action()
+                return
 
         self.client = actionlib.SimpleActionClient('/move_base', MoveBaseAction)
 
@@ -137,7 +136,7 @@ class gotoRoom(AbstractAction):
                 # Sending the position to the client
                 self.client.send_goal(self.goal_msg, done_cb=self._on_goTo_done)
                 rospy.loginfo("Waiting for goTo result...")
-                rospy.set_param(ROS_PARAM, "Succeded")
+                rospy.set_param(ROS_PARAM, "Succeeded")
 
     def _on_goTo_done(self, goalState, result):
         print("goToRoom DONE", goalState, result)
@@ -145,9 +144,10 @@ class gotoRoom(AbstractAction):
         rospy.loginfo('Destination reached')
 
     def _stop_action(self):
-        self.client.cancel_all_goals()
-        self.params.append("done")
-        rospy.loginfo('STOPPED goto action')
+        if hasattr(self, 'client') and self.client is not None:  # ADDED THIS CHECK
+            self.client.cancel_all_goals()
+            self.params.append("done")
+            rospy.loginfo('STOPPED goto action')
 
     @classmethod
     def is_goal_reached(cls, params):
